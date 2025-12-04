@@ -183,7 +183,7 @@ The `IMultiTenantContext<ClubTenantInfo>` is managed by Finbuckle:
 
 ### ClubManagement.Infrastructure
 - Microsoft.EntityFrameworkCore
-- Microsoft.EntityFrameworkCore.Npgsql
+- Npgsql.EntityFrameworkCore.PostgreSQL
 - Microsoft.AspNetCore.Identity.EntityFrameworkCore
 - **Finbuckle.MultiTenant** (7.5.0)
 - → References ClubManagement.Core
