@@ -1,0 +1,23 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome to Club Management</h1>
+    <p>Multi-tenant SaaS platform for sports clubs.</p>
+    
+    @if (User.Identity?.IsAuthenticated ?? false)
+    {
+        <p class="lead">Welcome, @User.Identity.Name</p>
+        <a class="btn btn-primary" href="/dashboard">Go to Dashboard</a>
+    }
+    else
+    {
+        <p class="lead">
+            <a class="btn btn-primary btn-lg" href="/Identity/Account/Login">Sign In</a>
+            <a class="btn btn-secondary btn-lg" href="/Identity/Account/Register">Sign Up</a>
+        </p>
+    }
+</div>
