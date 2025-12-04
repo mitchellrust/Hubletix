@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.AspNetCore;
 using ClubManagement.Core.Entities;
 
 namespace ClubManagement.Infrastructure.Persistence;

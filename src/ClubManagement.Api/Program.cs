@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.AspNetCore;
 using ClubManagement.Core.Entities;
 using ClubManagement.Infrastructure.Persistence;
 using ClubManagement.Infrastructure.Services;

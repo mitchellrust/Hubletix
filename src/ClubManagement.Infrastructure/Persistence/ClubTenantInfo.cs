@@ -1,4 +1,4 @@
-using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.AspNetCore;
 
 namespace ClubManagement.Infrastructure.Persistence;
 

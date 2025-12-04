@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.AspNetCore;
 using ClubManagement.Infrastructure.Persistence;
 using ClubManagement.Core.Constants;
 
