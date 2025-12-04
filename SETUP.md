@@ -18,6 +18,7 @@ src/
 - **Entity Framework Core 10**
 - **PostgreSQL** (with JSONB support)
 - **Microsoft.AspNetCore.Identity**
+- **Finbuckle.MultiTenant 10.0.0** (multi-tenant SaaS support)
 
 ## Multi-Tenancy Architecture
 

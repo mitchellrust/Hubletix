@@ -2,15 +2,31 @@
   "version": 3,
   "targets": {
     "net10.0": {
-      "Finbuckle.MultiTenant/8.0.0": {
+      "Finbuckle.MultiTenant/10.0.0": {
         "type": "package",
+        "dependencies": {
+          "Finbuckle.MultiTenant.Abstractions": "10.0.0"
+        },
         "compile": {
-          "lib/net8.0/Finbuckle.MultiTenant.dll": {
+          "lib/net10.0/Finbuckle.MultiTenant.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net8.0/Finbuckle.MultiTenant.dll": {
+          "lib/net10.0/Finbuckle.MultiTenant.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Finbuckle.MultiTenant.Abstractions/10.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/Finbuckle.MultiTenant.Abstractions.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/Finbuckle.MultiTenant.Abstractions.dll": {
             "related": ".xml"
           }
         }
@@ -1217,7 +1233,7 @@
         "framework": ".NETCoreApp,Version=v10.0",
         "dependencies": {
           "ClubManagement.Core": "1.0.0",
-          "Finbuckle.MultiTenant": "7.5.0",
+          "Finbuckle.MultiTenant": "10.0.0",
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "10.0.0",
           "Microsoft.EntityFrameworkCore": "10.0.0",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "10.0.0"
@@ -1232,22 +1248,34 @@
     }
   },
   "libraries": {
-    "Finbuckle.MultiTenant/8.0.0": {
-      "sha512": "BGrrwnYQ7ity7X9rR5EZtRIVK0ANkF3UErQ7gTxwSuGgK280M0MmvMmgbkF1CILYTr1ts8oMYbqvAav7NI4XWA==",
+    "Finbuckle.MultiTenant/10.0.0": {
+      "sha512": "SrzlbfIxVRqbD4pWFXWLwAHissk1Rskr5tbVfULl2xoP6neqMaZnVB3ZK/kS4d9utabwhf5+QE2r2QYiY2t9iA==",
       "type": "package",
-      "path": "finbuckle.multitenant/8.0.0",
+      "path": "finbuckle.multitenant/10.0.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
+        "NUGET_README.md",
         "finbuckle-128x128.png",
-        "finbuckle.multitenant.8.0.0.nupkg.sha512",
+        "finbuckle.multitenant.10.0.0.nupkg.sha512",
         "finbuckle.multitenant.nuspec",
-        "lib/net6.0/Finbuckle.MultiTenant.dll",
-        "lib/net6.0/Finbuckle.MultiTenant.xml",
-        "lib/net7.0/Finbuckle.MultiTenant.dll",
-        "lib/net7.0/Finbuckle.MultiTenant.xml",
-        "lib/net8.0/Finbuckle.MultiTenant.dll",
-        "lib/net8.0/Finbuckle.MultiTenant.xml"
+        "lib/net10.0/Finbuckle.MultiTenant.dll",
+        "lib/net10.0/Finbuckle.MultiTenant.xml"
+      ]
+    },
+    "Finbuckle.MultiTenant.Abstractions/10.0.0": {
+      "sha512": "er3dsWj0EpG+CJB7P3X4Rs7sv/qzMybC1I3aMT142iw49Ie+fbXv9o/7QK4k7ml7tmF5gWHuXhKOZwTSSb9Itw==",
+      "type": "package",
+      "path": "finbuckle.multitenant.abstractions/10.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "NUGET_README.md",
+        "finbuckle-128x128.png",
+        "finbuckle.multitenant.abstractions.10.0.0.nupkg.sha512",
+        "finbuckle.multitenant.abstractions.nuspec",
+        "lib/net10.0/Finbuckle.MultiTenant.Abstractions.dll",
+        "lib/net10.0/Finbuckle.MultiTenant.Abstractions.xml"
       ]
     },
     "Humanizer.Core/2.14.1": {
@@ -3239,7 +3267,7 @@
     "net10.0": [
       "ClubManagement.Core >= 1.0.0",
       "ClubManagement.Infrastructure >= 1.0.0",
-      "Finbuckle.MultiTenant >= 7.5.0",
+      "Finbuckle.MultiTenant >= 10.0.0",
       "Microsoft.AspNetCore.Identity.UI >= 10.0.0",
       "Microsoft.EntityFrameworkCore.Design >= 10.0.0"
     ]
@@ -3296,7 +3324,7 @@
         "dependencies": {
           "Finbuckle.MultiTenant": {
             "target": "Package",
-            "version": "[7.5.0, )"
+            "version": "[10.0.0, )"
           },
           "Microsoft.AspNetCore.Identity.UI": {
             "target": "Package",
@@ -3745,17 +3773,5 @@
         }
       }
     }
-  },
-  "logs": [
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "ClubManagement.Api depends on Finbuckle.MultiTenant (>= 7.5.0) but Finbuckle.MultiTenant 7.5.0 was not found. Finbuckle.MultiTenant 8.0.0 was resolved instead.",
-      "libraryId": "Finbuckle.MultiTenant",
-      "targetGraphs": [
-        "net10.0"
-      ]
-    }
-  ]
+  }
 }

@@ -1,10 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "FGvWNSfzmuk=",
+  "dgSpecHash": "aX8mtYUqexM=",
   "success": true,
   "projectFilePath": "/Users/mitchellrust/dev/club-management/src/ClubManagement.Infrastructure/ClubManagement.Infrastructure.csproj",
   "expectedPackageFiles": [
-    "/Users/mitchellrust/.nuget/packages/finbuckle.multitenant/8.0.0/finbuckle.multitenant.8.0.0.nupkg.sha512",
+    "/Users/mitchellrust/.nuget/packages/finbuckle.multitenant/10.0.0/finbuckle.multitenant.10.0.0.nupkg.sha512",
+    "/Users/mitchellrust/.nuget/packages/finbuckle.multitenant.abstractions/10.0.0/finbuckle.multitenant.abstractions.10.0.0.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/microsoft.aspnetcore.cryptography.internal/10.0.0/microsoft.aspnetcore.cryptography.internal.10.0.0.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/microsoft.aspnetcore.cryptography.keyderivation/10.0.0/microsoft.aspnetcore.cryptography.keyderivation.10.0.0.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/microsoft.aspnetcore.identity.entityframeworkcore/10.0.0/microsoft.aspnetcore.identity.entityframeworkcore.10.0.0.nupkg.sha512",
@@ -14,36 +15,23 @@
     "/Users/mitchellrust/.nuget/packages/microsoft.entityframeworkcore.relational/10.0.0/microsoft.entityframeworkcore.relational.10.0.0.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/microsoft.extensions.caching.abstractions/10.0.0/microsoft.extensions.caching.abstractions.10.0.0.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/microsoft.extensions.caching.memory/10.0.0/microsoft.extensions.caching.memory.10.0.0.nupkg.sha512",
-    "/Users/mitchellrust/.nuget/packages/microsoft.extensions.configuration/8.0.0/microsoft.extensions.configuration.8.0.0.nupkg.sha512",
+    "/Users/mitchellrust/.nuget/packages/microsoft.extensions.configuration/10.0.0/microsoft.extensions.configuration.10.0.0.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/microsoft.extensions.configuration.abstractions/10.0.0/microsoft.extensions.configuration.abstractions.10.0.0.nupkg.sha512",
-    "/Users/mitchellrust/.nuget/packages/microsoft.extensions.configuration.binder/8.0.0/microsoft.extensions.configuration.binder.8.0.0.nupkg.sha512",
+    "/Users/mitchellrust/.nuget/packages/microsoft.extensions.configuration.binder/10.0.0/microsoft.extensions.configuration.binder.10.0.0.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/microsoft.extensions.dependencyinjection/10.0.0/microsoft.extensions.dependencyinjection.10.0.0.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/10.0.0/microsoft.extensions.dependencyinjection.abstractions.10.0.0.nupkg.sha512",
-    "/Users/mitchellrust/.nuget/packages/microsoft.extensions.diagnostics/8.0.0/microsoft.extensions.diagnostics.8.0.0.nupkg.sha512",
-    "/Users/mitchellrust/.nuget/packages/microsoft.extensions.diagnostics.abstractions/8.0.0/microsoft.extensions.diagnostics.abstractions.8.0.0.nupkg.sha512",
-    "/Users/mitchellrust/.nuget/packages/microsoft.extensions.http/8.0.0/microsoft.extensions.http.8.0.0.nupkg.sha512",
+    "/Users/mitchellrust/.nuget/packages/microsoft.extensions.diagnostics/10.0.0/microsoft.extensions.diagnostics.10.0.0.nupkg.sha512",
+    "/Users/mitchellrust/.nuget/packages/microsoft.extensions.diagnostics.abstractions/10.0.0/microsoft.extensions.diagnostics.abstractions.10.0.0.nupkg.sha512",
+    "/Users/mitchellrust/.nuget/packages/microsoft.extensions.http/10.0.0/microsoft.extensions.http.10.0.0.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/microsoft.extensions.identity.core/10.0.0/microsoft.extensions.identity.core.10.0.0.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/microsoft.extensions.identity.stores/10.0.0/microsoft.extensions.identity.stores.10.0.0.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/microsoft.extensions.logging/10.0.0/microsoft.extensions.logging.10.0.0.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/microsoft.extensions.logging.abstractions/10.0.0/microsoft.extensions.logging.abstractions.10.0.0.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/microsoft.extensions.options/10.0.0/microsoft.extensions.options.10.0.0.nupkg.sha512",
-    "/Users/mitchellrust/.nuget/packages/microsoft.extensions.options.configurationextensions/8.0.0/microsoft.extensions.options.configurationextensions.8.0.0.nupkg.sha512",
+    "/Users/mitchellrust/.nuget/packages/microsoft.extensions.options.configurationextensions/10.0.0/microsoft.extensions.options.configurationextensions.10.0.0.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/microsoft.extensions.primitives/10.0.0/microsoft.extensions.primitives.10.0.0.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/npgsql/10.0.0/npgsql.10.0.0.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/npgsql.entityframeworkcore.postgresql/10.0.0/npgsql.entityframeworkcore.postgresql.10.0.0.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "message": "ClubManagement.Infrastructure depends on Finbuckle.MultiTenant (>= 7.5.0) but Finbuckle.MultiTenant 7.5.0 was not found. Finbuckle.MultiTenant 8.0.0 was resolved instead.",
-      "projectPath": "/Users/mitchellrust/dev/club-management/src/ClubManagement.Infrastructure/ClubManagement.Infrastructure.csproj",
-      "warningLevel": 1,
-      "filePath": "/Users/mitchellrust/dev/club-management/src/ClubManagement.Infrastructure/ClubManagement.Infrastructure.csproj",
-      "libraryId": "Finbuckle.MultiTenant",
-      "targetGraphs": [
-        "net10.0"
-      ]
-    }
-  ]
+  "logs": []
 }

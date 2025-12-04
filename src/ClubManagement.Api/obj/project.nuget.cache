@@ -1,10 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "vmNXJsIU1GA=",
+  "dgSpecHash": "XNMqiPxhiNA=",
   "success": true,
   "projectFilePath": "/Users/mitchellrust/dev/club-management/src/ClubManagement.Api/ClubManagement.Api.csproj",
   "expectedPackageFiles": [
-    "/Users/mitchellrust/.nuget/packages/finbuckle.multitenant/8.0.0/finbuckle.multitenant.8.0.0.nupkg.sha512",
+    "/Users/mitchellrust/.nuget/packages/finbuckle.multitenant/10.0.0/finbuckle.multitenant.10.0.0.nupkg.sha512",
+    "/Users/mitchellrust/.nuget/packages/finbuckle.multitenant.abstractions/10.0.0/finbuckle.multitenant.abstractions.10.0.0.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/microsoft.aspnetcore.identity.entityframeworkcore/10.0.0/microsoft.aspnetcore.identity.entityframeworkcore.10.0.0.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/microsoft.aspnetcore.identity.ui/10.0.0/microsoft.aspnetcore.identity.ui.10.0.0.nupkg.sha512",
@@ -46,18 +47,5 @@
     "/Users/mitchellrust/.nuget/packages/system.security.permissions/9.0.0/system.security.permissions.9.0.0.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/system.windows.extensions/9.0.0/system.windows.extensions.9.0.0.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "message": "ClubManagement.Api depends on Finbuckle.MultiTenant (>= 7.5.0) but Finbuckle.MultiTenant 7.5.0 was not found. Finbuckle.MultiTenant 8.0.0 was resolved instead.",
-      "projectPath": "/Users/mitchellrust/dev/club-management/src/ClubManagement.Api/ClubManagement.Api.csproj",
-      "warningLevel": 1,
-      "filePath": "/Users/mitchellrust/dev/club-management/src/ClubManagement.Api/ClubManagement.Api.csproj",
-      "libraryId": "Finbuckle.MultiTenant",
-      "targetGraphs": [
-        "net10.0"
-      ]
-    }
-  ]
+  "logs": []
 }

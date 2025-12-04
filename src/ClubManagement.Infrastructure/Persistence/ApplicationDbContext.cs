@@ -12,14 +12,14 @@ namespace ClubManagement.Infrastructure.Persistence;
 /// </summary>
 public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
 {
-    private readonly IMultiTenantContext<ClubTenantInfo> _multiTenantContext;
+    private readonly IMultiTenantContext<ClubTenantInfo>? _multiTenantContext;
 
     public ApplicationDbContext(
         DbContextOptions<ApplicationDbContext> options,
         IMultiTenantContext<ClubTenantInfo>? multiTenantContext = null)
         : base(options)
     {
-        _multiTenantContext = multiTenantContext!;
+        _multiTenantContext = multiTenantContext;
     }
 
     // DbSets
