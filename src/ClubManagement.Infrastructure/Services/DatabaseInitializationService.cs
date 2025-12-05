@@ -118,7 +118,7 @@ public class DatabaseInitializationService
                 Name = adminTenantInfo.Name!,
                 Subdomain = adminTenantInfo.Identifier,
                 IsActive = true,
-                ConfigJson = "{}" // Default empty config
+                ConfigJson = GetAdminConfig()
             };
 
             context.Tenants.Add(adminTenant);
@@ -131,5 +131,31 @@ public class DatabaseInitializationService
             _logger.LogError(ex, "Error seeding app database");
             throw;
         }
+    }
+
+    /// <summary>
+    /// Get default configuration JSON for admin tenant.
+    /// </summary>
+    private static string GetAdminConfig()
+    {
+        return """
+        {
+          "theme": {
+            "primaryColor": "#4F46E5",
+            "secondaryColor": "#06B6D4",
+            "fontFamily": "Inter, sans-serif",
+            "logoUrl": null
+          },
+          "features": {
+            "enableMemberships": true,
+            "enableEventRegistrations": true,
+            "enablePayments": true
+          },
+          "settings": {
+            "timezone": "America/Boise",
+            "defaultCurrency": "usd"
+          }
+        }
+        """;
     }
 }
