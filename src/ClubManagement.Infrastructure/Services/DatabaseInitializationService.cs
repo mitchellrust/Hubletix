@@ -19,7 +19,7 @@ public class DatabaseInitializationService
     }
 
     /// <summary>
-    /// Initialize databases by applying migrations and seeding initial data.
+    /// Initialize databases by applying migrations and seeding admin tenant if needed.
     /// </summary>
     public async Task InitializeDatabaseAsync(
       TenantStoreDbContext tenantStoreContext,
@@ -41,12 +41,12 @@ public class DatabaseInitializationService
           _logger.LogInformation("App database migrations applied successfully");
 
           // Seed tenant store data
-          ClubTenantInfo? demoTenantInfo = await SeedTenantStoreAsync(tenantStoreContext);
+          ClubTenantInfo? adminTenantInfo = await SeedTenantStoreAsync(tenantStoreContext);
 
-          if (demoTenantInfo != null)
+          if (adminTenantInfo != null)
           {
-            // Seed application data
-            await SeedAppAsync(appContext, demoTenantInfo);
+            // Seed application data with admin tenant info.
+            await SeedAppAsync(appContext, adminTenantInfo);
           }
 
           _logger.LogInformation("Database initialization completed successfully");
@@ -59,11 +59,11 @@ public class DatabaseInitializationService
     }
 
     /// <summary>
-    /// Seed tenant store with initial tenant data if needed.
+    /// Seed tenant store with admin tenant data if needed.
     /// </summary>
     private async Task<ClubTenantInfo?> SeedTenantStoreAsync(TenantStoreDbContext context)
     {
-        ClubTenantInfo? demoTenant = null;
+        ClubTenantInfo? adminTenant = null;
         try
         {
             // Check if any tenants exist
@@ -71,19 +71,19 @@ public class DatabaseInitializationService
             
             if (!tenantExists)
             {
-                _logger.LogInformation("No tenants found. Creating demo tenant...");
+                _logger.LogInformation("No tenants found. Creating admin tenant...");
 
-                demoTenant = new ClubTenantInfo(
+                adminTenant = new ClubTenantInfo(
                     Id: Guid.NewGuid().ToString(),
-                    Identifier: "demo",  // This is the subdomain
-                    Name: "Demo Club"
+                    Identifier: "admin",  // This is the subdomain
+                    Name: "Admin Tenant"
                 );
 
-                context.TenantInfo.Add(demoTenant);
+                context.TenantInfo.Add(adminTenant);
                 await context.SaveChangesAsync();
 
-                _logger.LogInformation("Demo tenant created with identifier: {Id}", demoTenant.Identifier);
-                _logger.LogInformation("Access the demo tenant at: https://{Id}.localhost:5001", demoTenant.Identifier);
+                _logger.LogInformation("Admin tenant created with identifier: {Subdomain}", adminTenant.Identifier);
+                _logger.LogInformation("Access the admin tenant at: https://{Subdomain}.localhost:5001", adminTenant.Identifier);
             }
             else
             {
@@ -96,37 +96,35 @@ public class DatabaseInitializationService
             throw;
         }
 
-        return demoTenant;
+        return adminTenant;
     }
 
     /// <summary>
-    /// Seed application database with initial data if needed.
+    /// Seed application database with admin tenant data if needed.
     /// This runs in a tenant-agnostic context.
     /// </summary>
     private async Task SeedAppAsync(
       AppDbContext context,
-      ClubTenantInfo demoTenantInfo
+      ClubTenantInfo adminTenantInfo
     )
     {
         try
         {
             // Add any global seed data here (lookup tables, reference data, etc.)
-            // Note: Tenant-specific data should be seeded when the tenant is created
-            // via TenantOnboardingService or similar
-            var demoTenant = new Tenant
+            var adminTenant = new Tenant
             {
-                Id = demoTenantInfo.Id,
-                TenantId = demoTenantInfo.Id,
-                Name = demoTenantInfo.Name ?? "Demo Club",
-                Subdomain = demoTenantInfo.Identifier,
+                Id = adminTenantInfo.Id,
+                TenantId = adminTenantInfo.Id,
+                Name = adminTenantInfo.Name!,
+                Subdomain = adminTenantInfo.Identifier,
                 IsActive = true,
                 ConfigJson = "{}" // Default empty config
             };
 
-            context.Tenants.Add(demoTenant);
+            context.Tenants.Add(adminTenant);
             await context.SaveChangesAsync();
 
-            _logger.LogInformation("Demo tenant created with identifier: {Id}", demoTenant.Id);
+            _logger.LogInformation("Admin tenant created with identifier: {Subdomain}", adminTenant.Id);
         }
         catch (Exception ex)
         {
