@@ -31,6 +31,7 @@ builder.Services.AddScoped<DatabaseInitializationService>();
 
 // Add in memory caching (for tenant info caching)
 builder.Services.AddMemoryCache();
+builder.Services.AddScoped<ITenantConfigCacheService, TenantConfigCacheService>();
 
 builder.Services.AddRazorPages();
 builder.Services.AddControllers();

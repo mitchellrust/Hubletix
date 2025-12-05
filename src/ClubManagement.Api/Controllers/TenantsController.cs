@@ -4,6 +4,7 @@ using Finbuckle.MultiTenant.Abstractions;
 using ClubManagement.Infrastructure.Persistence;
 using Microsoft.Extensions.Caching.Memory;
 using ClubManagement.Core.Entities;
+using ClubManagement.Infrastructure.Services;
 
 namespace ClubManagement.Api.Controllers;
 
@@ -14,19 +15,19 @@ public class TenantsController : ControllerBase
     private const string TenantConfigCachePrefix = "tenantconfig:";
     private readonly AppDbContext _dbContext;
     private readonly IMultiTenantContextAccessor<ClubTenantInfo> _multiTenantContextAccessor;
-    private readonly IMemoryCache _cache;
+    private readonly ITenantConfigCacheService _tenantConfigCache;
     private readonly ILogger<TenantsController> _logger;
 
     public TenantsController(
         AppDbContext dbContext,
         IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
-        IMemoryCache cache,
+        ITenantConfigCacheService tenantConfigCache,
         ILogger<TenantsController> logger
     )
     {
         _dbContext = dbContext;
         _multiTenantContextAccessor = multiTenantContextAccessor;
-        _cache = cache;
+        _tenantConfigCache = tenantConfigCache;
         _logger = logger;
     }
 
@@ -39,34 +40,13 @@ public class TenantsController : ControllerBase
             return NotFound("No tenant context set");
         }
 
-        Tenant? tenant;
+        var tenant = await _tenantConfigCache.GetTenantConfigAsync(
+            _multiTenantContextAccessor.MultiTenantContext.TenantInfo.Id);
 
-        var cacheKey = $"{TenantConfigCachePrefix}{_multiTenantContextAccessor.MultiTenantContext.TenantInfo.Id}";
-        if (!_cache.TryGetValue(cacheKey, out tenant))
+        if (tenant == null)
         {
-            _logger.LogInformation("Cache miss: {TenantId}", _multiTenantContextAccessor.MultiTenantContext.TenantInfo.Id);
-
-            tenant = await _dbContext.Tenants
-                .FindAsync(_multiTenantContextAccessor.MultiTenantContext.TenantInfo.Id);
-
-            if (tenant == null)
-            {
-                return NotFound();
-            }
-
-            _cache.Set(
-                cacheKey,
-                tenant,
-                new MemoryCacheEntryOptions
-                {
-                    SlidingExpiration = TimeSpan.FromMinutes(5),
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
-                });
+            return NotFound("Tenant configuration not found");
         }
-    else
-    {
-      _logger.LogInformation("Cache Hit: {TenantId}", tenant!.Id);
-    }
 
         return Ok(new
         {
