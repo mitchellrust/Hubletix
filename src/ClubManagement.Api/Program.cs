@@ -29,6 +29,9 @@ builder.Services.AddScoped<ITenantOnboardingService, TenantOnboardingService>();
 // Register database initialization service
 builder.Services.AddScoped<DatabaseInitializationService>();
 
+// Add in memory caching (for tenant info caching)
+builder.Services.AddMemoryCache();
+
 builder.Services.AddRazorPages();
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
