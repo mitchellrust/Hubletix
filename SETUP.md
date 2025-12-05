@@ -34,7 +34,7 @@ src/
 - `ClubTenantInfo`: Implements `ITenantInfo` - represents tenant in Finbuckle
 - `TenantStore`: Implements `IMultiTenantStore<ClubTenantInfo>` - loads tenants from database
 - `IMultiTenantContext<ClubTenantInfo>`: Injected for accessing current tenant info
-- `app.UseMultiTenant<ClubTenantInfo>()`: Middleware that resolves tenant automatically
+- `app.UseMultiTenant()`: Middleware that resolves tenant automatically
 
 Finbuckle eliminates the need for manual:
 - Tenant context management (AsyncLocal)

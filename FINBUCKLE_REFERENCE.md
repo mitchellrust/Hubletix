@@ -43,11 +43,11 @@ public class SomeService
 
 ### In DbContext
 ```csharp
-public class ApplicationDbContext : IdentityDbContext
+public class AppDbContext : IdentityDbContext
 {
     private readonly IMultiTenantContext<ClubTenantInfo> _multiTenantContext;
     
-    public ApplicationDbContext(
+    public AppDbContext(
         DbContextOptions options,
         IMultiTenantContext<ClubTenantInfo> multiTenantContext)
         : base(options)

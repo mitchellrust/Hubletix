@@ -1,0 +1,15 @@
+/Users/mitchellrust/dev/club-management/src/ClubManagement.Infrastructure/obj/Debug/net10.0/ClubManagement.Infrastructure.csproj.AssemblyReference.cache
+/Users/mitchellrust/dev/club-management/src/ClubManagement.Infrastructure/obj/Debug/net10.0/ClubManagement.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+/Users/mitchellrust/dev/club-management/src/ClubManagement.Infrastructure/obj/Debug/net10.0/ClubManagement.Infrastructure.AssemblyInfoInputs.cache
+/Users/mitchellrust/dev/club-management/src/ClubManagement.Infrastructure/obj/Debug/net10.0/ClubManagement.Infrastructure.AssemblyInfo.cs
+/Users/mitchellrust/dev/club-management/src/ClubManagement.Infrastructure/obj/Debug/net10.0/ClubManagement.Infrastructure.csproj.CoreCompileInputs.cache
+/Users/mitchellrust/dev/club-management/src/ClubManagement.Infrastructure/bin/Debug/net10.0/ClubManagement.Infrastructure.deps.json
+/Users/mitchellrust/dev/club-management/src/ClubManagement.Infrastructure/bin/Debug/net10.0/ClubManagement.Infrastructure.dll
+/Users/mitchellrust/dev/club-management/src/ClubManagement.Infrastructure/bin/Debug/net10.0/ClubManagement.Infrastructure.pdb
+/Users/mitchellrust/dev/club-management/src/ClubManagement.Infrastructure/bin/Debug/net10.0/ClubManagement.Core.dll
+/Users/mitchellrust/dev/club-management/src/ClubManagement.Infrastructure/bin/Debug/net10.0/ClubManagement.Core.pdb
+/Users/mitchellrust/dev/club-management/src/ClubManagement.Infrastructure/obj/Debug/net10.0/ClubMana.3E3983F8.Up2Date
+/Users/mitchellrust/dev/club-management/src/ClubManagement.Infrastructure/obj/Debug/net10.0/ClubManagement.Infrastructure.dll
+/Users/mitchellrust/dev/club-management/src/ClubManagement.Infrastructure/obj/Debug/net10.0/refint/ClubManagement.Infrastructure.dll
+/Users/mitchellrust/dev/club-management/src/ClubManagement.Infrastructure/obj/Debug/net10.0/ClubManagement.Infrastructure.pdb
+/Users/mitchellrust/dev/club-management/src/ClubManagement.Infrastructure/obj/Debug/net10.0/ref/ClubManagement.Infrastructure.dll

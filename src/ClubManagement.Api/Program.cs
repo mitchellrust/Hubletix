@@ -1,33 +1,36 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Finbuckle.MultiTenant.AspNetCore;
 using ClubManagement.Core.Entities;
 using ClubManagement.Infrastructure.Persistence;
 using ClubManagement.Infrastructure.Services;
+using Finbuckle.MultiTenant.Extensions;
+using Finbuckle.MultiTenant.AspNetCore.Extensions;
+using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add DbContext with factory for TenantStore
-builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
+builder.Services.AddDbContextFactory<TenantStoreDbContext>(options =>
 {
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("TenantStoreConnection"));
 });
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("AppDbConnection"));
 });
 
 // Register Finbuckle.MultiTenant
 builder.Services.AddMultiTenant<ClubTenantInfo>()
-    .WithStore<TenantStore>(ServiceLifetime.Scoped);
+    .WithHostStrategy()
+    .WithEFCoreStore<TenantStoreDbContext, ClubTenantInfo>();
 
 // Register onboarding service
 builder.Services.AddScoped<ITenantOnboardingService, TenantOnboardingService>();
 
 // Add Identity with custom ApplicationUser
 builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>()
-    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
 // Configure Identity options
@@ -50,7 +53,7 @@ var app = builder.Build();
 // Apply migrations and seed database
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     
     // Apply pending migrations
     await dbContext.Database.MigrateAsync();
@@ -69,7 +72,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 // Finbuckle MultiTenant middleware - resolves tenant from subdomain or query param
-app.UseMultiTenant<ClubTenantInfo>();
+app.UseMultiTenant();
 
 app.UseRouting();
 app.UseAuthentication();
@@ -85,7 +88,7 @@ app.Run();
 /// </summary>
 async Task SeedDemoTenantAsync(IServiceProvider serviceProvider)
 {
-    var dbContext = serviceProvider.GetRequiredService<ApplicationDbContext>();
+    var dbContext = serviceProvider.GetRequiredService<AppDbContext>();
     
     // Check if any tenants exist
     if (await dbContext.Tenants.AnyAsync())
@@ -98,16 +101,16 @@ async Task SeedDemoTenantAsync(IServiceProvider serviceProvider)
     try
     {
         await onboardingService.OnboardTenantAsync(
-            name: "Demo Fitness Club",
-            subdomain: "demo",
-            adminEmail: "admin@demo.local",
-            adminPassword: "Demo@123456"
+            name: "Idaho One Volleyball Club",
+            subdomain: "id1",
+            adminEmail: "admin@id1.local",
+            adminPassword: "id1@12345"
         );
         
         Console.WriteLine("✓ Demo tenant created successfully!");
-        Console.WriteLine("  Subdomain: demo");
-        Console.WriteLine("  Admin Email: admin@demo.local");
-        Console.WriteLine("  Admin Password: Demo@123456");
+        Console.WriteLine("  Subdomain: id1");
+        Console.WriteLine("  Admin Email: admin@id1.local");
+        Console.WriteLine("  Admin Password: id1@12345");
     }
     catch (Exception ex)
     {

@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Finbuckle.MultiTenant.AspNetCore;
+using Finbuckle.MultiTenant.EntityFrameworkCore;
+using Finbuckle.MultiTenant.Abstractions;
 using ClubManagement.Core.Entities;
+using Finbuckle.MultiTenant.EntityFrameworkCore.Stores;
 
 namespace ClubManagement.Infrastructure.Persistence;
 
@@ -10,17 +11,33 @@ namespace ClubManagement.Infrastructure.Persistence;
 /// Application DbContext with multi-tenant support via Finbuckle.MultiTenant.
 /// Uses global query filters to enforce data isolation per tenant.
 /// </summary>
-public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
+public class AppDbContext : MultiTenantDbContext
 {
-    private readonly IMultiTenantContext<ClubTenantInfo>? _multiTenantContext;
+    // Used for dependency injection
+    public AppDbContext(
+        IMultiTenantContextAccessor multiTenantContextAccessor
+    ) : base(multiTenantContextAccessor)
+    { }
 
-    public ApplicationDbContext(
-        DbContextOptions<ApplicationDbContext> options,
-        IMultiTenantContext<ClubTenantInfo>? multiTenantContext = null)
-        : base(options)
-    {
-        _multiTenantContext = multiTenantContext;
-    }
+    // Used for dependency injection
+    public AppDbContext(
+        IMultiTenantContextAccessor multiTenantContextAccessor,
+        DbContextOptions<AppDbContext> options
+    ) : base(multiTenantContextAccessor, options)
+    { }
+
+    // Useful for testing, no DI
+    public AppDbContext(
+        ClubTenantInfo tenantInfo
+    ) : base((IMultiTenantContextAccessor)tenantInfo)
+    { }
+
+    // Useful for testing, no DI
+    public AppDbContext(
+        ClubTenantInfo tenantInfo,
+        DbContextOptions<AppDbContext> options
+    ) : base((IMultiTenantContextAccessor)tenantInfo, options)
+    { }
 
     // DbSets
     public DbSet<Tenant> Tenants { get; set; } = null!;
@@ -52,11 +69,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             .HasForeignKey(u => u.TenantId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // Global query filter for ApplicationUser (tenant isolation)
-        builder.Entity<ApplicationUser>()
-            .HasQueryFilter(u => _multiTenantContext == null || _multiTenantContext.TenantInfo == null || 
-                u.TenantId == Guid.Parse(_multiTenantContext.TenantInfo.Id!));
-
         // Configure MembershipPlan
         builder.Entity<MembershipPlan>()
             .HasKey(p => p.Id);
@@ -67,11 +79,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             .OnDelete(DeleteBehavior.Cascade);
         builder.Entity<MembershipPlan>()
             .HasIndex(p => new { p.TenantId, p.StripeProductId });
-
-        // Global query filter for MembershipPlan
-        builder.Entity<MembershipPlan>()
-            .HasQueryFilter(p => _multiTenantContext == null || _multiTenantContext.TenantInfo == null || 
-                p.TenantId == Guid.Parse(_multiTenantContext.TenantInfo.Id!));
 
         // Configure MembershipSubscription
         builder.Entity<MembershipSubscription>()
@@ -89,11 +96,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
         builder.Entity<MembershipSubscription>()
             .HasIndex(s => s.StripeSubscriptionId);
 
-        // Global query filter for MembershipSubscription
-        builder.Entity<MembershipSubscription>()
-            .HasQueryFilter(s => _multiTenantContext == null || _multiTenantContext.TenantInfo == null || 
-                s.User.TenantId == Guid.Parse(_multiTenantContext.TenantInfo.Id!));
-
         // Configure Event
         builder.Entity<Event>()
             .HasKey(e => e.Id);
@@ -109,11 +111,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             .OnDelete(DeleteBehavior.SetNull)
             .IsRequired(false);
 
-        // Global query filter for Event
-        builder.Entity<Event>()
-            .HasQueryFilter(e => _multiTenantContext == null || _multiTenantContext.TenantInfo == null || 
-                e.TenantId == Guid.Parse(_multiTenantContext.TenantInfo.Id!));
-
         // Configure EventSchedule
         builder.Entity<EventSchedule>()
             .HasKey(s => s.Id);
@@ -124,11 +121,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             .OnDelete(DeleteBehavior.Cascade);
         builder.Entity<EventSchedule>()
             .HasIndex(s => new { s.EventId, s.DateTimeStart });
-
-        // Global query filter for EventSchedule
-        builder.Entity<EventSchedule>()
-            .HasQueryFilter(s => _multiTenantContext == null || _multiTenantContext.TenantInfo == null || 
-                s.Event.TenantId == Guid.Parse(_multiTenantContext.TenantInfo.Id!));
 
         // Configure EventSignup
         builder.Entity<EventSignup>()
@@ -147,11 +139,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             .HasIndex(s => new { s.ScheduleId, s.UserId })
             .IsUnique();
 
-        // Global query filter for EventSignup
-        builder.Entity<EventSignup>()
-            .HasQueryFilter(s => _multiTenantContext == null || _multiTenantContext.TenantInfo == null || 
-                s.Schedule.Event.TenantId == Guid.Parse(_multiTenantContext.TenantInfo.Id!));
-
         // Configure PaymentRecord
         builder.Entity<PaymentRecord>()
             .HasKey(p => p.Id);
@@ -169,11 +156,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
         builder.Entity<PaymentRecord>()
             .HasIndex(p => p.StripePaymentId)
             .IsUnique();
-
-        // Global query filter for PaymentRecord
-        builder.Entity<PaymentRecord>()
-            .HasQueryFilter(p => _multiTenantContext == null || _multiTenantContext.TenantInfo == null || 
-                p.TenantId == Guid.Parse(_multiTenantContext.TenantInfo.Id!));
 
         // Configure Identity entities to use Guid
         builder.Entity<IdentityRole<Guid>>().ToTable("AspNetRoles");

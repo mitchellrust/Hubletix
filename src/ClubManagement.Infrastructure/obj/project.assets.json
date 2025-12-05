@@ -58,6 +58,41 @@
           "Microsoft.AspNetCore.App"
         ]
       },
+      "Finbuckle.MultiTenant.EntityFrameworkCore/10.0.0": {
+        "type": "package",
+        "dependencies": {
+          "Finbuckle.MultiTenant": "10.0.0",
+          "Microsoft.EntityFrameworkCore.Relational": "10.0.0"
+        },
+        "compile": {
+          "lib/net10.0/Finbuckle.MultiTenant.EntityFrameworkCore.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/Finbuckle.MultiTenant.EntityFrameworkCore.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Finbuckle.MultiTenant.Identity.EntityFrameworkCore/10.0.0": {
+        "type": "package",
+        "dependencies": {
+          "Finbuckle.MultiTenant.EntityFrameworkCore": "10.0.0",
+          "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "10.0.0",
+          "Microsoft.Extensions.Identity.Stores": "10.0.0"
+        },
+        "compile": {
+          "lib/net10.0/Finbuckle.MultiTenant.Identity.EntityFrameworkCore.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/Finbuckle.MultiTenant.Identity.EntityFrameworkCore.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Microsoft.AspNetCore.Authentication.OpenIdConnect/10.0.0": {
         "type": "package",
         "dependencies": {
@@ -720,6 +755,36 @@
         "finbuckle.multitenant.aspnetcore.nuspec",
         "lib/net10.0/Finbuckle.MultiTenant.AspNetCore.dll",
         "lib/net10.0/Finbuckle.MultiTenant.AspNetCore.xml"
+      ]
+    },
+    "Finbuckle.MultiTenant.EntityFrameworkCore/10.0.0": {
+      "sha512": "5jB7zyMglMu+/Ux12fSJS/QlCaCJY99bzHOtJzjGirpPM9y1H9AYFtreVbswzHemgk9JMWU6FryisyzByNz8Iw==",
+      "type": "package",
+      "path": "finbuckle.multitenant.entityframeworkcore/10.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "NUGET_README.md",
+        "finbuckle-128x128.png",
+        "finbuckle.multitenant.entityframeworkcore.10.0.0.nupkg.sha512",
+        "finbuckle.multitenant.entityframeworkcore.nuspec",
+        "lib/net10.0/Finbuckle.MultiTenant.EntityFrameworkCore.dll",
+        "lib/net10.0/Finbuckle.MultiTenant.EntityFrameworkCore.xml"
+      ]
+    },
+    "Finbuckle.MultiTenant.Identity.EntityFrameworkCore/10.0.0": {
+      "sha512": "FU4v6HOJf65zin1NgLf99MWIo4ockVVoSkYf2d7Wau5eR8kbCrN6ec0UXHNt2bDtOFS0HSkFJwyAt9xsK4xUag==",
+      "type": "package",
+      "path": "finbuckle.multitenant.identity.entityframeworkcore/10.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "NUGET_README.md",
+        "finbuckle-128x128.png",
+        "finbuckle.multitenant.identity.entityframeworkcore.10.0.0.nupkg.sha512",
+        "finbuckle.multitenant.identity.entityframeworkcore.nuspec",
+        "lib/net10.0/Finbuckle.MultiTenant.Identity.EntityFrameworkCore.dll",
+        "lib/net10.0/Finbuckle.MultiTenant.Identity.EntityFrameworkCore.xml"
       ]
     },
     "Microsoft.AspNetCore.Authentication.OpenIdConnect/10.0.0": {
@@ -1605,6 +1670,7 @@
     "net10.0": [
       "ClubManagement.Core >= 1.0.0",
       "Finbuckle.MultiTenant.AspNetCore >= 10.0.0",
+      "Finbuckle.MultiTenant.Identity.EntityFrameworkCore >= 10.0.0",
       "Microsoft.AspNetCore.Identity.EntityFrameworkCore >= 10.0.0",
       "Microsoft.EntityFrameworkCore >= 10.0.0",
       "Npgsql.EntityFrameworkCore.PostgreSQL >= 10.0.0"
@@ -1658,6 +1724,10 @@
         "targetAlias": "net10.0",
         "dependencies": {
           "Finbuckle.MultiTenant.AspNetCore": {
+            "target": "Package",
+            "version": "[10.0.0, )"
+          },
+          "Finbuckle.MultiTenant.Identity.EntityFrameworkCore": {
             "target": "Package",
             "version": "[10.0.0, )"
           },

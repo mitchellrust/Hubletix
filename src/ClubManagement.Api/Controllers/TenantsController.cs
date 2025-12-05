@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
-using Finbuckle.MultiTenant.AspNetCore;
+using Finbuckle.MultiTenant.Abstractions;
 using ClubManagement.Infrastructure.Persistence;
-using ClubManagement.Core.Constants;
 
 namespace ClubManagement.Api.Controllers;
 
@@ -12,25 +10,25 @@ namespace ClubManagement.Api.Controllers;
 [Authorize]
 public class TenantsController : ControllerBase
 {
-    private readonly ApplicationDbContext _dbContext;
-    private readonly IMultiTenantContext<ClubTenantInfo> _multiTenantContext;
+    private readonly AppDbContext _dbContext;
+    private readonly IMultiTenantContextAccessor<ClubTenantInfo> _multiTenantContextAccessor;
 
-    public TenantsController(ApplicationDbContext dbContext, IMultiTenantContext<ClubTenantInfo> multiTenantContext)
+    public TenantsController(AppDbContext dbContext, IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor)
     {
         _dbContext = dbContext;
-        _multiTenantContext = multiTenantContext;
+        _multiTenantContextAccessor = multiTenantContextAccessor;
     }
 
     [HttpGet("current")]
     [AllowAnonymous]
     public async Task<IActionResult> GetCurrentTenant()
     {
-        if (_multiTenantContext?.TenantInfo == null)
+        if (_multiTenantContextAccessor.MultiTenantContext.TenantInfo == null)
         {
             return NotFound("No tenant context set");
         }
 
-        if (!Guid.TryParse(_multiTenantContext.TenantInfo.Id, out var tenantId))
+        if (!Guid.TryParse(_multiTenantContextAccessor.MultiTenantContext.TenantInfo.Id, out var tenantId))
         {
             return BadRequest("Invalid tenant ID");
         }

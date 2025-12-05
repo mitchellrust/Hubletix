@@ -1,10 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
-using Finbuckle.MultiTenant.AspNetCore;
+using Finbuckle.MultiTenant.Abstractions;
 using ClubManagement.Core.Entities;
 using ClubManagement.Infrastructure.Persistence;
 using ClubManagement.Core.Constants;
-
 namespace ClubManagement.Infrastructure.Services;
 
 /// <summary>
@@ -21,28 +20,30 @@ public interface ITenantOnboardingService
 
 public class TenantOnboardingService : ITenantOnboardingService
 {
-    private readonly ApplicationDbContext _dbContext;
+    private readonly AppDbContext _dbContext;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<IdentityRole<Guid>> _roleManager;
-    private readonly IMultiTenantContext<ClubTenantInfo> _multiTenantContext;
 
     public TenantOnboardingService(
-        ApplicationDbContext dbContext,
+        AppDbContext dbContext,
         UserManager<ApplicationUser> userManager,
         RoleManager<IdentityRole<Guid>> roleManager,
-        IMultiTenantContext<ClubTenantInfo> multiTenantContext)
+        IMultiTenantContextAccessor multiTenantContextAccessor)
     {
         _dbContext = dbContext;
         _userManager = userManager;
         _roleManager = roleManager;
-        _multiTenantContext = multiTenantContext;
     }
 
-    public async Task<Tenant> OnboardTenantAsync(string name, string subdomain, string adminEmail, string adminPassword)
+    public async Task<Tenant> OnboardTenantAsync(
+        string name,
+        string subdomain,
+        string adminEmail,
+        string adminPassword
+    )
     {
         // Check if subdomain already exists
         var existingTenant = await _dbContext.Tenants
-            .AsNoTracking()
             .FirstOrDefaultAsync(t => t.Subdomain == subdomain);
         
         if (existingTenant != null)
@@ -62,16 +63,6 @@ public class TenantOnboardingService : ITenantOnboardingService
 
         _dbContext.Tenants.Add(tenant);
         await _dbContext.SaveChangesAsync();
-
-        // Manually set the tenant context for subsequent operations
-        // Finbuckle will be bypassed for these operations since we're creating the tenant
-        var tenantInfo = new ClubTenantInfo
-        {
-            Id = tenant.Id.ToString(),
-            Identifier = tenant.Subdomain,
-            Name = tenant.Name
-        };
-        _multiTenantContext.TenantInfo = tenantInfo;
 
         try
         {
@@ -109,7 +100,7 @@ public class TenantOnboardingService : ITenantOnboardingService
         }
         catch
         {
-            _multiTenantContext.TenantInfo = null;
+            // TODO: What should go here?
             throw;
         }
     }
@@ -250,7 +241,7 @@ public class TenantOnboardingService : ITenantOnboardingService
             "enablePayments": true
           },
           "settings": {
-            "timezone": "America/Denver",
+            "timezone": "America/Boise",
             "defaultCurrency": "usd"
           }
         }

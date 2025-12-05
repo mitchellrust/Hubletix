@@ -12,7 +12,7 @@ Successfully migrated from custom multi-tenant infrastructure to **Finbuckle.Mul
 ### Updated Files
 1. **ClubManagement.Infrastructure.csproj** - Added `Finbuckle.MultiTenant` package
 2. **ClubManagement.Api.csproj** - Added `Finbuckle.MultiTenant` package
-3. **ApplicationDbContext.cs** - Replaced `ITenantContext` with `IMultiTenantContext<ClubTenantInfo>`
+3. **AppDbContext.cs** - Replaced `ITenantContext` with `IMultiTenantContext<ClubTenantInfo>`
 4. **TenantOnboardingService.cs** - Updated to use Finbuckle's multi-tenant context
 5. **Program.cs** - Finbuckle service registration and middleware setup
 6. **TenantsController.cs** - Updated to use Finbuckle's context
@@ -123,7 +123,7 @@ curl http://localhost:5000/api/tenants/current?tenant=demo
 - ✅ Add Finbuckle.MultiTenant packages
 - ✅ Create ClubTenantInfo (ITenantInfo)
 - ✅ Create TenantStore (IMultiTenantStore)
-- ✅ Update ApplicationDbContext filters
+- ✅ Update AppDbContext filters
 - ✅ Update Program.cs configuration
 - ✅ Update dependent services
 - ✅ Update controllers

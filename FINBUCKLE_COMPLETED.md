@@ -21,7 +21,7 @@ Successfully refactored the multi-tenant infrastructure from custom implementati
 - `ClubManagement.Api.csproj` ✅ Added `Finbuckle.MultiTenant` v7.5.0
 
 #### Infrastructure Layer
-- **`ApplicationDbContext.cs`** - Updated all global query filters to use `IMultiTenantContext<ClubTenantInfo>`
+- **`AppDbContext.cs`** - Updated all global query filters to use `IMultiTenantContext<ClubTenantInfo>`
 - **`TenantOnboardingService.cs`** - Replaced `ITenantContext` with Finbuckle's multi-tenant context
 
 #### API Layer
@@ -55,7 +55,7 @@ builder.Services.AddScoped<ITenantResolutionService, TenantResolutionService>();
 app.UseTenantResolution();
 app.Use(async (context, next) => { /* manual resolution logic */ });
 
-// ApplicationDbContext
+// AppDbContext
 private readonly ITenantContext _tenantContext;
 .HasQueryFilter(u => _tenantContext.CurrentTenantId == null || 
     u.TenantId == _tenantContext.CurrentTenantId);
@@ -68,7 +68,7 @@ builder.Services.AddMultiTenant<ClubTenantInfo>()
     .WithStore<TenantStore>(ServiceLifetime.Scoped);
 app.UseMultiTenant<ClubTenantInfo>();
 
-// ApplicationDbContext
+// AppDbContext
 private readonly IMultiTenantContext<ClubTenantInfo> _multiTenantContext;
 .HasQueryFilter(u => _multiTenantContext == null || _multiTenantContext.TenantInfo == null ||
     u.TenantId == Guid.Parse(_multiTenantContext.TenantInfo.Id!));
@@ -107,11 +107,11 @@ private readonly IMultiTenantContext<ClubTenantInfo> _multiTenantContext;
 public class EventService
 {
     private readonly IMultiTenantContext<ClubTenantInfo> _multiTenantContext;
-    private readonly ApplicationDbContext _dbContext;
+    private readonly AppDbContext _dbContext;
     
     public EventService(
         IMultiTenantContext<ClubTenantInfo> multiTenantContext,
-        ApplicationDbContext dbContext)
+        AppDbContext dbContext)
     {
         _multiTenantContext = multiTenantContext;
         _dbContext = dbContext;
@@ -160,7 +160,7 @@ With Finbuckle in place, you're ready for:
 - ✅ Finbuckle packages added to both projects
 - ✅ ClubTenantInfo implements ITenantInfo
 - ✅ TenantStore implements IMultiTenantStore
-- ✅ ApplicationDbContext uses IMultiTenantContext
+- ✅ AppDbContext uses IMultiTenantContext
 - ✅ Program.cs configured with Finbuckle
 - ✅ TenantOnboardingService updated
 - ✅ Controllers updated to use Finbuckle context

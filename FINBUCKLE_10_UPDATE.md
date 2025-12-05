@@ -8,7 +8,7 @@
 
 ### 2. Code Compatibility Updates
 
-**ApplicationDbContext.cs**:
+**AppDbContext.cs**:
 - Changed `IMultiTenantContext<ClubTenantInfo> _multiTenantContext` to nullable: `IMultiTenantContext<ClubTenantInfo>? _multiTenantContext`
 - Removed force null-coalescing (`!`) on constructor parameter to properly handle null context
 - This allows the DbContext to work both in multi-tenant and non-multi-tenant scenarios
