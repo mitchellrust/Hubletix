@@ -7,6 +7,5 @@ namespace ClubManagement.Infrastructure.Persistence;
 /// </summary>
 public record ClubTenantInfo(string Id, string Identifier, string Name) : TenantInfo(Id, Identifier, Name)
 {
-    public string? ConnectionString { get; set; }
-    public object? Items { get; set; }
+
 }

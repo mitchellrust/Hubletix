@@ -1,22 +1,22 @@
+using ClubManagement.Core.Models;
+
 namespace ClubManagement.Core.Entities;
 
 /// <summary>
 /// Represents a user's signup for a specific event schedule.
 /// Enforces unique signup per user/schedule.
 /// </summary>
-public class EventSignup
-{
-    public Guid Id { get; set; }
+public class EventRegistration: BaseEntity
+{    
+    /// <summary>
+    /// Foreign key to Event
+    /// </summary>
+    public required string EventId { get; set; }
     
     /// <summary>
-    /// Foreign key to EventSchedule
+    /// Foreign key to User
     /// </summary>
-    public Guid ScheduleId { get; set; }
-    
-    /// <summary>
-    /// Foreign key to ApplicationUser
-    /// </summary>
-    public Guid UserId { get; set; }
+    public required string UserId { get; set; }
     
     /// <summary>
     /// Signup status: "registered", "cancelled", "attended"
@@ -33,12 +33,7 @@ public class EventSignup
     /// </summary>
     public DateTime SignedUpAt { get; set; } = DateTime.UtcNow;
     
-    /// <summary>
-    /// Last updated timestamp
-    /// </summary>
-    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-    
     // Navigation properties
-    public EventSchedule Schedule { get; set; } = null!;
-    public ApplicationUser User { get; set; } = null!;
+    public User User { get; set; } = null!;
+    public Event Event { get; set; } = null!;
 }

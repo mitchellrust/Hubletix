@@ -1,9 +1,7 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Finbuckle.MultiTenant.Abstractions;
 using ClubManagement.Core.Entities;
-using Finbuckle.MultiTenant.EntityFrameworkCore.Stores;
 
 namespace ClubManagement.Infrastructure.Persistence;
 
@@ -41,12 +39,11 @@ public class AppDbContext : MultiTenantDbContext
 
     // DbSets
     public DbSet<Tenant> Tenants { get; set; } = null!;
+    public DbSet<User> Users { get; set; } = null!;
     public DbSet<MembershipPlan> MembershipPlans { get; set; } = null!;
-    public DbSet<MembershipSubscription> MembershipSubscriptions { get; set; } = null!;
     public DbSet<Event> Events { get; set; } = null!;
-    public DbSet<EventSchedule> EventSchedules { get; set; } = null!;
-    public DbSet<EventSignup> EventSignups { get; set; } = null!;
-    public DbSet<PaymentRecord> PaymentRecords { get; set; } = null!;
+    public DbSet<EventRegistration> EventRegistrations { get; set; } = null!;
+    public DbSet<Payment> Payments { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -62,12 +59,15 @@ public class AppDbContext : MultiTenantDbContext
             .Property(t => t.ConfigJson)
             .HasColumnType("jsonb");
 
-        // Configure ApplicationUser
-        builder.Entity<ApplicationUser>()
+        // Configure User
+        builder.Entity<User>()
             .HasOne(u => u.Tenant)
             .WithMany(t => t.Users)
             .HasForeignKey(u => u.TenantId)
             .OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<User>()
+            .HasIndex(u => u.UserName)
+            .IsUnique();
 
         // Configure MembershipPlan
         builder.Entity<MembershipPlan>()
@@ -79,22 +79,6 @@ public class AppDbContext : MultiTenantDbContext
             .OnDelete(DeleteBehavior.Cascade);
         builder.Entity<MembershipPlan>()
             .HasIndex(p => new { p.TenantId, p.StripeProductId });
-
-        // Configure MembershipSubscription
-        builder.Entity<MembershipSubscription>()
-            .HasKey(s => s.Id);
-        builder.Entity<MembershipSubscription>()
-            .HasOne(s => s.User)
-            .WithMany(u => u.MembershipSubscriptions)
-            .HasForeignKey(s => s.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
-        builder.Entity<MembershipSubscription>()
-            .HasOne(s => s.MembershipPlan)
-            .WithMany(p => p.Subscriptions)
-            .HasForeignKey(s => s.MembershipPlanId)
-            .OnDelete(DeleteBehavior.Restrict);
-        builder.Entity<MembershipSubscription>()
-            .HasIndex(s => s.StripeSubscriptionId);
 
         // Configure Event
         builder.Entity<Event>()
@@ -111,59 +95,37 @@ public class AppDbContext : MultiTenantDbContext
             .OnDelete(DeleteBehavior.SetNull)
             .IsRequired(false);
 
-        // Configure EventSchedule
-        builder.Entity<EventSchedule>()
+        // Configure EventRegistration
+        builder.Entity<EventRegistration>()
             .HasKey(s => s.Id);
-        builder.Entity<EventSchedule>()
+        builder.Entity<EventRegistration>()
             .HasOne(s => s.Event)
-            .WithMany(e => e.Schedules)
+            .WithMany(es => es.EventRegistrations)
             .HasForeignKey(s => s.EventId)
             .OnDelete(DeleteBehavior.Cascade);
-        builder.Entity<EventSchedule>()
-            .HasIndex(s => new { s.EventId, s.DateTimeStart });
-
-        // Configure EventSignup
-        builder.Entity<EventSignup>()
-            .HasKey(s => s.Id);
-        builder.Entity<EventSignup>()
-            .HasOne(s => s.Schedule)
-            .WithMany(es => es.Signups)
-            .HasForeignKey(s => s.ScheduleId)
-            .OnDelete(DeleteBehavior.Cascade);
-        builder.Entity<EventSignup>()
+        builder.Entity<EventRegistration>()
             .HasOne(s => s.User)
-            .WithMany(u => u.EventSignups)
+            .WithMany(u => u.EventRegistrations)
             .HasForeignKey(s => s.UserId)
             .OnDelete(DeleteBehavior.Cascade);
-        builder.Entity<EventSignup>()
-            .HasIndex(s => new { s.ScheduleId, s.UserId })
-            .IsUnique();
 
-        // Configure PaymentRecord
-        builder.Entity<PaymentRecord>()
+        // Configure Payment
+        builder.Entity<Payment>()
             .HasKey(p => p.Id);
-        builder.Entity<PaymentRecord>()
+        builder.Entity<Payment>()
             .HasOne(p => p.Tenant)
-            .WithMany(t => t.PaymentRecords)
+            .WithMany(t => t.Payments)
             .HasForeignKey(p => p.TenantId)
             .OnDelete(DeleteBehavior.Cascade);
-        builder.Entity<PaymentRecord>()
+        builder.Entity<Payment>()
             .HasOne(p => p.User)
-            .WithMany(u => u.PaymentRecords)
+            .WithMany(u => u.Payments)
             .HasForeignKey(p => p.UserId)
             .OnDelete(DeleteBehavior.SetNull)
             .IsRequired(false);
-        builder.Entity<PaymentRecord>()
+        builder.Entity<Payment>()
             .HasIndex(p => p.StripePaymentId)
             .IsUnique();
-
-        // Configure Identity entities to use Guid
-        builder.Entity<IdentityRole<Guid>>().ToTable("AspNetRoles");
-        builder.Entity<IdentityUserRole<Guid>>().ToTable("AspNetUserRoles");
-        builder.Entity<IdentityUserClaim<Guid>>().ToTable("AspNetUserClaims");
-        builder.Entity<IdentityUserLogin<Guid>>().ToTable("AspNetUserLogins");
-        builder.Entity<IdentityUserToken<Guid>>().ToTable("AspNetUserTokens");
-        builder.Entity<IdentityRoleClaim<Guid>>().ToTable("AspNetRoleClaims");
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

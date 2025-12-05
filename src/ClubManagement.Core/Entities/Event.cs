@@ -1,17 +1,12 @@
+using ClubManagement.Core.Models;
+
 namespace ClubManagement.Core.Entities;
 
 /// <summary>
 /// Represents an event (class, training session, etc.) offered by a tenant.
 /// </summary>
-public class Event
-{
-    public Guid Id { get; set; }
-    
-    /// <summary>
-    /// Foreign key to Tenant
-    /// </summary>
-    public Guid TenantId { get; set; }
-    
+public class Event : BaseEntity
+{    
     /// <summary>
     /// Event name
     /// </summary>
@@ -30,7 +25,7 @@ public class Event
     /// <summary>
     /// Foreign key to coach user (optional, can be null for drop-in events)
     /// </summary>
-    public Guid? CoachId { get; set; }
+    public string? CoachId { get; set; }
     
     /// <summary>
     /// Maximum capacity for this event
@@ -42,18 +37,8 @@ public class Event
     /// </summary>
     public bool IsActive { get; set; } = true;
     
-    /// <summary>
-    /// Created timestamp
-    /// </summary>
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    
-    /// <summary>
-    /// Last updated timestamp
-    /// </summary>
-    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-    
     // Navigation properties
     public Tenant Tenant { get; set; } = null!;
-    public ApplicationUser? Coach { get; set; }
-    public ICollection<EventSchedule> Schedules { get; set; } = new List<EventSchedule>();
+    public User? Coach { get; set; }
+    public ICollection<EventRegistration> EventRegistrations { get; set; } = new List<EventRegistration>();
 }

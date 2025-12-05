@@ -1,9 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
 using Finbuckle.MultiTenant.Abstractions;
 using ClubManagement.Core.Entities;
 using ClubManagement.Infrastructure.Persistence;
-using ClubManagement.Core.Constants;
 namespace ClubManagement.Infrastructure.Services;
 
 /// <summary>
@@ -15,31 +13,32 @@ public interface ITenantOnboardingService
     /// <summary>
     /// Creates a new tenant with admin user and default setup.
     /// </summary>
-    Task<Tenant> OnboardTenantAsync(string name, string subdomain, string adminEmail, string adminPassword);
+    Task<Tenant> OnboardTenantAsync(
+        string name,
+        string subdomain,
+        string adminFirstName,
+        string adminLastName,
+        string adminEmail
+    );
 }
 
 public class TenantOnboardingService : ITenantOnboardingService
 {
     private readonly AppDbContext _dbContext;
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly RoleManager<IdentityRole<Guid>> _roleManager;
 
     public TenantOnboardingService(
         AppDbContext dbContext,
-        UserManager<ApplicationUser> userManager,
-        RoleManager<IdentityRole<Guid>> roleManager,
         IMultiTenantContextAccessor multiTenantContextAccessor)
     {
         _dbContext = dbContext;
-        _userManager = userManager;
-        _roleManager = roleManager;
     }
 
     public async Task<Tenant> OnboardTenantAsync(
         string name,
         string subdomain,
-        string adminEmail,
-        string adminPassword
+        string adminFirstName,
+        string adminLastName,
+        string adminEmail
     )
     {
         // Check if subdomain already exists
@@ -51,44 +50,34 @@ public class TenantOnboardingService : ITenantOnboardingService
             throw new InvalidOperationException($"Tenant with subdomain '{subdomain}' already exists.");
         }
 
-        // Create tenant record
-        var tenant = new Tenant
-        {
-            Id = Guid.NewGuid(),
-            Name = name,
-            Subdomain = subdomain,
-            IsActive = true,
-            ConfigJson = GetDefaultConfig()
-        };
-
-        _dbContext.Tenants.Add(tenant);
-        await _dbContext.SaveChangesAsync();
-
         try
         {
-            // Ensure roles exist (per-tenant role setup)
-            await EnsureRolesExistAsync();
+             // Create tenant record
+            var tenant = new Tenant
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = name,
+                Subdomain = subdomain,
+                IsActive = true,
+                ConfigJson = GetDefaultConfig()
+            };
+
+            _dbContext.Tenants.Add(tenant);
+            await _dbContext.SaveChangesAsync();
 
             // Create admin user
-            var adminUser = new ApplicationUser
+            var adminUser = new User
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid().ToString(),
                 TenantId = tenant.Id,
                 UserName = adminEmail,
-                Email = adminEmail,
-                EmailConfirmed = true,
-                FullName = name + " Admin",
+                FirstName = adminFirstName,
+                LastName = adminLastName,
                 IsActive = true
             };
 
-            var result = await _userManager.CreateAsync(adminUser, adminPassword);
-            if (!result.Succeeded)
-            {
-                throw new InvalidOperationException($"Failed to create admin user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
-            }
-
-            // Assign Admin role
-            await _userManager.AddToRoleAsync(adminUser, UserRoles.Admin);
+            _dbContext.Users.Add(adminUser);
+            await _dbContext.SaveChangesAsync();
 
             // Create default membership plans
             await CreateDefaultMembershipPlansAsync(tenant.Id);
@@ -105,32 +94,13 @@ public class TenantOnboardingService : ITenantOnboardingService
         }
     }
 
-    private async Task EnsureRolesExistAsync()
-    {
-        var roles = new[] { UserRoles.Admin, UserRoles.Coach, UserRoles.Member };
-        
-        foreach (var roleName in roles)
-        {
-            if (!await _roleManager.RoleExistsAsync(roleName))
-            {
-                var role = new IdentityRole<Guid>
-                {
-                    Id = Guid.NewGuid(),
-                    Name = roleName,
-                    NormalizedName = roleName.ToUpperInvariant()
-                };
-                await _roleManager.CreateAsync(role);
-            }
-        }
-    }
-
-    private async Task CreateDefaultMembershipPlansAsync(Guid tenantId)
+    private async Task CreateDefaultMembershipPlansAsync(string tenantId)
     {
         var plans = new[]
         {
             new MembershipPlan
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid().ToString(),
                 TenantId = tenantId,
                 Name = "Monthly Membership",
                 Description = "Full access to all classes and events",
@@ -141,7 +111,7 @@ public class TenantOnboardingService : ITenantOnboardingService
             },
             new MembershipPlan
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid().ToString(),
                 TenantId = tenantId,
                 Name = "Annual Membership",
                 Description = "Full access for a full year (2 months free!)",
@@ -156,13 +126,13 @@ public class TenantOnboardingService : ITenantOnboardingService
         await _dbContext.SaveChangesAsync();
     }
 
-    private async Task CreateDemoEventsAsync(Guid tenantId, Guid coachId)
+    private async Task CreateDemoEventsAsync(string tenantId, string coachId)
     {
-        var demEvents = new[]
+        var demoEvents = new[]
         {
             new Event
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid().ToString(),
                 TenantId = tenantId,
                 Name = "Morning CrossFit",
                 Description = "High-intensity functional fitness training",
@@ -173,7 +143,7 @@ public class TenantOnboardingService : ITenantOnboardingService
             },
             new Event
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid().ToString(),
                 TenantId = tenantId,
                 Name = "Yoga & Flexibility",
                 Description = "Low-intensity flexibility and mindfulness",
@@ -184,7 +154,7 @@ public class TenantOnboardingService : ITenantOnboardingService
             },
             new Event
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid().ToString(),
                 TenantId = tenantId,
                 Name = "Open Gym",
                 Description = "Self-directed workout time",
@@ -195,33 +165,7 @@ public class TenantOnboardingService : ITenantOnboardingService
             }
         };
 
-        _dbContext.Events.AddRange(demEvents);
-        await _dbContext.SaveChangesAsync();
-
-        // Create demo schedules for each event
-        var tomorrow = DateTime.UtcNow.AddDays(1);
-        var schedules = new List<EventSchedule>();
-
-        foreach (var evt in demEvents)
-        {
-            // Monday through Friday schedules
-            for (int i = 0; i < 5; i++)
-            {
-                var scheduleDate = tomorrow.AddDays(i);
-                var schedule = new EventSchedule
-                {
-                    Id = Guid.NewGuid(),
-                    EventId = evt.Id,
-                    DateTimeStart = scheduleDate.AddHours(9), // 9 AM
-                    DateTimeEnd = scheduleDate.AddHours(10),   // 10 AM
-                    Location = "Main Studio",
-                    IsActive = true
-                };
-                schedules.Add(schedule);
-            }
-        }
-
-        _dbContext.EventSchedules.AddRange(schedules);
+        _dbContext.Events.AddRange(demoEvents);
         await _dbContext.SaveChangesAsync();
     }
 
@@ -237,7 +181,7 @@ public class TenantOnboardingService : ITenantOnboardingService
           },
           "features": {
             "enableMemberships": true,
-            "enableEventSignups": true,
+            "enableEventRegistrations": true,
             "enablePayments": true
           },
           "settings": {

@@ -1,21 +1,16 @@
+using ClubManagement.Core.Models;
+
 namespace ClubManagement.Core.Entities;
 
 /// <summary>
 /// Represents a payment record (Stripe charge or subscription payment).
 /// </summary>
-public class PaymentRecord
-{
-    public Guid Id { get; set; }
-    
-    /// <summary>
-    /// Foreign key to Tenant
-    /// </summary>
-    public Guid TenantId { get; set; }
-    
+public class Payment : BaseEntity
+{    
     /// <summary>
     /// Foreign key to User (can be null for administrative payments)
     /// </summary>
-    public Guid? UserId { get; set; }
+    public string? UserId { get; set; }
     
     /// <summary>
     /// Stripe Payment Intent ID or Charge ID
@@ -52,12 +47,7 @@ public class PaymentRecord
     /// </summary>
     public DateTime PaymentDate { get; set; } = DateTime.UtcNow;
     
-    /// <summary>
-    /// Created timestamp
-    /// </summary>
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    
     // Navigation properties
     public Tenant Tenant { get; set; } = null!;
-    public ApplicationUser? User { get; set; }
+    public User? User { get; set; }
 }

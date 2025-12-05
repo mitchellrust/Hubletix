@@ -1,13 +1,13 @@
+using ClubManagement.Core.Models;
+
 namespace ClubManagement.Core.Entities;
 
 /// <summary>
 /// Represents a tenant (club) in the system.
 /// Each tenant has their own isolated data within the shared database.
 /// </summary>
-public class Tenant
-{
-    public Guid Id { get; set; }
-    
+public class Tenant : BaseEntity
+{    
     /// <summary>
     /// Tenant name (e.g., "Downtown CrossFit")
     /// </summary>
@@ -33,19 +33,9 @@ public class Tenant
     /// </summary>
     public string? ConfigJson { get; set; }
     
-    /// <summary>
-    /// Created timestamp
-    /// </summary>
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    
-    /// <summary>
-    /// Last updated timestamp
-    /// </summary>
-    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-    
     // Navigation properties
-    public ICollection<ApplicationUser> Users { get; set; } = new List<ApplicationUser>();
+    public ICollection<User> Users { get; set; } = new List<User>();
     public ICollection<MembershipPlan> MembershipPlans { get; set; } = new List<MembershipPlan>();
     public ICollection<Event> Events { get; set; } = new List<Event>();
-    public ICollection<PaymentRecord> PaymentRecords { get; set; } = new List<PaymentRecord>();
+    public ICollection<Payment> Payments { get; set; } = new List<Payment>();
 }

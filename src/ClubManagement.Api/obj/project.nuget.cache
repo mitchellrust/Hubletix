@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "LYCnQ6cgviI=",
+  "dgSpecHash": "U3jpgV7MdKU=",
   "success": true,
   "projectFilePath": "/Users/mitchellrust/dev/club-management/src/ClubManagement.Api/ClubManagement.Api.csproj",
   "expectedPackageFiles": [
@@ -8,11 +8,8 @@
     "/Users/mitchellrust/.nuget/packages/finbuckle.multitenant.abstractions/10.0.0/finbuckle.multitenant.abstractions.10.0.0.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/finbuckle.multitenant.aspnetcore/10.0.0/finbuckle.multitenant.aspnetcore.10.0.0.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/finbuckle.multitenant.entityframeworkcore/10.0.0/finbuckle.multitenant.entityframeworkcore.10.0.0.nupkg.sha512",
-    "/Users/mitchellrust/.nuget/packages/finbuckle.multitenant.identity.entityframeworkcore/10.0.0/finbuckle.multitenant.identity.entityframeworkcore.10.0.0.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/microsoft.aspnetcore.authentication.openidconnect/10.0.0/microsoft.aspnetcore.authentication.openidconnect.10.0.0.nupkg.sha512",
-    "/Users/mitchellrust/.nuget/packages/microsoft.aspnetcore.identity.entityframeworkcore/10.0.0/microsoft.aspnetcore.identity.entityframeworkcore.10.0.0.nupkg.sha512",
-    "/Users/mitchellrust/.nuget/packages/microsoft.aspnetcore.identity.ui/10.0.0/microsoft.aspnetcore.identity.ui.10.0.0.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/microsoft.build/17.7.2/microsoft.build.17.7.2.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/microsoft.build.framework/17.14.28/microsoft.build.framework.17.14.28.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/microsoft.build.tasks.core/17.14.28/microsoft.build.tasks.core.17.14.28.nupkg.sha512",
@@ -30,7 +27,6 @@
     "/Users/mitchellrust/.nuget/packages/microsoft.entityframeworkcore.relational/10.0.0/microsoft.entityframeworkcore.relational.10.0.0.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/microsoft.extensions.apidescription.server/10.0.0/microsoft.extensions.apidescription.server.10.0.0.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/microsoft.extensions.dependencymodel/10.0.0/microsoft.extensions.dependencymodel.10.0.0.nupkg.sha512",
-    "/Users/mitchellrust/.nuget/packages/microsoft.extensions.fileproviders.embedded/10.0.0/microsoft.extensions.fileproviders.embedded.10.0.0.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/microsoft.identitymodel.abstractions/8.0.1/microsoft.identitymodel.abstractions.8.0.1.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/microsoft.identitymodel.jsonwebtokens/8.0.1/microsoft.identitymodel.jsonwebtokens.8.0.1.nupkg.sha512",
     "/Users/mitchellrust/.nuget/packages/microsoft.identitymodel.logging/8.0.1/microsoft.identitymodel.logging.8.0.1.nupkg.sha512",

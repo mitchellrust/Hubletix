@@ -1,18 +1,13 @@
+using ClubManagement.Core.Models;
+
 namespace ClubManagement.Core.Entities;
 
 /// <summary>
 /// Represents a membership plan offered by a tenant (e.g., "Monthly CrossFit", "Annual Premium").
 /// Pricing and configuration are tenant-specific.
 /// </summary>
-public class MembershipPlan
-{
-    public Guid Id { get; set; }
-    
-    /// <summary>
-    /// Foreign key to Tenant
-    /// </summary>
-    public Guid TenantId { get; set; }
-    
+public class MembershipPlan : BaseEntity
+{    
     /// <summary>
     /// Plan name (e.g., "Monthly Membership")
     /// </summary>
@@ -53,17 +48,6 @@ public class MembershipPlan
     /// </summary>
     public int DisplayOrder { get; set; } = 0;
     
-    /// <summary>
-    /// Created timestamp
-    /// </summary>
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    
-    /// <summary>
-    /// Last updated timestamp
-    /// </summary>
-    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-    
     // Navigation properties
     public Tenant Tenant { get; set; } = null!;
-    public ICollection<MembershipSubscription> Subscriptions { get; set; } = new List<MembershipSubscription>();
 }
