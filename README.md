@@ -77,7 +77,7 @@ Edit `src/ClubManagement.Api/appsettings.json`:
 ### 2. Build the Solution
 
 ```bash
-cd /Users/mitchellrust/dev/club-management
+cd /Users/mitchellrust/dev/ClubManagement
 dotnet build
 ```
 

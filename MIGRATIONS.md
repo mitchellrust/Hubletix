@@ -24,7 +24,7 @@ src/ClubManagement.Infrastructure/Migrations/
 
 ## Common Commands
 
-All commands should be run from the solution root: `/Users/mitchellrust/dev/club-management`
+All commands should be run from the solution root: `/Users/mitchellrust/dev/ClubManagement`
 
 ### Creating New Migrations
 
