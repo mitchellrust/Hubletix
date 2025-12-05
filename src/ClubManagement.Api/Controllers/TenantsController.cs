@@ -28,12 +28,7 @@ public class TenantsController : ControllerBase
             return NotFound("No tenant context set");
         }
 
-        if (!Guid.TryParse(_multiTenantContextAccessor.MultiTenantContext.TenantInfo.Id, out var tenantId))
-        {
-            return BadRequest("Invalid tenant ID");
-        }
-
-        var tenant = await _dbContext.Tenants.FindAsync(tenantId);
+        var tenant = await _dbContext.Tenants.FindAsync(_multiTenantContextAccessor.MultiTenantContext.TenantInfo.Id);
         if (tenant == null)
         {
             return NotFound();

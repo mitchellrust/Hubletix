@@ -26,11 +26,36 @@ builder.Services.AddMultiTenant<ClubTenantInfo>()
 // Register onboarding service
 builder.Services.AddScoped<ITenantOnboardingService, TenantOnboardingService>();
 
+// Register database initialization service
+builder.Services.AddScoped<DatabaseInitializationService>();
+
 builder.Services.AddRazorPages();
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+// Initialize database on startup (apply migrations and seed data as needed)
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    
+    try
+    {
+        var dbInitService = services.GetRequiredService<DatabaseInitializationService>();
+        var tenantStoreContextFactory = services.GetRequiredService<IDbContextFactory<TenantStoreDbContext>>();
+        var appContext = services.GetRequiredService<AppDbContext>();
+        
+        using var tenantStoreContext = await tenantStoreContextFactory.CreateDbContextAsync();
+        await dbInitService.InitializeDatabaseAsync(tenantStoreContext, appContext);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while initializing the database");
+        throw;
+    }
+}
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
