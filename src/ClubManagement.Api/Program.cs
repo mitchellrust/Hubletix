@@ -81,6 +81,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Serve static files from wwwroot, required for Bootstrap CSS/JS
+app.UseStaticFiles();
+
 // Finbuckle MultiTenant middleware - resolves tenant from subdomain or query param
 app.UseMultiTenant();
 
