@@ -95,7 +95,7 @@ namespace ClubManagement.Infrastructure.Migrations.App
                     Id = table.Column<string>(type: "text", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
-                    EventType = table.Column<string>(type: "text", nullable: false),
+                    EventType = table.Column<int>(type: "integer", nullable: false),
                     CoachId = table.Column<string>(type: "text", nullable: true),
                     Capacity = table.Column<int>(type: "integer", nullable: false),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),

@@ -1,0 +1,84 @@
+@page "/admin/dashboard"
+@model DashboardModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-5 fw-bold">Dashboard</h1>
+            <p class="text-muted">Welcome back! Here's what's happening with your club.</p>
+        </div>
+    </div>
+
+    <!-- Stats Row (placeholder) -->
+    <div class="row mb-4">
+        <div class="col-12 col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-muted text-uppercase small">Total Members</h6>
+                    <h2 class="text-primary">1,234</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-muted text-uppercase small">Active Events</h6>
+                    <h2 class="text-success">8</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-muted text-uppercase small">Registrations</h6>
+                    <h2 class="text-info">342</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-muted text-uppercase small">Revenue</h6>
+                    <h2 class="text-warning">$12.5K</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Events -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Upcoming Events</h5>
+                    <a href="/admin/events" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        @foreach (var evt in Model.UpcomingEvents)
+                        {
+                            <div class="list-group-item px-4 py-3 d-flex justify-content-between align-items-center">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="badge bg-primary me-2">@evt.Date.ToString("dd MMM")</div>
+                                        <h6 class="mb-0 fw-semibold">@evt.Name</h6>
+                                    </div>
+                                    <p class="text-muted small mb-0">
+                                        <i class="bi bi-clock"></i> @evt.Time | 
+                                        <i class="bi bi-geo-alt"></i> @evt.Location | 
+                                        <i class="bi bi-people"></i> @evt.Registrations registrations
+                                    </p>
+                                </div>
+                                <a href="/admin/events/@evt.Id" class="btn btn-sm btn-outline-secondary">Manage</a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

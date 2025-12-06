@@ -1,3 +1,4 @@
+using ClubManagement.Core.Constants;
 using ClubManagement.Core.Models;
 
 namespace ClubManagement.Core.Entities;
@@ -18,9 +19,9 @@ public class Event : BaseEntity
     public string? Description { get; set; }
     
     /// <summary>
-    /// Event type (e.g., "CrossFit Class", "Personal Training", "Group Event")
+    /// Event type (e.g., Class, PersonalTraining, GroupEvent)
     /// </summary>
-    public string EventType { get; set; } = "Class";
+    public EventType EventType { get; set; } = Constants.EventType.Class;
     
     /// <summary>
     /// Foreign key to coach user (optional, can be null for drop-in events)

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ClubManagement.Infrastructure.Migrations.App
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251205210711_InitialCreate")]
+    [Migration("20251206213532_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -46,9 +46,8 @@ namespace ClubManagement.Infrastructure.Migrations.App
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<string>("EventType")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("EventType")
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");

@@ -121,7 +121,42 @@ public class DatabaseInitializationService
                 ConfigJson = GetDemoConfig()
             };
 
+            var demoEvents = new List<Event>
+            {
+                new Event
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    TenantId = demoTenant.Id,
+                    Name = "New Player Orientation",
+                    Description = "An introductory event to welcome new members to the Demo VB Club.",
+                    EventType = Core.Constants.EventType.GroupEvent,
+                    Capacity = 200,
+                    IsActive = true
+                },
+                new Event
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    TenantId = demoTenant.Id,
+                    Name = "Holiday Tournament",
+                    Description = "Join us for our annual holiday volleyball tournament! Open to all skill levels.",
+                    EventType = Core.Constants.EventType.Competition,
+                    Capacity = 400,
+                    IsActive = true
+                },
+                new Event
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    TenantId = demoTenant.Id,
+                    Name = "Parent & Me Volleyball",
+                    Description = "A fun event for parents and their kids to play volleyball together.",
+                    EventType = Core.Constants.EventType.GroupEvent,
+                    Capacity = 50,
+                    IsActive = true
+                }
+            };
+
             context.Tenants.Add(demoTenant);
+            context.Events.AddRange(demoEvents);
             await context.SaveChangesAsync();
 
             _logger.LogInformation("Demo tenant created with identifier: {Subdomain}", demoTenant.Id);

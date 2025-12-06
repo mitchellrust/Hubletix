@@ -1,30 +1,13 @@
 # EF Core Migrations Guide
 
 ## Quick Reference
-
-### Initial Setup ✅ COMPLETED
-
-The initial migrations have been created and are ready to apply:
-
-```
-src/ClubManagement.Infrastructure/Migrations/
-├── TenantStore/
-│   ├── 20251205210628_InitialCreate.cs
-│   ├── 20251205210628_InitialCreate.Designer.cs
-│   └── TenantStoreDbContextModelSnapshot.cs
-└── App/
-    ├── 20251205210711_InitialCreate.cs
-    ├── 20251205210711_InitialCreate.Designer.cs
-    └── AppDbContextModelSnapshot.cs
-```
-
 **Automatic Application**: Migrations will be applied automatically when you run the app via `DatabaseInitializationService`.
 
 ---
 
 ## Common Commands
 
-All commands should be run from the solution root: `/Users/mitchellrust/dev/ClubManagement`
+All commands should be run from the solution root.
 
 ### Creating New Migrations
 
@@ -311,27 +294,6 @@ if (app.Environment.IsDevelopment())
 - Skip testing migrations before production
 - Mix manual SQL changes with EF migrations
 - Create migrations without building first
-
----
-
-## Current Status
-
-**Initial Setup**: ✅ Complete
-- TenantStore migration created
-- App migration created
-- DatabaseInitializationService configured
-- Auto-migration on startup enabled
-
-**Next Steps**:
-1. Run the application to apply migrations
-2. Verify demo tenant is created
-3. Test tenant isolation with subdomain access
-4. Begin feature development
-
-**Access Demo Tenant**:
-```
-https://demo.localhost:5001
-```
 
 ---
 

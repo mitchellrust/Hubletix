@@ -136,7 +136,7 @@ public class TenantOnboardingService : ITenantOnboardingService
                 TenantId = tenantId,
                 Name = "Morning CrossFit",
                 Description = "High-intensity functional fitness training",
-                EventType = "Class",
+                EventType = Core.Constants.EventType.Class,
                 CoachId = coachId,
                 Capacity = 20,
                 IsActive = true
@@ -147,7 +147,7 @@ public class TenantOnboardingService : ITenantOnboardingService
                 TenantId = tenantId,
                 Name = "Yoga & Flexibility",
                 Description = "Low-intensity flexibility and mindfulness",
-                EventType = "Class",
+                EventType = Core.Constants.EventType.Class,
                 CoachId = coachId,
                 Capacity = 15,
                 IsActive = true
@@ -158,7 +158,7 @@ public class TenantOnboardingService : ITenantOnboardingService
                 TenantId = tenantId,
                 Name = "Open Gym",
                 Description = "Self-directed workout time",
-                EventType = "Open Gym",
+                EventType = Core.Constants.EventType.Other,
                 CoachId = null,
                 Capacity = 50,
                 IsActive = true

@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ClubManagement.Infrastructure.Migrations.TenantStore
 {
     [DbContext(typeof(TenantStoreDbContext))]
-    [Migration("20251205210628_InitialCreate")]
+    [Migration("20251206213606_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
