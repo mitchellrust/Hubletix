@@ -280,6 +280,9 @@ obj/
 /node_modules
 /wwwroot/node_modules
 
+# Libman package files
+wwwroot/lib/
+
 ### VisualStudioCode ###
 .vscode/*
 !.vscode/settings.json
