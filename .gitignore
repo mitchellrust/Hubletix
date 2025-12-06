@@ -281,7 +281,7 @@ obj/
 /wwwroot/node_modules
 
 # Libman package files
-wwwroot/lib/
+src/*/wwwroot/lib/
 
 ### VisualStudioCode ###
 .vscode/*
@@ -290,7 +290,7 @@ wwwroot/lib/
 !.vscode/launch.json
 !.vscode/extensions.json
 !.vscode/*.code-snippets
-
+  
 # Local History for Visual Studio Code
 .history/
 
