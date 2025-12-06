@@ -1,0 +1,29 @@
+/* Override Bootstrap 5 CSS custom properties */
+:root {
+  /* Brand colors */
+  --bs-primary: #283845;      /* Jet Black */
+  --bs-secondary: #F2D492;    /* Soft Peach */
+  --bs-success: #10B981;      /* Green */
+  --bs-danger: #EF4444;       /* Red */
+  --bs-warning: #F59E0B;      /* Amber */
+  --bs-info: #3B82F6;         /* Blue */
+  --bs-light: #F3F4F6;        /* Light gray */
+  --bs-dark: #1F2937;         /* Dark gray */
+
+  /* Other colors to include in brand theme:
+  Darker Jet Black: 202C39
+  Dry Sage: B8B08D
+  Tangerine Dream: F29559 */
+  
+  /* Primary shades */
+  --bs-primary-rgb: 79, 70, 229;
+  
+  /* Link colors */
+  --bs-link-color: var(--bs-primary);
+  --bs-link-hover-color: #4338CA;
+  
+  /* Body */
+  --bs-body-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --bs-body-bg: #ffffff;
+  --bs-body-color: #374151;
+}
