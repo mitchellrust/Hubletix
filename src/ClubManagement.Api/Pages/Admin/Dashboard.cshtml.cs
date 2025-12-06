@@ -1,62 +1,51 @@
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using ClubManagement.Infrastructure.Persistence;
+using Finbuckle.MultiTenant.Abstractions;
+using ClubManagement.Core.Entities;
 
 namespace ClubManagement.Api.Pages.Admin;
 
-public class DashboardModel : PageModel
+public class DashboardModel : TenantPageModel
 {
+    private readonly AppDbContext _dbContext;
     public List<UpcomingEventDto> UpcomingEvents { get; set; } = new();
+    public TenantStatsDto TenantStats { get; set; } = new();
 
-    public void OnGet()
+    public DashboardModel(
+        AppDbContext dbContext,
+        IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor
+    ) : base(multiTenantContextAccessor)
     {
-        // Placeholder data - will be replaced with database queries
-        UpcomingEvents = new List<UpcomingEventDto>
-        {
-            new UpcomingEventDto
+        _dbContext = dbContext;
+    }
+
+    public async Task OnGetAsync()
+    {
+        // Fetch tenant statistics
+        TenantStats.TotalMembers = await _dbContext.Users
+            .Where(u => u.TenantId == CurrentTenantInfo.Id)
+            .CountAsync();
+
+        TenantStats.ActiveEvents = await _dbContext.Events
+            .Where(e => e.TenantId == CurrentTenantInfo.Id && e.IsActive)
+            .CountAsync();
+
+        // Fetch the next 5 active events from the database
+        UpcomingEvents = await _dbContext.Events
+            .Where(e => e.IsActive)
+            .Include(e => e.EventRegistrations)
+            .OrderBy(e => e.CreatedAt)
+            .Take(5)
+            .Select(e => new UpcomingEventDto
             {
-                Id = "1",
-                Name = "Stone and Chalk Melbourne, Docklands",
-                Date = DateTime.Now.AddDays(3),
-                Time = "7:30pm",
-                Location = "Docklands, VIC",
-                Registrations = 45
-            },
-            new UpcomingEventDto
-            {
-                Id = "2",
-                Name = "All Hands Meetup with Stephan Livera",
-                Date = DateTime.Now.AddDays(10),
-                Time = "6:00pm",
-                Location = "Docklands, VIC",
-                Registrations = 82
-            },
-            new UpcomingEventDto
-            {
-                Id = "3",
-                Name = "Introduction to Blockchain Workshop",
-                Date = DateTime.Now.AddDays(17),
-                Time = "6:00pm",
-                Location = "Docklands, VIC",
-                Registrations = 124
-            },
-            new UpcomingEventDto
-            {
-                Id = "4",
-                Name = "Founder Meetup with Zedoop Co-founder Sandeep Goenka",
-                Date = DateTime.Now.AddDays(25),
-                Time = "7:00pm",
-                Location = "Docklands, VIC",
-                Registrations = 56
-            },
-            new UpcomingEventDto
-            {
-                Id = "5",
-                Name = "5 Steps To Growth: Lessons from TransferWise",
-                Date = DateTime.Now.AddDays(31),
-                Time = "6:30pm",
-                Location = "Docklands, VIC",
-                Registrations = 93
-            }
-        };
+                Id = e.Id,
+                Name = e.Name,
+                Date = e.CreatedAt.AddDays(1), // Placeholder: events are 1 day from creation
+                Time = "6:00 PM",
+                Location = "Club Location",
+                Registrations = e.EventRegistrations.Count
+            })
+            .ToListAsync();
     }
 }
 
@@ -71,4 +60,10 @@ public class UpcomingEventDto
     public string Time { get; set; } = string.Empty;
     public string Location { get; set; } = string.Empty;
     public int Registrations { get; set; }
+}
+
+public class TenantStatsDto
+{
+    public int TotalMembers { get; set; }
+    public int ActiveEvents { get; set; }
 }

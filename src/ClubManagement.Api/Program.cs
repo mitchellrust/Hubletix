@@ -21,6 +21,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Register Finbuckle.MultiTenant with EFCore Tenant Store
 builder.Services.AddMultiTenant<ClubTenantInfo>()
     .WithHostStrategy()
+    .WithStaticStrategy("demo")
     .WithEFCoreStore<TenantStoreDbContext, ClubTenantInfo>();
 
 // Register onboarding service
@@ -88,8 +89,8 @@ app.UseStaticFiles();
 app.UseMultiTenant();
 
 app.UseRouting();
-app.UseAuthentication();
-app.UseAuthorization();
+// app.UseAuthentication();
+// app.UseAuthorization();
 
 app.MapRazorPages();
 app.MapControllers();
