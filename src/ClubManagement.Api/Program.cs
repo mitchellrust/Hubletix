@@ -33,7 +33,18 @@ builder.Services.AddScoped<DatabaseInitializationService>();
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<ITenantConfigCacheService, TenantConfigCacheService>();
 
-builder.Services.AddRazorPages();
+// Enable hot reload of razor pages in development
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services
+        .AddRazorPages()
+        .AddRazorRuntimeCompilation();
+}
+else
+{
+    builder.Services.AddRazorPages();
+}
+
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
 

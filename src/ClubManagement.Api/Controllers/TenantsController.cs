@@ -2,14 +2,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Finbuckle.MultiTenant.Abstractions;
 using ClubManagement.Infrastructure.Persistence;
-using Microsoft.Extensions.Caching.Memory;
-using ClubManagement.Core.Entities;
 using ClubManagement.Infrastructure.Services;
 
 namespace ClubManagement.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("[controller]")]
 public class TenantsController : ControllerBase
 {
     private const string TenantConfigCachePrefix = "tenantconfig:";
