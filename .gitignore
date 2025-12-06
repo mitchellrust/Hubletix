@@ -281,7 +281,7 @@ obj/
 /wwwroot/node_modules
 
 # Libman package files
-/wwwroot/lib
+wwwroot/lib/
 
 ### VisualStudioCode ###
 .vscode/*
