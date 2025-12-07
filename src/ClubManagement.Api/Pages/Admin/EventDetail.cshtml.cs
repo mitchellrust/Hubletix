@@ -89,6 +89,16 @@ public class EventDetailModel : TenantPageModel
             if (DateTime.TryParse(LocalStartTime, out var localStart) && 
                 DateTime.TryParse(LocalEndTime, out var localEnd))
             {
+                // Validate start time is before or same as end time
+                if (localStart > localEnd)
+                {
+                    ErrorMessage = "Start time must be before end time.";
+                    PopulateEventTypeOptions();
+                    PopulateTimeZoneOptions();
+                    Event = existingEvent;
+                    return Page();
+                }
+
                 var timeZone = TimeZoneInfo.FindSystemTimeZoneById(Event.TimeZoneId);
                 startTimeUtc = TimeZoneInfo.ConvertTimeToUtc(localStart, timeZone);
                 endTimeUtc = TimeZoneInfo.ConvertTimeToUtc(localEnd, timeZone);
