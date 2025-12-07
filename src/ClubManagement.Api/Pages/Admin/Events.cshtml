@@ -1,7 +1,7 @@
-@page "/admin/dashboard"
-@model DashboardModel
+@page "/admin/events"
+@model EventsModel
 @{
-    ViewData["Title"] = "Admin Dashboard";
+    ViewData["Title"] = "Events";
 }
 
 <div class="container-fluid py-4">
@@ -9,49 +9,18 @@
     <div class="row mb-4">
         <div class="col-12">
             <h1 class="display-5 fw-bold">@Model.CurrentTenantInfo.Name</h1>
-            <p class="text-muted">Welcome back! Here's what's happening with your club.</p>
         </div>
     </div>
-
-    <!-- Stats Row (placeholder) -->
-    <div class="row mb-4">
-        <div class="col-12 col-md-3 mb-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <h6 class="card-title text-muted text-uppercase small">Total Members</h6>
-                    <h2 class="text-primary">@Model.TenantStats.TotalMembers</h2>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-md-3 mb-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <h6 class="card-title text-muted text-uppercase small">Active Events</h6>
-                    <h2 class="text-success">@Model.TenantStats.ActiveEvents</h2>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-md-3 mb-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <h6 class="card-title text-muted text-uppercase small">Revenue</h6>
-                    <h2 class="text-warning">$12.5K</h2>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Upcoming Events -->
     <div class="row">
         <div class="col-12">
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Upcoming Events</h5>
-                    <a href="/admin/events" class="btn btn-sm btn-outline-primary">View All</a>
+                    <h3 class="mb-0">Events</h3>
                 </div>
                 <div class="card-body p-0">
                     <div class="list-group list-group-flush">
-                        @foreach (UpcomingEventDto evt in Model.UpcomingEvents)
+                        @foreach (EventDto evt in Model.Events)
                         {
                             <div class="list-group-item px-4 py-3 d-flex justify-content-between align-items-center">
                                 <div class="flex-grow-1">
