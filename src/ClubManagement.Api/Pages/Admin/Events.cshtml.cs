@@ -17,6 +17,7 @@ public class EventsModel : TenantPageModel
     public string SortDirection { get; set; } = "desc";
     private readonly string _sortDirectionDesc = "desc";
     private readonly string _sortDirectionAsc = "asc";
+    public string? StatusFilter { get; set; } = "all"; // all, active, inactive
 
     public EventsModel(
         AppDbContext dbContext,
@@ -26,18 +27,27 @@ public class EventsModel : TenantPageModel
         _dbContext = dbContext;
     }
 
-    public async Task OnGetAsync(string? sort = null, string? dir = null, int pageNum = 1, int pageSize = 10)
+    public async Task OnGetAsync(string? sort = null, string? dir = null, int pageNum = 1, int pageSize = 10, string? status = null)
     {
         // Calculate pagination and sorting
         PageNum = Math.Max(1, pageNum);
         PageSize = Math.Clamp(pageSize, 5, 50);
         SortField = string.IsNullOrWhiteSpace(sort) ? _defaultSortField : sort.ToLowerInvariant();
         SortDirection = string.Equals(dir, _sortDirectionDesc, StringComparison.OrdinalIgnoreCase) ? _sortDirectionDesc : _sortDirectionAsc;
+        StatusFilter = string.IsNullOrWhiteSpace(status) ? "all" : status.ToLowerInvariant();
 
         // Build a deferred query for events
         var query = _dbContext.Events
             .Include(e => e.EventRegistrations)
             .AsQueryable();
+
+        // Apply status filter
+        query = StatusFilter switch
+        {
+            "active" => query.Where(e => e.IsActive),
+            "inactive" => query.Where(e => !e.IsActive),
+            _ => query // "all" - no filter
+        };
 
         // Apply sorting
         query = SortField switch
@@ -83,7 +93,8 @@ public class EventsModel : TenantPageModel
                 Location = "Club Location",
                 Registrations = e.EventRegistrations.Count,
                 EventType = e.EventType.ToString().Humanize(),
-                Capacity = e.Capacity
+                Capacity = e.Capacity,
+                IsActive = e.IsActive
             };
         }).ToList();
     }
@@ -102,5 +113,6 @@ public class EventDto
     public int Registrations { get; set; }
     public string EventType { get; set; } = string.Empty;
     public int Capacity { get; set; }
+    public bool IsActive { get; set; }
 }
 
