@@ -17,7 +17,14 @@ public class EventDetailModel : TenantPageModel
     [BindProperty]
     public Event? Event { get; set; }
 
+    [BindProperty]
+    public string? LocalStartTime { get; set; }
+
+    [BindProperty]
+    public string? LocalEndTime { get; set; }
+
     public List<SelectListItem> EventTypeOptions { get; set; } = new();
+    public List<SelectListItem> TimeZoneOptions { get; set; } = new();
     public string? StatusMessage { get; set; }
     public string? ErrorMessage { get; set; }
 
@@ -40,13 +47,20 @@ public class EventDetailModel : TenantPageModel
         Event = await _dbContext.Events
             .FirstOrDefaultAsync(e => e.Id == id);
 
-        // If event not found, should return better UI than just blank page.
+        // If event not found, should return better UI than 404.
         if (Event == null)
         {
             return Page();
         }
 
+        // Convert UTC times to local times for form display
+        var localStart = Event.StartTimeUtc.ToTimeZone(Event.TimeZoneId);
+        var localEnd = Event.EndTimeUtc.ToTimeZone(Event.TimeZoneId);
+        LocalStartTime = localStart.ToString("yyyy-MM-ddTHH:mm");
+        LocalEndTime = localEnd.ToString("yyyy-MM-ddTHH:mm");
+
         PopulateEventTypeOptions();
+        PopulateTimeZoneOptions();
         return Page();
     }
 
@@ -66,13 +80,31 @@ public class EventDetailModel : TenantPageModel
             return NotFound();
         }
 
+        // Parse and convert local times to UTC
+        DateTime startTimeUtc = existingEvent.StartTimeUtc;
+        DateTime endTimeUtc = existingEvent.EndTimeUtc;
+        
+        if (!string.IsNullOrEmpty(LocalStartTime) && !string.IsNullOrEmpty(LocalEndTime))
+        {
+            if (DateTime.TryParse(LocalStartTime, out var localStart) && 
+                DateTime.TryParse(LocalEndTime, out var localEnd))
+            {
+                var timeZone = TimeZoneInfo.FindSystemTimeZoneById(Event.TimeZoneId);
+                startTimeUtc = TimeZoneInfo.ConvertTimeToUtc(localStart, timeZone);
+                endTimeUtc = TimeZoneInfo.ConvertTimeToUtc(localEnd, timeZone);
+            }
+        }
+
         // Check if any fields have actually changed
         bool hasChanges = 
             existingEvent.Name != Event.Name ||
             existingEvent.Description != Event.Description ||
             existingEvent.EventType != Event.EventType ||
             existingEvent.Capacity != Event.Capacity ||
-            existingEvent.IsActive != Event.IsActive;
+            existingEvent.IsActive != Event.IsActive ||
+            existingEvent.TimeZoneId != Event.TimeZoneId ||
+            existingEvent.StartTimeUtc != startTimeUtc ||
+            existingEvent.EndTimeUtc != endTimeUtc;
 
         if (!hasChanges)
         {
@@ -86,6 +118,9 @@ public class EventDetailModel : TenantPageModel
             existingEvent.EventType = Event.EventType;
             existingEvent.Capacity = Event.Capacity;
             existingEvent.IsActive = Event.IsActive;
+            existingEvent.TimeZoneId = Event.TimeZoneId;
+            existingEvent.StartTimeUtc = startTimeUtc;
+            existingEvent.EndTimeUtc = endTimeUtc;
 
             try
             {
@@ -99,8 +134,19 @@ public class EventDetailModel : TenantPageModel
             }
         }
 
+        // Repopulate form with current values
         PopulateEventTypeOptions();
+        PopulateTimeZoneOptions();
         Event = existingEvent;
+        
+        // Convert UTC times back to local for display
+        LocalStartTime = existingEvent.StartTimeUtc
+            .ToTimeZone(existingEvent.TimeZoneId)
+            .ToString("yyyy-MM-ddTHH:mm");
+        LocalEndTime = existingEvent.EndTimeUtc
+            .ToTimeZone(existingEvent.TimeZoneId)
+            .ToString("yyyy-MM-ddTHH:mm");
+        
         return Page();
     }
 
@@ -131,6 +177,7 @@ public class EventDetailModel : TenantPageModel
             ErrorMessage = $"Error deleting event: {ex.Message}";
             Event = eventToDelete;
             PopulateEventTypeOptions();
+            PopulateTimeZoneOptions();
             return Page();
         }
     }
@@ -146,5 +193,33 @@ public class EventDetailModel : TenantPageModel
                 Selected = Event?.EventType == et
             })
             .ToList();
+    }
+
+    private void PopulateTimeZoneOptions(
+        DateTime? startTimeUtc = null
+    )
+    {
+        // US time zones
+        var timeZones = new[]
+        {
+            "America/New_York",      // Eastern
+            "America/Chicago",       // Central
+            "America/Denver",        // Mountain
+            "America/Los_Angeles",   // Pacific
+            "America/Anchorage",     // Alaska
+            "Pacific/Honolulu"       // Hawaii-Aleutian
+        };
+
+        TimeZoneOptions = timeZones.Select(tzId =>
+        {
+            var tz = TimeZoneInfo.FindSystemTimeZoneById(tzId);
+            var displayName = tzId.Replace("America/", "").Replace("Pacific/", "").Replace("_", " ");
+            return new SelectListItem
+            {
+                Value = tzId,
+                Text = $"{displayName} ({(startTimeUtc != null && tz.IsDaylightSavingTime(startTimeUtc.Value) ? tz.DaylightName : tz.StandardName)})",
+                Selected = Event?.TimeZoneId == tzId
+            };
+        }).ToList();
     }
 }

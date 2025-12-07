@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ClubManagement.Infrastructure.Persistence;
 using Finbuckle.MultiTenant.Abstractions;
-using ClubManagement.Core.Entities;
+using ClubManagement.Api.Utils;
 
 namespace ClubManagement.Api.Pages.Admin;
 
@@ -31,21 +31,30 @@ public class DashboardModel : TenantPageModel
             .CountAsync();
 
         // Fetch the next 5 active events from the database
-        UpcomingEvents = await _dbContext.Events
-            .Where(e => e.IsActive)
+        var events = await _dbContext.Events
+            .Where(e => e.IsActive && e.StartTimeUtc > DateTime.UtcNow)
             .Include(e => e.EventRegistrations)
-            .OrderBy(e => e.CreatedAt)
+            .OrderBy(e => e.StartTimeUtc)
             .Take(5)
-            .Select(e => new UpcomingEventDto
+            .ToListAsync();
+
+        // Convert UTC times to local timezone for display
+        UpcomingEvents = events.Select(e =>
+        {
+            var localStart = e.StartTimeUtc.ToTimeZone(e.TimeZoneId);
+            var localEnd = e.EndTimeUtc.ToTimeZone(e.TimeZoneId);
+            var tzShort = e.TimeZoneId.GetAbbreviationFromUtc(e.StartTimeUtc);
+
+            return new UpcomingEventDto
             {
                 Id = e.Id,
                 Name = e.Name,
-                Date = e.CreatedAt.AddDays(1), // Placeholder: events are 1 day from creation
-                Time = "6:00 PM",
-                Location = "Club Location",
+                Date = localStart,
+                Time = $"{localStart:h:mm tt} - {localEnd:h:mm tt} ({tzShort})",
+                Location = "Club", // TODO: Add location field to Event entity
                 Registrations = e.EventRegistrations.Count
-            })
-            .ToListAsync();
+            };
+        }).ToList();
     }
 }
 

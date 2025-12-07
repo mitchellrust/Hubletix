@@ -131,7 +131,11 @@ public class DatabaseInitializationService
                     Description = "An introductory event to welcome new members to the Demo VB Club.",
                     EventType = Core.Constants.EventType.GroupEvent,
                     Capacity = 200,
-                    IsActive = true
+                    IsActive = true,
+                    StartTimeUtc = DateTime.UtcNow.AddDays(7),
+                    EndTimeUtc = DateTime.UtcNow.AddDays(7).AddHours(2),
+                    TimeZoneId = "America/Denver",
+                    CreatedBy = "System"
                 },
                 new Event
                 {
@@ -141,7 +145,11 @@ public class DatabaseInitializationService
                     Description = "Join us for our annual holiday volleyball tournament! Open to all skill levels.",
                     EventType = Core.Constants.EventType.Competition,
                     Capacity = 400,
-                    IsActive = true
+                    IsActive = true,
+                    StartTimeUtc = DateTime.UtcNow.AddDays(8),
+                    EndTimeUtc = DateTime.UtcNow.AddDays(8).AddHours(2),
+                    TimeZoneId = "America/Denver",
+                    CreatedBy = "System"
                 },
                 new Event
                 {
@@ -151,7 +159,11 @@ public class DatabaseInitializationService
                     Description = "A fun event for parents and their kids to play volleyball together.",
                     EventType = Core.Constants.EventType.GroupEvent,
                     Capacity = 50,
-                    IsActive = true
+                    IsActive = true,
+                    StartTimeUtc = DateTime.UtcNow.AddDays(3),
+                    EndTimeUtc = DateTime.UtcNow.AddDays(3).AddHours(1),
+                    TimeZoneId = "America/Denver",
+                    CreatedBy = "System"
                 }
             };
 
@@ -187,7 +199,7 @@ public class DatabaseInitializationService
             "enablePayments": true
           },
           "settings": {
-            "timezone": "America/Boise",
+            "timezone": "America/Denver",
             "defaultCurrency": "usd"
           }
         }

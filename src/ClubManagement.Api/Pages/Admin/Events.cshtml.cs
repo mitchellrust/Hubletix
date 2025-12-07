@@ -32,7 +32,7 @@ public class EventsModel : TenantPageModel
         PageNum = Math.Max(1, pageNum);
         PageSize = Math.Clamp(pageSize, 5, 50);
         SortField = string.IsNullOrWhiteSpace(sort) ? _defaultSortField : sort.ToLowerInvariant();
-        SortDirection = string.Equals(dir, _sortDirectionAsc, StringComparison.OrdinalIgnoreCase) ? _sortDirectionAsc : _sortDirectionDesc;
+        SortDirection = string.Equals(dir, _sortDirectionDesc, StringComparison.OrdinalIgnoreCase) ? _sortDirectionDesc : _sortDirectionAsc;
 
         // Build a deferred query for events
         var query = _dbContext.Events
@@ -55,8 +55,8 @@ public class EventsModel : TenantPageModel
                 ? query.OrderBy(e => e.EventRegistrations.Count)
                 : query.OrderByDescending(e => e.EventRegistrations.Count),
             _ => SortDirection == _sortDirectionAsc
-                ? query.OrderBy(e => e.CreatedAt)
-                : query.OrderByDescending(e => e.CreatedAt)
+                ? query.OrderBy(e => e.StartTimeUtc)
+                : query.OrderByDescending(e => e.StartTimeUtc)
         };
 
         // Get total count for pagination
@@ -64,21 +64,28 @@ public class EventsModel : TenantPageModel
         TotalPages = (int)Math.Ceiling(totalCount / (double)PageSize);
 
         // Fetch paginated events (executes query)
-        Events = await query
+        var events = await query
             .Skip((PageNum - 1) * PageSize) // Skips items for previous pages
             .Take(PageSize)                 // Limits results to only the page size
-            .Select(e => new EventDto
+            .ToListAsync();
+
+        // Project to DTO in-memory
+        Events = events.Select(e =>
+        {
+            var localStart = e.StartTimeUtc.ToTimeZone(e.TimeZoneId);
+
+            return new EventDto
             {
                 Id = e.Id,
                 Name = e.Name,
-                Date = e.CreatedAt,
-                Time = e.CreatedAt.ToString("h:mm tt"),
+                Date = localStart,
+                Time = localStart.ToString("h:mm tt"),
                 Location = "Club Location",
                 Registrations = e.EventRegistrations.Count,
                 EventType = e.EventType.ToString().Humanize(),
                 Capacity = e.Capacity
-            })
-            .ToListAsync();
+            };
+        }).ToList();
     }
 }
 

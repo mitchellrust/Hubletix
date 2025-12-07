@@ -84,6 +84,26 @@
                                 </div>
                             </div>
 
+                            <div class="row">
+                                <div class="col-12 col-md-6 mb-3">
+                                    <label asp-for="LocalStartTime" class="form-label">Start Time</label>
+                                    <input type="datetime-local" class="form-control" asp-for="LocalStartTime" />
+                                    <span class="text-muted small">Local time in selected timezone</span>
+                                </div>
+
+                                <div class="col-12 col-md-6 mb-3">
+                                    <label asp-for="LocalEndTime" class="form-label">End Time</label>
+                                    <input type="datetime-local" class="form-control" asp-for="LocalEndTime" />
+                                    <span class="text-muted small">Local time in selected timezone</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Event.TimeZoneId" class="form-label">Time Zone</label>
+                                <select class="form-select" asp-for="Event.TimeZoneId" asp-items="Model.TimeZoneOptions"></select>
+                                <span asp-validation-for="Event.TimeZoneId" class="text-danger small"></span>
+                            </div>
+
                             <div class="mb-3">
                                 <label class="form-label">Status</label>
                                 <div class="form-check form-switch">

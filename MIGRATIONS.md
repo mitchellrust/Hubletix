@@ -153,12 +153,12 @@ public string NewColumn { get; set; } = string.Empty;  // Added
 **Reset local database**:
 ```bash
 # Drop databases
-psql -U postgres -c "DROP DATABASE IF EXISTS clubmanagement_tenantstore;"
-psql -U postgres -c "DROP DATABASE IF EXISTS clubmanagement_app;"
+psql -U postgres -c "DROP DATABASE IF EXISTS tenantstore;"
+psql -U postgres -c "DROP DATABASE IF EXISTS appdb;"
 
 # Recreate databases
-psql -U postgres -c "CREATE DATABASE clubmanagement_tenantstore;"
-psql -U postgres -c "CREATE DATABASE clubmanagement_app;"
+psql -U postgres -c "CREATE DATABASE tenantstore;"
+psql -U postgres -c "CREATE DATABASE appdb;"
 
 # Run app - migrations apply automatically
 ```
