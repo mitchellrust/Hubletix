@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ClubManagement.Infrastructure.Persistence;
 using Finbuckle.MultiTenant.Abstractions;
+using ClubManagement.Api.Utils;
 
 namespace ClubManagement.Api.Pages.Admin;
 
@@ -29,14 +30,12 @@ public class EventsModel : TenantPageModel
     {
         // Calculate pagination and sorting
         PageNum = Math.Max(1, pageNum);
-        // PageSize = Math.Clamp(pageSize, 5, 50);
-        PageSize = 2;
+        PageSize = Math.Clamp(pageSize, 5, 50);
         SortField = string.IsNullOrWhiteSpace(sort) ? _defaultSortField : sort.ToLowerInvariant();
         SortDirection = string.Equals(dir, _sortDirectionAsc, StringComparison.OrdinalIgnoreCase) ? _sortDirectionAsc : _sortDirectionDesc;
 
         // Build a deferred query for events
         var query = _dbContext.Events
-            .Where(e => e.IsActive)
             .Include(e => e.EventRegistrations)
             .AsQueryable();
 
@@ -76,7 +75,7 @@ public class EventsModel : TenantPageModel
                 Time = e.CreatedAt.ToString("h:mm tt"),
                 Location = "Club Location",
                 Registrations = e.EventRegistrations.Count,
-                EventType = e.EventType.ToString(),
+                EventType = e.EventType.ToString().Humanize(),
                 Capacity = e.Capacity
             })
             .ToListAsync();
