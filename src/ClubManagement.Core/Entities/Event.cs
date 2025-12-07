@@ -36,6 +36,24 @@ public class Event : BaseEntity
     public int Capacity { get; set; } = 15;
     
     /// <summary>
+    /// Event start time (UTC)
+    /// </summary>
+    public DateTime? StartTimeUtc { get; set; }
+    
+    /// <summary>
+    /// Event end time (UTC)
+    /// </summary>
+    public DateTime? EndTimeUtc { get; set; }
+    
+    /// <summary>
+    /// Time zone ID for the event (e.g., "America/Denver" for Mountain Time)
+    /// Uses IANA time zone identifier format.
+    /// </summary>
+    [Required]
+    [StringLength(100)]
+    public string TimeZoneId { get; set; } = "America/Denver";
+    
+    /// <summary>
     /// Whether signups are currently enabled
     /// </summary>
     public bool IsActive { get; set; } = true;

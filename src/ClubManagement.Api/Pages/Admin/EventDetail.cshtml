@@ -25,6 +25,10 @@
                     <i class="bi bi-arrow-left"></i> Back to Events
                 </a>
                 <h1 class="display-5 fw-bold">@Model.Event.Name</h1>
+                @if (!string.IsNullOrWhiteSpace(Model.Event.CreatedBy))
+                {
+                    <p class="text-muted">Created by @Model.Event.CreatedBy</p>
+                }
             </div>
         </div>
 
