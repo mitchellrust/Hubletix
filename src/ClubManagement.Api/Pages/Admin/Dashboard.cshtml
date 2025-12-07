@@ -53,11 +53,15 @@
                     <div class="list-group list-group-flush">
                         @foreach (UpcomingEventDto evt in Model.UpcomingEvents)
                         {
-                            <div class="list-group-item px-4 py-3 d-flex justify-content-between align-items-center">
+                            <div class="list-group-item px-4 py-3 d-flex justify-content-between align-items-center @(evt.IsActive ? "" : "bg-light")">
                                 <div class="flex-grow-1">
                                     <div class="d-flex align-items-center mb-2">
                                         <div class="badge bg-primary me-2">@evt.Date.ToString("MMM dd, yyyy")</div>
                                         <h6 class="mb-0 fw-semibold">@evt.Name</h6>
+                                        @if (!evt.IsActive)
+                                        {
+                                            <span class="badge bg-secondary ms-2">Inactive</span>
+                                        }
                                     </div>
                                     <p class="text-muted small mb-0">
                                         <i class="bi bi-clock"></i> @evt.Time | 

@@ -32,7 +32,7 @@ public class DashboardModel : TenantPageModel
 
         // Fetch the next 5 active events from the database
         var events = await _dbContext.Events
-            .Where(e => e.IsActive && e.StartTimeUtc > DateTime.UtcNow)
+            .Where(e => e.StartTimeUtc > DateTime.UtcNow)
             .Include(e => e.EventRegistrations)
             .OrderBy(e => e.StartTimeUtc)
             .Take(5)
@@ -52,7 +52,8 @@ public class DashboardModel : TenantPageModel
                 Date = localStart,
                 Time = $"{localStart:h:mm tt} - {localEnd:h:mm tt} ({tzShort})",
                 Location = "Club", // TODO: Add location field to Event entity
-                Registrations = e.EventRegistrations.Count
+                Registrations = e.EventRegistrations.Count,
+                IsActive = e.IsActive
             };
         }).ToList();
     }
@@ -69,6 +70,7 @@ public class UpcomingEventDto
     public string Time { get; set; } = string.Empty;
     public string Location { get; set; } = string.Empty;
     public int Registrations { get; set; }
+    public bool IsActive { get; set; }
 }
 
 public class TenantStatsDto
