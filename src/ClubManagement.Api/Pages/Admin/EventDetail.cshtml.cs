@@ -66,22 +66,37 @@ public class EventDetailModel : TenantPageModel
             return NotFound();
         }
 
-        // Update allowed fields
-        existingEvent.Name = Event.Name;
-        existingEvent.Description = Event.Description;
-        existingEvent.EventType = Event.EventType;
-        existingEvent.Capacity = Event.Capacity;
-        existingEvent.IsActive = Event.IsActive;
+        // Check if any fields have actually changed
+        bool hasChanges = 
+            existingEvent.Name != Event.Name ||
+            existingEvent.Description != Event.Description ||
+            existingEvent.EventType != Event.EventType ||
+            existingEvent.Capacity != Event.Capacity ||
+            existingEvent.IsActive != Event.IsActive;
 
-        try
+        if (!hasChanges)
         {
-            _dbContext.Events.Update(existingEvent);
-            await _dbContext.SaveChangesAsync();
-            StatusMessage = "Event updated successfully.";
+            StatusMessage = "No changes were made.";
         }
-        catch (Exception ex)
+        else
         {
-            ErrorMessage = $"Error updating event: {ex.Message}";
+            // Update allowed fields
+            existingEvent.Name = Event.Name;
+            existingEvent.Description = Event.Description;
+            existingEvent.EventType = Event.EventType;
+            existingEvent.Capacity = Event.Capacity;
+            existingEvent.IsActive = Event.IsActive;
+
+            try
+            {
+                _dbContext.Events.Update(existingEvent);
+                await _dbContext.SaveChangesAsync();
+                StatusMessage = "Event updated successfully.";
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = $"Error updating event: {ex.Message}";
+            }
         }
 
         PopulateEventTypeOptions();

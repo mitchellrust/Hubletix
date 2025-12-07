@@ -83,9 +83,9 @@
                             <div class="mb-3">
                                 <label class="form-label">Status</label>
                                 <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="isActive" asp-for="Event.IsActive" />
-                                    <label class="form-check-label" for="isActive">
-                                        @(Model.Event?.IsActive == true ? "Active" : "Inactive")
+                                    <input class="form-check-input" type="checkbox" id="isActive" asp-for="Event.IsActive" onchange="updateStatusLabel(this)" />
+                                    <label class="form-check-label" for="isActive" id="statusLabel">
+                                        @(Model.Event.IsActive == true ? "Active" : "Inactive")
                                     </label>
                                 </div>
                             </div>
@@ -123,7 +123,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Are you sure you want to delete <strong>@Model.Event?.Name</strong>?</p>
+                    <p>Are you sure you want to delete <strong>@Model.Event.Name</strong>?</p>
                     <p class="text-muted small">This action cannot be undone.</p>
                 </div>
                 <div class="modal-footer">
@@ -136,5 +136,12 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Update event status label on toggle
+        function updateStatusLabel(checkbox) {
+            document.getElementById('statusLabel').textContent = checkbox.checked ? 'Active' : 'Inactive';
+        }
+    </script>
     }
 </div>

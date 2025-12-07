@@ -20,7 +20,8 @@
       "sourceLanguageMapping": {
         "C#": "csharp"
       },
-      "console": "internalConsole"
+      "console": "internalConsole",
+      "requireExactSource": false
     }
   ]
 }
