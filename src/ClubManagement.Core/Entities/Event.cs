@@ -38,12 +38,12 @@ public class Event : BaseEntity
     /// <summary>
     /// Event start time (UTC)
     /// </summary>
-    public DateTime? StartTimeUtc { get; set; }
+    public DateTime StartTimeUtc { get; set; }
     
     /// <summary>
     /// Event end time (UTC)
     /// </summary>
-    public DateTime? EndTimeUtc { get; set; }
+    public DateTime EndTimeUtc { get; set; }
     
     /// <summary>
     /// Time zone ID for the event (e.g., "America/Denver" for Mountain Time)
