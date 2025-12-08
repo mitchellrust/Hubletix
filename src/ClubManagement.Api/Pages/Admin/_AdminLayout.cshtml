@@ -4,9 +4,12 @@
 
 <div class="d-flex min-vh-100">
     <!-- Sidebar -->
-    <nav class="sidebar bg-dark text-white d-flex flex-column" style="width: 240px;">
-        <div class="p-4 border-bottom border-secondary">
+    <nav class="sidebar bg-dark text-white d-flex flex-column" id="adminSidebar">
+        <div class="p-4 border-bottom border-secondary d-flex justify-content-between align-items-center">
             <h4 class="mb-0 fw-bold">@ViewData["TenantName"]</h4>
+            <button class="btn btn-dark d-lg-none" type="button" onclick="toggleSidebar()">
+                <i class="bi bi-x-lg"></i>
+            </button>
         </div>
         
         <ul class="nav flex-column flex-grow-1 py-3">
@@ -57,12 +60,20 @@
         </ul>
     </nav>
 
+    <!-- Backdrop overlay for mobile -->
+    <div class="sidebar-backdrop d-lg-none" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+
     <!-- Main Content -->
     <div class="flex-grow-1 d-flex flex-column">
         <!-- Header -->
         <header class="bg-white border-bottom px-4 py-3">
             <div class="d-flex justify-content-between align-items-center">
-                <h2 class="mb-0">@ViewData["Title"]</h2>
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn btn-light d-lg-none" type="button" onclick="toggleSidebar()">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <h2 class="mb-0">@ViewData["Title"]</h2>
+                </div>
                 
                 <div class="d-flex align-items-center gap-3">
                     <button class="btn btn-light position-relative">
@@ -76,7 +87,7 @@
                         <button class="btn btn-light d-flex align-items-center gap-2 dropdown-toggle" type="button" data-bs-toggle="dropdown">
                             <img src="https://ui-avatars.com/api/?name=Admin&background=4F46E5&color=fff&size=32" 
                                  class="rounded-circle" width="32" height="32" alt="Admin">
-                            <span>Admin User</span>
+                            <span class="d-none d-md-inline">Admin User</span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="#">Profile</a></li>
@@ -97,6 +108,11 @@
 </div>
 
 <style>
+    .sidebar {
+        width: 240px;
+        transition: transform 0.3s ease;
+    }
+    
     .sidebar .nav-link {
         transition: background-color 0.2s;
     }
@@ -108,4 +124,67 @@
     .sidebar .nav-link.active {
         background-color: #0d6efd;
     }
+
+    .sidebar-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1040;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .sidebar-backdrop.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* Mobile styles */
+    @@media (max-width: 991.98px) {
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-index: 1050;
+            transform: translateX(-100%);
+        }
+
+        .sidebar.show {
+            transform: translateX(0);
+        }
+    }
 </style>
+
+<script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById('adminSidebar');
+        const backdrop = document.getElementById('sidebarBackdrop');
+        
+        sidebar.classList.toggle('show');
+        backdrop.classList.toggle('show');
+    }
+
+    // Close sidebar when clicking a link on mobile
+    document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth < 992) {
+                toggleSidebar();
+            }
+        });
+    });
+
+    // Close sidebar on window resize if desktop size
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 992) {
+            const sidebar = document.getElementById('adminSidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            sidebar.classList.remove('show');
+            backdrop.classList.remove('show');
+        }
+    });
+</script>
