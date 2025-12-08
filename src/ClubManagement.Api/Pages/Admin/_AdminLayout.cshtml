@@ -1,0 +1,111 @@
+@{
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="d-flex min-vh-100">
+    <!-- Sidebar -->
+    <nav class="sidebar bg-dark text-white d-flex flex-column" style="width: 240px;">
+        <div class="p-4 border-bottom border-secondary">
+            <h4 class="mb-0 fw-bold">@ViewData["TenantName"]</h4>
+        </div>
+        
+        <ul class="nav flex-column flex-grow-1 py-3">
+            <li class="nav-item">
+                <a class="nav-link text-white px-4 py-2 @(ViewContext.RouteData.Values["page"]?.ToString() == "/Admin/Dashboard" ? "active bg-primary" : "")" 
+                   href="/admin/dashboard">
+                    <i class="bi bi-speedometer2 me-2"></i>
+                    Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white px-4 py-2 @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Events") == true ? "active bg-primary" : "")" 
+                   href="/admin/events">
+                    <i class="bi bi-calendar-event me-2"></i>
+                    Events
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white px-4 py-2" href="#">
+                    <i class="bi bi-people me-2"></i>
+                    Members
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white px-4 py-2" href="#">
+                    <i class="bi bi-door-open me-2"></i>
+                    Membership Plans
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white px-4 py-2" href="#">
+                    <i class="bi bi-graph-up me-2"></i>
+                    Analytics
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white px-4 py-2" href="#">
+                    <i class="bi bi-file-text me-2"></i>
+                    Reports
+                </a>
+            </li>
+            <li class="nav-item mt-auto">
+                <a class="nav-link text-white px-4 py-2" href="#">
+                    <i class="bi bi-gear me-2"></i>
+                    Settings
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="flex-grow-1 d-flex flex-column">
+        <!-- Header -->
+        <header class="bg-white border-bottom px-4 py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">@ViewData["Title"]</h2>
+                
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn btn-light position-relative">
+                        <i class="bi bi-bell"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+                            3
+                        </span>
+                    </button>
+                    
+                    <div class="dropdown">
+                        <button class="btn btn-light d-flex align-items-center gap-2 dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <img src="https://ui-avatars.com/api/?name=Admin&background=4F46E5&color=fff&size=32" 
+                                 class="rounded-circle" width="32" height="32" alt="Admin">
+                            <span>Admin User</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#">Profile</a></li>
+                            <li><a class="dropdown-item" href="#">Account Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <main class="flex-grow-1 overflow-auto" style="background-color: #f8f9fa;">
+            @RenderBody()
+        </main>
+    </div>
+</div>
+
+<style>
+    .sidebar .nav-link {
+        transition: background-color 0.2s;
+    }
+    
+    .sidebar .nav-link:hover:not(.active) {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .sidebar .nav-link.active {
+        background-color: #0d6efd;
+    }
+</style>

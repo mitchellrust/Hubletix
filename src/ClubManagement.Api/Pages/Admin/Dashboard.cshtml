@@ -1,17 +1,12 @@
 @page "/admin/dashboard"
 @model DashboardModel
 @{
-    ViewData["Title"] = "Admin Dashboard";
+    ViewData["Title"] = "Dashboard";
+    ViewData["TenantName"] = Model.CurrentTenantInfo.Name;
+    Layout = "_AdminLayout";
 }
 
 <div class="container-fluid py-4">
-    <!-- Header -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <h1 class="display-5 fw-bold">@Model.CurrentTenantInfo.Name</h1>
-            <p class="text-muted">Welcome back! Here's what's happening with your club.</p>
-        </div>
-    </div>
 
     <!-- Stats Row (placeholder) -->
     <div class="row mb-4">

@@ -2,14 +2,11 @@
 @model EventsModel
 @{
     ViewData["Title"] = "Events";
+    ViewData["TenantName"] = Model.CurrentTenantInfo.Name;
+    Layout = "_AdminLayout";
 }
 
 <div class="container-fluid py-4">
-    <div class="row mb-4">
-        <div class="col-12">
-            <h1 class="display-5 fw-bold">@Model.CurrentTenantInfo.Name</h1>
-        </div>
-    </div>
 
     <div class="card border-0 shadow-sm">
         <div class="card-header bg-white border-bottom">

@@ -2,6 +2,8 @@
 @model CreateEventModel
 @{
     ViewData["Title"] = "Create Event";
+    ViewData["TenantName"] = Model.CurrentTenantInfo.Name;
+    Layout = "_AdminLayout";
 }
 
 <div class="container-fluid py-4">
