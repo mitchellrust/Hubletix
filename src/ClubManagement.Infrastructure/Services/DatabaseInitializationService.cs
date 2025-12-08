@@ -169,8 +169,37 @@ public class DatabaseInitializationService
                 }
             };
 
+            var demoPlans = new List<MembershipPlan>
+            {
+                new MembershipPlan
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    TenantId = demoTenant.Id,
+                    Name = "Basic Membership",
+                    Description = "Access to gym facilities during staffed hours.",
+                    PriceInCents = 3000, // $30.00
+                    BillingInterval = Core.Constants.BillingIntervals.Monthly,
+                    IsActive = true,
+                    DisplayOrder = 0,
+                    CreatedBy = "System"
+                },
+                new MembershipPlan
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    TenantId = demoTenant.Id,
+                    Name = "Premium Membership",
+                    Description = "Includes 24/7 gym access and discounts on events.",
+                    PriceInCents = 5000, // $50.00
+                    BillingInterval = Core.Constants.BillingIntervals.Annually,
+                    IsActive = true,
+                    DisplayOrder = 1,
+                    CreatedBy = "System"
+                }
+            };
+
             context.Tenants.Add(demoTenant);
             context.Events.AddRange(demoEvents);
+            context.MembershipPlans.AddRange(demoPlans);
             await context.SaveChangesAsync();
 
             _logger.LogInformation("Demo tenant created with identifier: {Subdomain}", demoTenant.Id);

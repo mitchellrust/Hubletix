@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using ClubManagement.Core.Models;
 
 namespace ClubManagement.Core.Entities;
@@ -22,6 +23,12 @@ public class MembershipPlan : BaseEntity
     /// Price in cents (e.g., 9999 = $99.99)
     /// </summary>
     public int PriceInCents { get; set; }
+
+    /// <summary>
+    /// Formatted price string (e.g., "$99.99")
+    /// </summary>
+    [NotMapped]
+    public string PriceFormatted => (PriceInCents / 100.0m).ToString("C");
     
     /// <summary>
     /// Billing interval: "month" or "year"
