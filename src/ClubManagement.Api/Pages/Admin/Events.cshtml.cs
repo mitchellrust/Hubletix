@@ -18,6 +18,7 @@ public class EventsModel : TenantPageModel
     private readonly string _sortDirectionDesc = "desc";
     private readonly string _sortDirectionAsc = "asc";
     public string? StatusFilter { get; set; } = "all"; // all, active, inactive
+    public string? DateFilter { get; set; } = "upcoming"; // upcoming, past, all
 
     public EventsModel(
         AppDbContext dbContext,
@@ -27,7 +28,7 @@ public class EventsModel : TenantPageModel
         _dbContext = dbContext;
     }
 
-    public async Task OnGetAsync(string? sort = null, string? dir = null, int pageNum = 1, int pageSize = 10, string? status = null)
+    public async Task OnGetAsync(string? sort = null, string? dir = null, int pageNum = 1, int pageSize = 10, string? status = null, string? date = null)
     {
         // Calculate pagination and sorting
         PageNum = Math.Max(1, pageNum);
@@ -35,6 +36,7 @@ public class EventsModel : TenantPageModel
         SortField = string.IsNullOrWhiteSpace(sort) ? _defaultSortField : sort.ToLowerInvariant();
         SortDirection = string.Equals(dir, _sortDirectionDesc, StringComparison.OrdinalIgnoreCase) ? _sortDirectionDesc : _sortDirectionAsc;
         StatusFilter = string.IsNullOrWhiteSpace(status) ? "all" : status.ToLowerInvariant();
+        DateFilter = string.IsNullOrWhiteSpace(date) ? "upcoming" : date.ToLowerInvariant();
 
         // Build a deferred query for events
         var query = _dbContext.Events
@@ -47,6 +49,14 @@ public class EventsModel : TenantPageModel
             "active" => query.Where(e => e.IsActive),
             "inactive" => query.Where(e => !e.IsActive),
             _ => query // "all" - no filter
+        };
+
+        // Apply date filter
+        var nowUtc = DateTime.UtcNow;
+        query = DateFilter switch
+        {
+            "past" => query.Where(e => e.StartTimeUtc < nowUtc),
+            _ => query.Where(e => e.StartTimeUtc >= nowUtc) // default to upcoming only
         };
 
         // Apply sorting

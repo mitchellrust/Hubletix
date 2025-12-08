@@ -17,12 +17,20 @@
                 <h3 class="mb-0">Events</h3>
                 <a class="btn btn-sm btn-primary" href="/admin/events/create">Create Event</a>
             </div>
+            <div class="d-flex gap-3 mb-3">
+                <div class="btn-group btn-group-sm" role="group" aria-label="Date filter">
+                    <a asp-page="/Admin/Events" asp-route-date="upcoming" asp-route-status="@Model.StatusFilter" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
+                       class="btn @(Model.DateFilter == "upcoming" ? "btn-success" : "btn-outline-success")">Upcoming</a>
+                    <a asp-page="/Admin/Events" asp-route-date="past" asp-route-status="@Model.StatusFilter" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
+                       class="btn @(Model.DateFilter == "past" ? "btn-success" : "btn-outline-success")">Past</a>
+                </div>
+            </div>
             <div class="btn-group btn-group-sm" role="group" aria-label="Status filter">
-                <a asp-page="/Admin/Events" asp-route-status="all" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
+                <a asp-page="/Admin/Events" asp-route-status="all" asp-route-date="@Model.DateFilter" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
                    class="btn @(Model.StatusFilter == "all" ? "btn-primary" : "btn-outline-primary")">All</a>
-                <a asp-page="/Admin/Events" asp-route-status="active" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
+                <a asp-page="/Admin/Events" asp-route-status="active" asp-route-date="@Model.DateFilter" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
                    class="btn @(Model.StatusFilter == "active" ? "btn-primary" : "btn-outline-primary")">Active</a>
-                <a asp-page="/Admin/Events" asp-route-status="inactive" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
+                <a asp-page="/Admin/Events" asp-route-status="inactive" asp-route-date="@Model.DateFilter" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
                    class="btn @(Model.StatusFilter == "inactive" ? "btn-primary" : "btn-outline-primary")">Inactive</a>
             </div>
         </div>
@@ -31,19 +39,19 @@
                 <thead class="table-light">
                     <tr>
                         <th>
-                            <a asp-page="/Admin/Events" asp-route-sort="date" asp-route-dir="@(Model.SortField == "date" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" class="text-decoration-none">Event Start</a>
+                            <a asp-page="/Admin/Events" asp-route-sort="date" asp-route-dir="@(Model.SortField == "date" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" asp-route-date="@Model.DateFilter" class="text-decoration-none">Event Start</a>
                         </th>
                         <th>
-                            <a asp-page="/Admin/Events" asp-route-sort="name" asp-route-dir="@(Model.SortField == "name" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" class="text-decoration-none">Name</a>
+                            <a asp-page="/Admin/Events" asp-route-sort="name" asp-route-dir="@(Model.SortField == "name" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" asp-route-date="@Model.DateFilter" class="text-decoration-none">Name</a>
                         </th>
                         <th>
-                            <a asp-page="/Admin/Events" asp-route-sort="type" asp-route-dir="@(Model.SortField == "type" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" class="text-decoration-none">Type</a>
+                            <a asp-page="/Admin/Events" asp-route-sort="type" asp-route-dir="@(Model.SortField == "type" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" asp-route-date="@Model.DateFilter" class="text-decoration-none">Type</a>
                         </th>
                         <th>
-                            <a asp-page="/Admin/Events" asp-route-sort="capacity" asp-route-dir="@(Model.SortField == "capacity" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" class="text-decoration-none">Capacity</a>
+                            <a asp-page="/Admin/Events" asp-route-sort="capacity" asp-route-dir="@(Model.SortField == "capacity" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" asp-route-date="@Model.DateFilter" class="text-decoration-none">Capacity</a>
                         </th>
                         <th>
-                            <a asp-page="/Admin/Events" asp-route-sort="registrations" asp-route-dir="@(Model.SortField == "registrations" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" class="text-decoration-none">Registrations</a>
+                            <a asp-page="/Admin/Events" asp-route-sort="registrations" asp-route-dir="@(Model.SortField == "registrations" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" asp-route-date="@Model.DateFilter" class="text-decoration-none">Registrations</a>
                         </th>
                         <th class="text-end">Actions</th>
                     </tr>
@@ -92,8 +100,8 @@
                 Page @Model.PageNum of @Model.TotalPages
             </div>
             <div>
-                <a class="btn btn-sm btn-outline-secondary me-2 @(Model.PageNum <= 1 ? "disabled" : string.Empty)" asp-page="/Admin/Events" asp-route-pageNum="@(Model.PageNum - 1)" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" asp-route-status="@Model.StatusFilter">Previous</a>
-                <a class="btn btn-sm btn-outline-secondary @(Model.PageNum >= Model.TotalPages ? "disabled" : string.Empty)" asp-page="/Admin/Events" asp-route-pageNum="@(Model.PageNum + 1)" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" asp-route-status="@Model.StatusFilter">Next</a>
+                <a class="btn btn-sm btn-outline-secondary me-2 @(Model.PageNum <= 1 ? "disabled" : string.Empty)" asp-page="/Admin/Events" asp-route-pageNum="@(Model.PageNum - 1)" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" asp-route-status="@Model.StatusFilter" asp-route-date="@Model.DateFilter">Previous</a>
+                <a class="btn btn-sm btn-outline-secondary @(Model.PageNum >= Model.TotalPages ? "disabled" : string.Empty)" asp-page="/Admin/Events" asp-route-pageNum="@(Model.PageNum + 1)" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" asp-route-status="@Model.StatusFilter" asp-route-date="@Model.DateFilter">Next</a>
             </div>
         </div>
     </div>
