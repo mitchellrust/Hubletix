@@ -1,0 +1,170 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using ClubManagement.Core.Constants;
+using ClubManagement.Core.Entities;
+using ClubManagement.Infrastructure.Persistence;
+using Finbuckle.MultiTenant.Abstractions;
+using ClubManagement.Api.Utils;
+using ClubManagement.Infrastructure.Services;
+
+namespace ClubManagement.Api.Pages.Admin;
+
+public class CreateEventModel : TenantPageModel
+{
+    private readonly AppDbContext _dbContext;
+    private readonly ClubTenantInfo _currentTenantInfo;
+    private readonly ITenantConfigCacheService _tenantConfigCache;
+
+    [BindProperty]
+    public Event Event { get; set; } = new Event();
+
+    [BindProperty]
+    public string? LocalStartTime { get; set; }
+
+    [BindProperty]
+    public string? LocalEndTime { get; set; }
+
+    public List<SelectListItem> EventTypeOptions { get; set; } = new();
+    public List<SelectListItem> TimeZoneOptions { get; set; } = new();
+    public string? ErrorMessage { get; set; }
+
+    public CreateEventModel(
+        AppDbContext dbContext,
+        ITenantConfigCacheService tenantConfigCache,
+        IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor
+        
+    ) : base(multiTenantContextAccessor)
+    {
+        _dbContext = dbContext;
+        _tenantConfigCache = tenantConfigCache;
+        _currentTenantInfo = multiTenantContextAccessor.MultiTenantContext.TenantInfo!;
+    }
+
+    public async Task<IActionResult> OnGetAsync()
+    {
+        // Fetch tenant config for defaults
+        var tenant = await _tenantConfigCache.GetTenantConfigAsync(_currentTenantInfo.Id);
+        if (tenant == null)
+        {
+            throw new InvalidOperationException("Tenant configuration not found.");
+        }
+
+        // Initialize with default values
+        var tenantConfig = tenant.GetConfig();
+        Event.TimeZoneId = tenantConfig.Settings.TimeZoneId;
+        Event.Capacity = 15;
+        Event.EventType = EventType.Class;
+        Event.IsActive = true;
+
+        // Set default times based on tenant's timezone
+        // TODO: Not sure if this the best, but setting to now seems reasonable
+        var tzNow = DateTime.UtcNow.ToTimeZone(tenantConfig.Settings.TimeZoneId);
+        LocalStartTime = tzNow.ToString("yyyy-MM-ddTHH:mm");
+        LocalEndTime = tzNow.ToString("yyyy-MM-ddTHH:mm");
+
+        PopulateEventTypeOptions();
+        PopulateTimeZoneOptions();
+        return Page();
+    }
+
+    public async Task<IActionResult> OnPostAsync()
+    {
+        // Validate required fields
+        if (string.IsNullOrWhiteSpace(Event.Name))
+        {
+            ErrorMessage = "Event name is required.";
+            PopulateEventTypeOptions();
+            PopulateTimeZoneOptions();
+            return Page();
+        }
+
+        // Parse and convert local times to UTC
+        if (string.IsNullOrEmpty(LocalStartTime) || string.IsNullOrEmpty(LocalEndTime))
+        {
+            ErrorMessage = "Start time and end time are required.";
+            PopulateEventTypeOptions();
+            PopulateTimeZoneOptions();
+            return Page();
+        }
+
+        if (!DateTime.TryParse(LocalStartTime, out var localStart) || 
+            !DateTime.TryParse(LocalEndTime, out var localEnd))
+        {
+            ErrorMessage = "Invalid date/time format.";
+            PopulateEventTypeOptions();
+            PopulateTimeZoneOptions();
+            return Page();
+        }
+
+        // Validate start time is not after end time
+        if (localStart > localEnd)
+        {
+            ErrorMessage = "Start time must be before end time.";
+            PopulateEventTypeOptions();
+            PopulateTimeZoneOptions();
+            return Page();
+        }
+
+        // Convert to UTC
+        var timeZone = TimeZoneInfo.FindSystemTimeZoneById(Event.TimeZoneId);
+        Event.StartTimeUtc = TimeZoneInfo.ConvertTimeToUtc(localStart, timeZone);
+        Event.EndTimeUtc = TimeZoneInfo.ConvertTimeToUtc(localEnd, timeZone);
+
+        // Set tenant ID
+        Event.TenantId = _currentTenantInfo.Id;
+        Event.Id = Guid.NewGuid().ToString();
+
+        try
+        {
+            _dbContext.Events.Add(Event);
+            await _dbContext.SaveChangesAsync();
+            return RedirectToPage("/Admin/Events", new { id = Event.Id });
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Error creating event: {ex.Message}";
+            PopulateEventTypeOptions();
+            PopulateTimeZoneOptions();
+            return Page();
+        }
+    }
+
+    private void PopulateEventTypeOptions()
+    {
+        EventTypeOptions = Enum.GetValues(typeof(EventType))
+            .Cast<EventType>()
+            .Select(et => new SelectListItem
+            {
+                Value = et.ToString(),
+                Text = et.ToString().Humanize(),
+                Selected = Event?.EventType == et
+            })
+            .ToList();
+    }
+
+    private void PopulateTimeZoneOptions()
+    {
+        // US time zones
+        var timeZones = new[]
+        {
+            "America/New_York",      // Eastern
+            "America/Chicago",       // Central
+            "America/Denver",        // Mountain
+            "America/Los_Angeles",   // Pacific
+            "America/Anchorage",     // Alaska
+            "Pacific/Honolulu"       // Hawaii-Aleutian
+        };
+
+        TimeZoneOptions = timeZones.Select(tzId =>
+        {
+            var tz = TimeZoneInfo.FindSystemTimeZoneById(tzId);
+            var displayName = tzId.Replace("America/", "").Replace("Pacific/", "").Replace("_", " ");
+            return new SelectListItem
+            {
+                Value = tzId,
+                Text = $"{displayName} ({tz.StandardName})",
+                Selected = Event?.TimeZoneId == tzId
+            };
+        }).ToList();
+    }
+}

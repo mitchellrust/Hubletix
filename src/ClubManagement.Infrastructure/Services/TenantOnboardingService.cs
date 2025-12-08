@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Finbuckle.MultiTenant.Abstractions;
 using ClubManagement.Core.Entities;
 using ClubManagement.Infrastructure.Persistence;
+using ClubManagement.Core.Models;
+using System.Text.Json;
 namespace ClubManagement.Infrastructure.Services;
 
 /// <summary>
@@ -169,26 +171,17 @@ public class TenantOnboardingService : ITenantOnboardingService
         await _dbContext.SaveChangesAsync();
     }
 
+    /// <summary>
+    /// Get default configuration JSON string for demo tenant.
+    /// </summary>
     private static string GetDefaultConfig()
     {
-        return """
-        {
-          "theme": {
-            "primaryColor": "#4F46E5",
-            "secondaryColor": "#06B6D4",
-            "fontFamily": "Inter, sans-serif",
-            "logoUrl": null
-          },
-          "features": {
-            "enableMemberships": true,
-            "enableEventRegistrations": true,
-            "enablePayments": true
-          },
-          "settings": {
-            "timezone": "America/Boise",
-            "defaultCurrency": "usd"
-          }
-        }
-        """;
+        return JsonSerializer.Serialize(
+            new TenantConfig(),
+            new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            }
+        );
     }
 }

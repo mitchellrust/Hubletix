@@ -17,6 +17,7 @@ public class Event : BaseEntity
     /// <summary>
     /// Event description
     /// </summary>
+    [MaxLength(2000)]
     public string? Description { get; set; }
     
     /// <summary>

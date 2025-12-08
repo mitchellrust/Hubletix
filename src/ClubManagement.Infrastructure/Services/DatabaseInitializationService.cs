@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ClubManagement.Infrastructure.Persistence;
 using ClubManagement.Core.Entities;
+using ClubManagement.Core.Models;
+using System.Text.Json;
 
 namespace ClubManagement.Infrastructure.Services;
 
@@ -181,28 +183,37 @@ public class DatabaseInitializationService
     }
 
     /// <summary>
-    /// Get default configuration JSON for demo tenant.
+    /// Get default configuration JSON string for demo tenant.
     /// </summary>
     private static string GetDemoConfig()
     {
-        return """
+        var demoConfig = new TenantConfig
         {
-          "theme": {
-            "primaryColor": "#4F46E5",
-            "secondaryColor": "#06B6D4",
-            "fontFamily": "Inter, sans-serif",
-            "logoUrl": null
-          },
-          "features": {
-            "enableMemberships": true,
-            "enableEventRegistrations": true,
-            "enablePayments": true
-          },
-          "settings": {
-            "timezone": "America/Denver",
-            "defaultCurrency": "usd"
-          }
-        }
-        """;
+            Settings = new SettingsConfig
+            {
+                TimeZoneId = "America/Denver",
+                DefaultCurrency = "usd"
+            },
+            Theme = new ThemeConfig
+            {
+                PrimaryColor = "#4F46E5",
+                SecondaryColor = "#06B6D4",
+                LogoUrl = null
+            },
+            Features = new FeatureFlags
+            {
+                EnableMemberships = true,
+                EnableEventRegistration = true,
+                EnablePayments = true
+            }
+        };
+
+        return JsonSerializer.Serialize(
+            demoConfig,
+            new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            }
+        );
     }
 }

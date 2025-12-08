@@ -75,9 +75,11 @@ public class EventDetailModel : TenantPageModel
         var existingEvent = await _dbContext.Events
             .FirstOrDefaultAsync(e => e.Id == Event.Id);
 
+        // If event not found, should return better UI than 404.
         if (existingEvent == null)
         {
-            return NotFound();
+            Event = null;
+            return Page();
         }
 
         // Parse and convert local times to UTC

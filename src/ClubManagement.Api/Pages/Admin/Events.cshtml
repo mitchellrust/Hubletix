@@ -15,7 +15,7 @@
         <div class="card-header bg-white border-bottom">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h3 class="mb-0">Events</h3>
-                <a class="btn btn-sm btn-primary" href="#">Create Event</a>
+                <a class="btn btn-sm btn-primary" href="/admin/events/create">Create Event</a>
             </div>
             <div class="btn-group btn-group-sm" role="group" aria-label="Status filter">
                 <a asp-page="/Admin/Events" asp-route-status="all" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
@@ -31,7 +31,7 @@
                 <thead class="table-light">
                     <tr>
                         <th>
-                            <a asp-page="/Admin/Events" asp-route-sort="date" asp-route-dir="@(Model.SortField == "date" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" class="text-decoration-none">Date</a>
+                            <a asp-page="/Admin/Events" asp-route-sort="date" asp-route-dir="@(Model.SortField == "date" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" class="text-decoration-none">Event Start</a>
                         </th>
                         <th>
                             <a asp-page="/Admin/Events" asp-route-sort="name" asp-route-dir="@(Model.SortField == "name" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" class="text-decoration-none">Name</a>
@@ -55,7 +55,7 @@
                         {
                             <tr class="@(evt.IsActive ? "" : "table-secondary")">
                                 <td>
-                                    <div class="fw-semibold">@evt.Date.ToString("dd MMM")</div>
+                                    <div class="fw-semibold">@evt.Date.ToString("MMM dd, yyyy")</div>
                                     <div class="text-muted small">@evt.Time</div>
                                 </td>
                                 <td>

@@ -83,13 +83,14 @@ public class EventsModel : TenantPageModel
         Events = events.Select(e =>
         {
             var localStart = e.StartTimeUtc.ToTimeZone(e.TimeZoneId);
+            var tzShort = e.TimeZoneId.GetAbbreviationFromUtc(e.StartTimeUtc);
 
             return new EventDto
             {
                 Id = e.Id,
                 Name = e.Name,
                 Date = localStart,
-                Time = localStart.ToString("h:mm tt"),
+                Time = $"{localStart:h:mm tt} ({tzShort})",
                 Location = "Club Location",
                 Registrations = e.EventRegistrations.Count,
                 EventType = e.EventType.ToString().Humanize(),

@@ -10,8 +10,6 @@ namespace ClubManagement.Api.Controllers;
 [Route("[controller]")]
 public class TenantsController : ControllerBase
 {
-    private const string TenantConfigCachePrefix = "tenantconfig:";
-    private readonly AppDbContext _dbContext;
     private readonly IMultiTenantContextAccessor<ClubTenantInfo> _multiTenantContextAccessor;
     private readonly ITenantConfigCacheService _tenantConfigCache;
     private readonly ILogger<TenantsController> _logger;
@@ -23,7 +21,6 @@ public class TenantsController : ControllerBase
         ILogger<TenantsController> logger
     )
     {
-        _dbContext = dbContext;
         _multiTenantContextAccessor = multiTenantContextAccessor;
         _tenantConfigCache = tenantConfigCache;
         _logger = logger;

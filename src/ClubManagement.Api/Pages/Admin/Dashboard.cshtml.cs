@@ -42,7 +42,6 @@ public class DashboardModel : TenantPageModel
         UpcomingEvents = events.Select(e =>
         {
             var localStart = e.StartTimeUtc.ToTimeZone(e.TimeZoneId);
-            var localEnd = e.EndTimeUtc.ToTimeZone(e.TimeZoneId);
             var tzShort = e.TimeZoneId.GetAbbreviationFromUtc(e.StartTimeUtc);
 
             return new UpcomingEventDto
@@ -50,7 +49,7 @@ public class DashboardModel : TenantPageModel
                 Id = e.Id,
                 Name = e.Name,
                 Date = localStart,
-                Time = $"{localStart:h:mm tt} - {localEnd:h:mm tt} ({tzShort})",
+                Time = $"{localStart:h:mm tt} ({tzShort})",
                 Location = "Club", // TODO: Add location field to Event entity
                 Registrations = e.EventRegistrations.Count,
                 IsActive = e.IsActive
