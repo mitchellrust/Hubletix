@@ -203,7 +203,10 @@
                 const monthlyDisplayToggle = document.getElementById('monthlyDisplayToggle');
                 
                 // Show the toggle only if billing interval is not Monthly
-                if (billingInterval !== '@BillingIntervals.Monthly' && billingInterval !== '@BillingIntervals.OneTime') {
+                if (
+                  billingInterval !== '@BillingIntervals.Monthly'
+                  && billingInterval !== '@BillingIntervals.OneTime'
+                ) {
                     monthlyDisplayToggle.style.display = 'block';
                 } else {
                     monthlyDisplayToggle.style.display = 'none';

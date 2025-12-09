@@ -72,6 +72,16 @@ public class PlanDetailModel : TenantPageModel
             return Page();
         }
 
+        // Validate required fields
+        if (string.IsNullOrWhiteSpace(Plan.Name))
+        {
+            ErrorMessage = "Plan name is required.";
+            PopulateBillingIntervalOptions();
+            Plan = existingPlan;
+            PriceInDollars = existingPlan.PriceInDollars;
+            return Page();
+        }
+
         // Validate price is positive
         if (PriceInDollars <= 0)
         {

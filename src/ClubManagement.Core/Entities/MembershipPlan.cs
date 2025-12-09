@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using ClubManagement.Core.Constants;
 using ClubManagement.Core.Models;
@@ -18,6 +19,7 @@ public class MembershipPlan : BaseEntity
     /// <summary>
     /// Plan description
     /// </summary>
+    [MaxLength(2000)]
     public string? Description { get; set; }
     
     /// <summary>

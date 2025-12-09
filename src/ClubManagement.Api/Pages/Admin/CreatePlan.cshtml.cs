@@ -1,0 +1,109 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using ClubManagement.Core.Constants;
+using ClubManagement.Core.Entities;
+using ClubManagement.Infrastructure.Persistence;
+using Finbuckle.MultiTenant.Abstractions;
+using ClubManagement.Api.Utils;
+
+namespace ClubManagement.Api.Pages.Admin;
+
+public class CreatePlanModel : TenantPageModel
+{
+    private readonly AppDbContext _dbContext;
+    private readonly ClubTenantInfo _currentTenantInfo;
+
+    [BindProperty]
+    public MembershipPlan Plan { get; set; } = new MembershipPlan();
+
+    [BindProperty]
+    public decimal PriceInDollars { get; set; }
+
+    public List<SelectListItem> BillingIntervalOptions { get; set; } = new();
+    public string? ErrorMessage { get; set; }
+
+    public CreatePlanModel(
+        AppDbContext dbContext,
+        IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor
+    ) : base(multiTenantContextAccessor)
+    {
+        _dbContext = dbContext;
+        _currentTenantInfo = multiTenantContextAccessor.MultiTenantContext.TenantInfo!;
+    }
+
+    public IActionResult OnGet()
+    {
+        // Initialize with default values
+        Plan.BillingInterval = BillingIntervals.Monthly;
+        Plan.IsActive = true;
+        Plan.DisplayOrder = 0;
+        PriceInDollars = 0;
+
+        PopulateBillingIntervalOptions();
+        return Page();
+    }
+
+    public async Task<IActionResult> OnPostAsync()
+    {
+        // Validate required fields
+        if (string.IsNullOrWhiteSpace(Plan.Name))
+        {
+            ErrorMessage = "Plan name is required.";
+            PopulateBillingIntervalOptions();
+            return Page();
+        }
+
+        // Validate price is positive
+        if (PriceInDollars <= 0)
+        {
+            ErrorMessage = "Price must be greater than zero.";
+            PopulateBillingIntervalOptions();
+            return Page();
+        }
+
+        // Convert dollars to cents with proper rounding
+        Plan.PriceInCents = (int)Math.Round(PriceInDollars * 100, MidpointRounding.AwayFromZero);
+
+        // Set tenant ID
+        Plan.TenantId = _currentTenantInfo.Id;
+        Plan.Id = Guid.NewGuid().ToString();
+
+        try
+        {
+            _dbContext.MembershipPlans.Add(Plan);
+            await _dbContext.SaveChangesAsync();
+            return RedirectToPage("/Admin/Plans", new { message = "Plan created successfully." });
+        }
+        catch (Exception)
+        {
+            ErrorMessage = $"Uh-Oh! Something went wrong.";
+            PopulateBillingIntervalOptions();
+            return Page();
+        }
+    }
+
+    private void PopulateBillingIntervalOptions()
+    {
+        BillingIntervalOptions = new List<SelectListItem>
+        {
+            new SelectListItem
+            {
+                Value = BillingIntervals.Monthly,
+                Text = BillingIntervals.Monthly.Humanize(),
+                Selected = Plan?.BillingInterval == BillingIntervals.Monthly
+            },
+            new SelectListItem
+            {
+                Value = BillingIntervals.Annually,
+                Text = BillingIntervals.Annually.Humanize(),
+                Selected = Plan?.BillingInterval == BillingIntervals.Annually
+            },
+            new SelectListItem
+            {
+                Value = BillingIntervals.OneTime,
+                Text = BillingIntervals.OneTime.Humanize(),
+                Selected = Plan?.BillingInterval == BillingIntervals.OneTime
+            }
+        };
+    }
+}
