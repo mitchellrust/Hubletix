@@ -3,6 +3,7 @@ using System;
 using ClubManagement.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ClubManagement.Infrastructure.Migrations.App
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251209133818_UsernameToEmail")]
+    partial class UsernameToEmail
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -47,9 +50,8 @@ namespace ClubManagement.Infrastructure.Migrations.App
                     b.Property<DateTime>("EndTimeUtc")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("EventType")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("EventType")
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
@@ -329,9 +331,6 @@ namespace ClubManagement.Infrastructure.Migrations.App
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("MembershipPlanId")
-                        .HasColumnType("text");
-
                     b.Property<string>("TenantId")
                         .IsRequired()
                         .HasColumnType("text");
@@ -346,8 +345,6 @@ namespace ClubManagement.Infrastructure.Migrations.App
 
                     b.HasIndex("Email")
                         .IsUnique();
-
-                    b.HasIndex("MembershipPlanId");
 
                     b.HasIndex("TenantId");
 
@@ -422,17 +419,11 @@ namespace ClubManagement.Infrastructure.Migrations.App
 
             modelBuilder.Entity("ClubManagement.Core.Entities.User", b =>
                 {
-                    b.HasOne("ClubManagement.Core.Entities.MembershipPlan", "MembershipPlan")
-                        .WithMany()
-                        .HasForeignKey("MembershipPlanId");
-
                     b.HasOne("ClubManagement.Core.Entities.Tenant", "Tenant")
                         .WithMany("Users")
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("MembershipPlan");
 
                     b.Navigation("Tenant");
                 });

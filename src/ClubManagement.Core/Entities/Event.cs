@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using ClubManagement.Core.Constants;
 using ClubManagement.Core.Models;
 
 namespace ClubManagement.Core.Entities;
@@ -24,7 +23,7 @@ public class Event : BaseEntity
     /// Event type (e.g., Class, PersonalTraining, GroupEvent)
     /// </summary>
     [Required]
-    public EventType EventType { get; set; } = EventType.Other;
+    public string EventType { get; set; } = Constants.EventType.Other;
     
     /// <summary>
     /// Foreign key to coach user (optional, can be null for drop-in events)

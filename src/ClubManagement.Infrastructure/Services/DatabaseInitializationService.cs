@@ -4,6 +4,7 @@ using ClubManagement.Infrastructure.Persistence;
 using ClubManagement.Core.Entities;
 using ClubManagement.Core.Models;
 using System.Text.Json;
+using Microsoft.EntityFrameworkCore.Migrations.Operations;
 
 namespace ClubManagement.Infrastructure.Services;
 
@@ -225,9 +226,21 @@ public class DatabaseInitializationService
                 }
             };
 
+            var demoUsers = GenerateDemoUsers(demoTenant.Id, 100);
+            demoUsers.ForEach(u =>
+                {
+                    if (u.IsActive)
+                    {
+                        // Add a membership plan to the user
+                        u.MembershipPlanId = demoPlans[new Random().Next(demoPlans.Count)].Id;
+                    }
+                }
+            );
+
             context.Tenants.Add(demoTenant);
             context.Events.AddRange(demoEvents);
             context.MembershipPlans.AddRange(demoPlans);
+            context.Users.AddRange(demoUsers);
             await context.SaveChangesAsync();
 
             _logger.LogInformation("Demo tenant created with identifier: {Subdomain}", demoTenant.Id);
@@ -272,5 +285,58 @@ public class DatabaseInitializationService
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             }
         );
+    }
+
+    /// <summary>
+    /// Generate demo users with random names and emails.
+    /// </summary>
+    private static List<User> GenerateDemoUsers(string tenantId, int count)
+    {
+        var firstNames = new[] 
+        { 
+            "James", "Mary", "John", "Patricia", "Robert", "Jennifer", "Michael", "Linda", 
+            "William", "Barbara", "David", "Elizabeth", "Richard", "Susan", "Joseph", "Jessica",
+            "Thomas", "Sarah", "Charles", "Karen", "Christopher", "Nancy", "Daniel", "Lisa",
+            "Matthew", "Betty", "Anthony", "Margaret", "Mark", "Sandra", "Donald", "Ashley",
+            "Steven", "Kimberly", "Paul", "Emily", "Andrew", "Donna", "Joshua", "Michelle",
+            "Kenneth", "Dorothy", "Kevin", "Carol", "Brian", "Amanda", "George", "Melissa",
+            "Timothy", "Deborah", "Ronald", "Stephanie", "Edward", "Rebecca", "Jason", "Sharon",
+            "Jeffrey", "Laura", "Ryan", "Cynthia", "Jacob", "Kathleen", "Gary", "Amy",
+            "Nicholas", "Angela", "Eric", "Shirley", "Jonathan", "Anna", "Stephen", "Brenda"
+        };
+        
+        var lastNames = new[] 
+        { 
+            "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis",
+            "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas",
+            "Taylor", "Moore", "Jackson", "Martin", "Lee", "Perez", "Thompson", "White",
+            "Harris", "Sanchez", "Clark", "Ramirez", "Lewis", "Robinson", "Walker", "Young",
+            "Allen", "King", "Wright", "Scott", "Torres", "Nguyen", "Hill", "Flores",
+            "Green", "Adams", "Nelson", "Baker", "Hall", "Rivera", "Campbell", "Mitchell",
+            "Carter", "Roberts", "Gomez", "Phillips", "Evans", "Turner", "Diaz", "Parker",
+            "Cruz", "Edwards", "Collins", "Reyes", "Stewart", "Morris", "Morales", "Murphy"
+        };
+
+        var random = new Random(42); // Fixed seed for reproducibility
+        var users = new List<User>();
+
+        for (int i = 0; i < count; i++)
+        {
+            var firstName = firstNames[i % firstNames.Length];
+            var lastName = lastNames[i % lastNames.Length];
+            var email = $"{firstName.ToLower()}.{lastName.ToLower()}{(i > 50 ? i.ToString() : "")}@demo.com";
+            
+            users.Add(new User
+            {
+                Id = Guid.NewGuid().ToString(),
+                TenantId = tenantId,
+                Email = email,
+                FirstName = firstName,
+                LastName = lastName,
+                IsActive = random.Next(100) > 10 // 90% active
+            });
+        }
+
+        return users;
     }
 }

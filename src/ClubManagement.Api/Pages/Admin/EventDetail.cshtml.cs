@@ -196,15 +196,21 @@ public class EventDetailModel : TenantPageModel
 
     private void PopulateEventTypeOptions()
     {
-        EventTypeOptions = Enum.GetValues(typeof(EventType))
-            .Cast<EventType>()
-            .Select(et => new SelectListItem
+        var eventTypeFields = typeof(EventType)
+            .GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
+            .Where(f => f.IsLiteral && f.FieldType == typeof(string));
+
+        EventTypeOptions = eventTypeFields.Select(field =>
+        {
+            var value = field.GetValue(null)?.ToString() ?? "";
+            var text = field.Name.Humanize();
+            return new SelectListItem
             {
-                Value = et.ToString(),
-                Text = et.ToString().Humanize(),
-                Selected = Event?.EventType == et
-            })
-            .ToList();
+                Value = value,
+                Text = text,
+                Selected = Event?.EventType == value
+            };
+        }).ToList();
     }
 
     private void PopulateTimeZoneOptions(

@@ -43,19 +43,49 @@
                 <thead class="table-light">
                     <tr>
                         <th>
-                            <a asp-page="/Admin/Events" asp-route-sort="date" asp-route-dir="@(Model.SortField == "date" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" asp-route-date="@Model.DateFilter" class="text-decoration-none">Event Start</a>
+                            <a asp-page="/Admin/Events" asp-route-sort="date" asp-route-dir="@(Model.SortField == "date" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" asp-route-date="@Model.DateFilter" class="text-decoration-none">
+                                    Event Start
+                                    @if (Model.SortField == "date")
+                                    {
+                                        <i class="bi bi-arrow-@(Model.SortDirection == "asc" ? "down" : "up")"></i>
+                                    }
+                            </a>
                         </th>
                         <th>
-                            <a asp-page="/Admin/Events" asp-route-sort="name" asp-route-dir="@(Model.SortField == "name" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" asp-route-date="@Model.DateFilter" class="text-decoration-none">Name</a>
+                            <a asp-page="/Admin/Events" asp-route-sort="name" asp-route-dir="@(Model.SortField == "name" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" asp-route-date="@Model.DateFilter" class="text-decoration-none">
+                                Name
+                                @if (Model.SortField == "name")
+                                {
+                                    <i class="bi bi-arrow-@(Model.SortDirection == "asc" ? "down" : "up")"></i>
+                                }
+                            </a>
                         </th>
                         <th>
-                            <a asp-page="/Admin/Events" asp-route-sort="type" asp-route-dir="@(Model.SortField == "type" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" asp-route-date="@Model.DateFilter" class="text-decoration-none">Type</a>
+                            <a asp-page="/Admin/Events" asp-route-sort="type" asp-route-dir="@(Model.SortField == "type" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" asp-route-date="@Model.DateFilter" class="text-decoration-none">
+                                Type
+                                @if (Model.SortField == "type")
+                                {
+                                    <i class="bi bi-arrow-@(Model.SortDirection == "asc" ? "down" : "up")"></i>
+                                }
+                            </a>
                         </th>
                         <th>
-                            <a asp-page="/Admin/Events" asp-route-sort="capacity" asp-route-dir="@(Model.SortField == "capacity" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" asp-route-date="@Model.DateFilter" class="text-decoration-none">Capacity</a>
+                            <a asp-page="/Admin/Events" asp-route-sort="capacity" asp-route-dir="@(Model.SortField == "capacity" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" asp-route-date="@Model.DateFilter" class="text-decoration-none">
+                                Capacity
+                                @if (Model.SortField == "capacity")
+                                {
+                                    <i class="bi bi-arrow-@(Model.SortDirection == "asc" ? "down" : "up")"></i>
+                                }
+                            </a>
                         </th>
                         <th>
-                            <a asp-page="/Admin/Events" asp-route-sort="registrations" asp-route-dir="@(Model.SortField == "registrations" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" asp-route-date="@Model.DateFilter" class="text-decoration-none">Registrations</a>
+                            <a asp-page="/Admin/Events" asp-route-sort="registrations" asp-route-dir="@(Model.SortField == "registrations" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" asp-route-date="@Model.DateFilter" class="text-decoration-none">
+                                Registrations
+                                @if (Model.SortField == "registrations")
+                                {
+                                    <i class="bi bi-arrow-@(Model.SortDirection == "asc" ? "down" : "up")"></i>
+                                }
+                            </a>
                         </th>
                         <th class="text-end">Actions</th>
                     </tr>

@@ -72,7 +72,7 @@ public class TenantOnboardingService : ITenantOnboardingService
             {
                 Id = Guid.NewGuid().ToString(),
                 TenantId = tenant.Id,
-                UserName = adminEmail,
+                Email = adminEmail,
                 FirstName = adminFirstName,
                 LastName = adminLastName,
                 IsActive = true

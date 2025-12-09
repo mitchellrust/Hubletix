@@ -57,7 +57,8 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white px-4 py-2" href="#">
+                    <a class="nav-link text-white px-4 py-2 @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Members") == true ? "active bg-primary" : "")" 
+                       href="/admin/members">
                         <i class="bi bi-people me-2"></i>
                         Members
                     </a>

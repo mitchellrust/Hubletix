@@ -66,7 +66,7 @@ public class AppDbContext : MultiTenantDbContext
             .HasForeignKey(u => u.TenantId)
             .OnDelete(DeleteBehavior.Cascade);
         builder.Entity<User>()
-            .HasIndex(u => u.UserName)
+            .HasIndex(u => u.Email)
             .IsUnique();
 
         // Configure MembershipPlan

@@ -1,0 +1,120 @@
+using Microsoft.EntityFrameworkCore;
+using ClubManagement.Infrastructure.Persistence;
+using Finbuckle.MultiTenant.Abstractions;
+
+namespace ClubManagement.Api.Pages.Admin;
+
+public class MembersModel : TenantPageModel
+{
+    private readonly AppDbContext _dbContext;
+    public List<MemberDto> Members { get; set; } = new();
+    public int PageNum { get; set; }
+    public int PageSize { get; set; }
+    public int TotalPages { get; set; }
+    public string SortField { get; set; } = "name";
+    private readonly string _defaultSortField = "name";
+    public string SortDirection { get; set; } = "asc";
+    private readonly string _sortDirectionDesc = "desc";
+    private readonly string _sortDirectionAsc = "asc";
+    public string? StatusFilter { get; set; } = "all"; // all, active, inactive
+    public string? StatusMessage { get; set; }
+
+    public MembersModel(
+        AppDbContext dbContext,
+        IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor
+    ) : base(multiTenantContextAccessor)
+    {
+        _dbContext = dbContext;
+    }
+
+    public async Task OnGetAsync(string? sort = null, string? dir = null, int pageNum = 1, int pageSize = 10, string? status = null, string? message = null)
+    {
+        // Capture status message from redirect
+        StatusMessage = message;
+        
+        // Calculate pagination and sorting
+        PageNum = Math.Max(1, pageNum);
+        PageSize = Math.Clamp(pageSize, 5, 50);
+        SortField = string.IsNullOrWhiteSpace(sort) ? _defaultSortField : sort.ToLowerInvariant();
+        SortDirection = string.Equals(dir, _sortDirectionDesc, StringComparison.OrdinalIgnoreCase) ? _sortDirectionDesc : _sortDirectionAsc;
+        StatusFilter = string.IsNullOrWhiteSpace(status) ? "all" : status.ToLowerInvariant();
+
+        // Build a deferred query for users
+        var query = _dbContext.Users
+            .Include(u => u.MembershipPlan)
+            .AsQueryable();
+
+        // Apply status filter
+        query = StatusFilter switch
+        {
+            "active" => query.Where(u => u.IsActive),
+            "inactive" => query.Where(u => !u.IsActive),
+            _ => query // "all" - no filter
+        };
+
+        // Apply sorting
+        query = SortField switch
+        {
+            "email" => SortDirection == _sortDirectionAsc
+                ? query.OrderBy(u => u.Email)
+                : query.OrderByDescending(u => u.Email),
+            "created" => SortDirection == _sortDirectionAsc
+                ? query.OrderBy(u => u.CreatedAt)
+                : query.OrderByDescending(u => u.CreatedAt),
+            "plan" => SortDirection == _sortDirectionAsc
+                ? query.OrderBy(u => u.Payments.Count(p => p.Status == "succeeded"))
+                : query.OrderByDescending(u => u.Payments.Count(p => p.Status == "succeeded")),
+            _ => SortDirection == _sortDirectionAsc
+                ? query.OrderBy(u => u.FirstName).ThenBy(u => u.LastName)
+                : query.OrderByDescending(u => u.FirstName).ThenByDescending(u => u.LastName)
+        };
+
+        // Get total count for pagination
+        var totalCount = await query.CountAsync();
+        TotalPages = (int)Math.Ceiling(totalCount / (double)PageSize);
+
+        // Fetch paginated members (executes query)
+        var users = await query
+            .Skip((PageNum - 1) * PageSize)
+            .Take(PageSize)
+            .Select(u => new
+            {
+                User = u,
+                MembershipPlanName = _dbContext.MembershipPlans
+                    .Where(p => p.Id == u.MembershipPlanId)
+                    .Select(p => p.Name)
+                    .FirstOrDefault()
+            })
+            .ToListAsync();
+
+        // Project to DTO
+        Members = users.Select(u => new MemberDto
+        {
+            Id = u.User.Id,
+            FirstName = u.User.FirstName,
+            LastName = u.User.LastName,
+            FullName = $"{u.User.FirstName} {u.User.LastName}",
+            Email = u.User.Email,
+            IsActive = u.User.IsActive,
+            MembershipPlanId = u.User.MembershipPlanId,
+            JoinedDate = u.User.CreatedAt,
+            MembershipPlanName = u.MembershipPlanName
+        }).ToList();
+    }
+}
+
+/// <summary>
+/// DTO for displaying members.
+/// </summary>
+public class MemberDto
+{
+    public string Id { get; set; } = string.Empty;
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
+    public string FullName { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public bool IsActive { get; set; }
+    public string? MembershipPlanId { get; set; }
+    public DateTime JoinedDate { get; set; }
+    public string? MembershipPlanName { get; set; }
+}

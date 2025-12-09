@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using ClubManagement.Core.Models;
 
 namespace ClubManagement.Core.Entities;
@@ -10,7 +11,8 @@ public class User : BaseEntity
     /// <summary>
     /// User's email address
     /// </summary>
-    public string UserName { get; set; } = null!;
+    [Required]
+    public string Email { get; set; } = null!;
 
     /// <summary>
     /// User's first name
@@ -26,10 +28,16 @@ public class User : BaseEntity
     /// Whether this user account is active
     /// </summary>
     public bool IsActive { get; set; } = true;
+
+    /// <summary>
+    /// Foreign key to membership plan (if any)
+    /// </summary>
+    public string? MembershipPlanId { get; set; }
     
     // Navigation properties
     public Tenant Tenant { get; set; } = null!;
     public ICollection<EventRegistration> EventRegistrations { get; set; } = new List<EventRegistration>();
     public ICollection<Event> CoachingEvents { get; set; } = new List<Event>();
     public ICollection<Payment> Payments { get; set; } = new List<Payment>();
+    public MembershipPlan? MembershipPlan { get; set; }
 }

@@ -35,13 +35,31 @@
                 <thead class="table-light">
                     <tr>
                         <th>
-                            <a asp-page="/Admin/Plans" asp-route-sort="name" asp-route-dir="@(Model.SortField == "name" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" class="text-decoration-none">Plan Name</a>
+                            <a asp-page="/Admin/Plans" asp-route-sort="name" asp-route-dir="@(Model.SortField == "name" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" class="text-decoration-none">
+                                Plan Name
+                                @if (Model.SortField == "name")
+                                {
+                                    <i class="bi bi-arrow-@(Model.SortDirection == "asc" ? "down" : "up")"></i>
+                                }
+                            </a>
                         </th>
                         <th>
-                            <a asp-page="/Admin/Plans" asp-route-sort="price" asp-route-dir="@(Model.SortField == "price" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" class="text-decoration-none">Price</a>
+                            <a asp-page="/Admin/Plans" asp-route-sort="price" asp-route-dir="@(Model.SortField == "price" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" class="text-decoration-none">
+                                Price
+                                @if (Model.SortField == "price")
+                                {
+                                    <i class="bi bi-arrow-@(Model.SortDirection == "asc" ? "down" : "up")"></i>
+                                }
+                            </a>
                         </th>
                         <th>
-                            <a asp-page="/Admin/Plans" asp-route-sort="interval" asp-route-dir="@(Model.SortField == "interval" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" class="text-decoration-none">Billing</a>
+                            <a asp-page="/Admin/Plans" asp-route-sort="interval" asp-route-dir="@(Model.SortField == "interval" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" class="text-decoration-none">
+                                Billing
+                                @if (Model.SortField == "interval")
+                                {
+                                    <i class="bi bi-arrow-@(Model.SortDirection == "asc" ? "down" : "up")"></i>
+                                }
+                            </a>
                         </th>
                         <th>Status</th>
                         <th class="text-end">Actions</th>
