@@ -175,7 +175,7 @@ public class EventDetailModel : TenantPageModel
 
         if (eventToDelete == null)
         {
-            return NotFound();
+            return RedirectToPage("/Admin/Events", new { message = "Event had already been deleted." });
         }
 
         try

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using ClubManagement.Core.Constants;
 using ClubManagement.Core.Models;
 
 namespace ClubManagement.Core.Entities;
@@ -25,15 +26,26 @@ public class MembershipPlan : BaseEntity
     public int PriceInCents { get; set; }
 
     /// <summary>
-    /// Formatted price string (e.g., "$99.99")
+    /// Price formatted to dollar amount (e.g., 99.99)
     /// </summary>
     [NotMapped]
-    public string PriceFormatted => (PriceInCents / 100.0m).ToString("C");
+    public decimal PriceInDollars => PriceInCents / 100.0m;
     
     /// <summary>
     /// Billing interval: "month" or "year"
     /// </summary>
-    public string BillingInterval { get; set; } = "month";
+    public string BillingInterval { get; set; } = BillingIntervals.Monthly;
+
+    /// <summary>
+    /// Whether the price is displayed as a monthly equivalent (e.g., $120/year shown as $10/month) 
+    /// </summary>
+    public bool IsPriceDisplayedMonthly { get; set; } = true;
+
+    /// <summary>
+    /// Whether this is a recurring subscription plan or a one-time purchase.
+    /// </summary>
+    [NotMapped]
+    public bool IsRecurring => BillingInterval != BillingIntervals.OneTime;
     
     /// <summary>
     /// Stripe Product ID for this plan

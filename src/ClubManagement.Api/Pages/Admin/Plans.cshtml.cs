@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ClubManagement.Infrastructure.Persistence;
 using Finbuckle.MultiTenant.Abstractions;
+using ClubManagement.Api.Utils;
 
 namespace ClubManagement.Api.Pages.Admin;
 
@@ -80,8 +81,8 @@ public class PlansModel : TenantPageModel
             Id = p.Id,
             Name = p.Name,
             Description = p.Description,
-            Price = p.PriceFormatted,
-            BillingInterval = p.BillingInterval,
+            Price = p.PriceInDollars.ToString("C"),
+            BillingInterval = p.BillingInterval.Humanize(),
             IsActive = p.IsActive
         }).ToList();
     }

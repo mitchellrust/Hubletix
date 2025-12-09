@@ -7,4 +7,5 @@ public static class BillingIntervals
 {
     public const string Monthly = "Monthly";
     public const string Annually = "Annually";
+    public const string OneTime = "OneTime";
 }

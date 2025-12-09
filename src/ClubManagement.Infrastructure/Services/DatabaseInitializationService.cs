@@ -177,8 +177,9 @@ public class DatabaseInitializationService
                     TenantId = demoTenant.Id,
                     Name = "Basic Membership",
                     Description = "Access to gym facilities during staffed hours.",
-                    PriceInCents = 3000, // $30.00
+                    PriceInCents = 1000, // $10.00
                     BillingInterval = Core.Constants.BillingIntervals.Monthly,
+                    IsPriceDisplayedMonthly = true,
                     IsActive = true,
                     DisplayOrder = 0,
                     CreatedBy = "System"
@@ -189,10 +190,37 @@ public class DatabaseInitializationService
                     TenantId = demoTenant.Id,
                     Name = "Premium Membership",
                     Description = "Includes 24/7 gym access and discounts on events.",
-                    PriceInCents = 5000, // $50.00
+                    PriceInCents = 12000, // $120.00, billed annually, displayed annually
                     BillingInterval = Core.Constants.BillingIntervals.Annually,
+                    IsPriceDisplayedMonthly = false,
                     IsActive = true,
                     DisplayOrder = 1,
+                    CreatedBy = "System"
+                },
+                new MembershipPlan
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    TenantId = demoTenant.Id,
+                    Name = "Ultra Membership",
+                    Description = "Includes 24/7 gym access and discounts on events, AND MORE.",
+                    PriceInCents = 15000, // $150.00 billed annually, displayed monthly
+                    BillingInterval = Core.Constants.BillingIntervals.Annually,
+                    IsPriceDisplayedMonthly = true,
+                    IsActive = true,
+                    DisplayOrder = 2,
+                    CreatedBy = "System"
+                },
+                new MembershipPlan
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    TenantId = demoTenant.Id,
+                    Name = "One Time Pass",
+                    Description = "A one time pass to the gym.",
+                    PriceInCents = 700, // $7.00
+                    BillingInterval = Core.Constants.BillingIntervals.OneTime,
+                    IsPriceDisplayedMonthly = false,
+                    IsActive = true,
+                    DisplayOrder = 3,
                     CreatedBy = "System"
                 }
             };
