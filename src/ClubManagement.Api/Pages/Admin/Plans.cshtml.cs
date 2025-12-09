@@ -18,6 +18,7 @@ public class PlansModel : TenantPageModel
     private readonly string _sortDirectionDesc = "desc";
     private readonly string _sortDirectionAsc = "asc";
     public string? StatusFilter { get; set; } = "all"; // all, active, inactive
+    public string? StatusMessage { get; set; }
 
     public PlansModel(
         AppDbContext dbContext,
@@ -27,8 +28,11 @@ public class PlansModel : TenantPageModel
         _dbContext = dbContext;
     }
 
-    public async Task OnGetAsync(string? sort = null, string? dir = null, int pageNum = 1, int pageSize = 10, string? status = null)
+    public async Task OnGetAsync(string? sort = null, string? dir = null, int pageNum = 1, int pageSize = 10, string? status = null, string? message = null)
     {
+        // Capture status message from redirect
+        StatusMessage = message;
+        
         // Calculate pagination and sorting
         PageNum = Math.Max(1, pageNum);
         PageSize = Math.Clamp(pageSize, 5, 50);

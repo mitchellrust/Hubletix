@@ -19,6 +19,7 @@ public class EventsModel : TenantPageModel
     private readonly string _sortDirectionAsc = "asc";
     public string? StatusFilter { get; set; } = "all"; // all, active, inactive
     public string? DateFilter { get; set; } = "upcoming"; // upcoming, past, all
+    public string? StatusMessage { get; set; }
 
     public EventsModel(
         AppDbContext dbContext,
@@ -28,8 +29,11 @@ public class EventsModel : TenantPageModel
         _dbContext = dbContext;
     }
 
-    public async Task OnGetAsync(string? sort = null, string? dir = null, int pageNum = 1, int pageSize = 10, string? status = null, string? date = null)
+    public async Task OnGetAsync(string? sort = null, string? dir = null, int pageNum = 1, int pageSize = 10, string? status = null, string? date = null, string? message = null)
     {
+        // Capture status message from redirect
+        StatusMessage = message;
+        
         // Calculate pagination and sorting
         PageNum = Math.Max(1, pageNum);
         PageSize = Math.Clamp(pageSize, 5, 50);
