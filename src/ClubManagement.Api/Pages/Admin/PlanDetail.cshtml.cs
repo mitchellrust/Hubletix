@@ -5,6 +5,7 @@ using ClubManagement.Core.Entities;
 using ClubManagement.Infrastructure.Persistence;
 using Finbuckle.MultiTenant.Abstractions;
 using ClubManagement.Core.Constants;
+using ClubManagement.Api.Utils;
 
 namespace ClubManagement.Api.Pages.Admin;
 
@@ -169,14 +170,20 @@ public class PlanDetailModel : TenantPageModel
             new SelectListItem
             {
                 Value = BillingIntervals.Monthly,
-                Text = BillingIntervals.Monthly,
+                Text = BillingIntervals.Monthly.Humanize(),
                 Selected = Plan?.BillingInterval == BillingIntervals.Monthly
             },
             new SelectListItem
             {
                 Value = BillingIntervals.Annually,
-                Text = BillingIntervals.Annually,
+                Text = BillingIntervals.Annually.Humanize(),
                 Selected = Plan?.BillingInterval == BillingIntervals.Annually
+            },
+            new SelectListItem
+            {
+                Value = BillingIntervals.OneTime,
+                Text = BillingIntervals.OneTime.Humanize(),
+                Selected = Plan?.BillingInterval == BillingIntervals.OneTime
             }
         };
     }

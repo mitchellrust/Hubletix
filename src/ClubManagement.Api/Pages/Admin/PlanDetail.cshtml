@@ -87,24 +87,21 @@
 
                                 <div class="col-12 col-md-6 mb-3">
                                     <label asp-for="Plan.BillingInterval" class="form-label">Billing Interval</label>
-                                    <select class="form-select" asp-for="Plan.BillingInterval" asp-items="Model.BillingIntervalOptions"></select>
+                                    <select class="form-select" asp-for="Plan.BillingInterval" asp-items="Model.BillingIntervalOptions" onchange="updateMonthlyDisplayVisibility()"></select>
                                     <span asp-validation-for="Plan.BillingInterval" class="text-danger small"></span>
                                 </div>
                             </div>
 
-                            @if (Model.Plan.IsRecurring && Model.Plan.BillingInterval != BillingIntervals.Monthly)
-                            {
-                                <div class="mb-3">
-                                    <label class="form-label">Display price as monthly equivalent?</label>
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="isActive" asp-for="Plan.IsPriceDisplayedMonthly" onchange="updatePriceDisplayLabel(this)" />
-                                        <label class="form-check-label" for="IsPriceDisplayedMonthly" id="priceDisplayLabel">
-                                            @(Model.Plan.IsPriceDisplayedMonthly == true ? "Yes" : "No")
-                                        </label>
-                                    </div>
-                                    <span class="text-muted small">$120/year shows as $10/month</span>
+                            <div class="mb-3" id="monthlyDisplayToggle" style="display: @(Model.Plan.IsRecurring && Model.Plan.BillingInterval != BillingIntervals.Monthly ? "block" : "none")">
+                                <label class="form-label">Display price as monthly equivalent?</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="IsPriceDisplayedMonthly" asp-for="Plan.IsPriceDisplayedMonthly" onchange="updatePriceDisplayLabel(this)" />
+                                    <label class="form-check-label" for="IsPriceDisplayedMonthly" id="priceDisplayLabel">
+                                        @(Model.Plan.IsPriceDisplayedMonthly == true ? "Yes" : "No")
+                                    </label>
                                 </div>
-                            }
+                                <span class="text-muted small">$120/year shows as $10/month</span>
+                            </div>
 
                             <div class="mb-3">
                                 <label asp-for="Plan.DisplayOrder" class="form-label">Display Order</label>
@@ -198,6 +195,19 @@
             // Update plan price display label on toggle
             function updatePriceDisplayLabel(checkbox) {
                 document.getElementById('priceDisplayLabel').textContent = checkbox.checked ? 'Yes' : 'No';
+            }
+
+            // Show/hide monthly display toggle based on billing interval
+            function updateMonthlyDisplayVisibility() {
+                const billingInterval = document.getElementById('Plan_BillingInterval').value;
+                const monthlyDisplayToggle = document.getElementById('monthlyDisplayToggle');
+                
+                // Show the toggle only if billing interval is not Monthly
+                if (billingInterval !== '@BillingIntervals.Monthly' && billingInterval !== '@BillingIntervals.OneTime') {
+                    monthlyDisplayToggle.style.display = 'block';
+                } else {
+                    monthlyDisplayToggle.style.display = 'none';
+                }
             }
         </script>
     }
