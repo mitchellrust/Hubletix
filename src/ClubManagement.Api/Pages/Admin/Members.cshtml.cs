@@ -41,14 +41,22 @@ public class MembersModel : TenantPageModel
 
         // Build a deferred query for users
         var query = _dbContext.Users
-            .Include(u => u.MembershipPlan)
+            .Select(u => new
+                {
+                    User = u,
+                    MembershipPlanName = _dbContext.MembershipPlans
+                        .Where(p => p.Id == u.MembershipPlanId)
+                        .Select(p => p.Name)
+                        .FirstOrDefault()
+                }
+            )
             .AsQueryable();
 
         // Apply status filter
         query = StatusFilter switch
         {
-            "active" => query.Where(u => u.IsActive),
-            "inactive" => query.Where(u => !u.IsActive),
+            "active" => query.Where(u => u.User.IsActive),
+            "inactive" => query.Where(u => !u.User.IsActive),
             _ => query // "all" - no filter
         };
 
@@ -56,17 +64,17 @@ public class MembersModel : TenantPageModel
         query = SortField switch
         {
             "email" => SortDirection == _sortDirectionAsc
-                ? query.OrderBy(u => u.Email)
-                : query.OrderByDescending(u => u.Email),
+                ? query.OrderBy(u => u.User.Email)
+                : query.OrderByDescending(u => u.User.Email),
             "created" => SortDirection == _sortDirectionAsc
-                ? query.OrderBy(u => u.CreatedAt)
-                : query.OrderByDescending(u => u.CreatedAt),
-            "plan" => SortDirection == _sortDirectionAsc
-                ? query.OrderBy(u => u.Payments.Count(p => p.Status == "succeeded"))
-                : query.OrderByDescending(u => u.Payments.Count(p => p.Status == "succeeded")),
+                ? query.OrderBy(u => u.User.CreatedAt)
+                : query.OrderByDescending(u => u.User.CreatedAt),
+            "membershipplan" => SortDirection == _sortDirectionAsc
+                ? query.OrderBy(u => u.MembershipPlanName)
+                : query.OrderByDescending(u => u.MembershipPlanName),
             _ => SortDirection == _sortDirectionAsc
-                ? query.OrderBy(u => u.FirstName).ThenBy(u => u.LastName)
-                : query.OrderByDescending(u => u.FirstName).ThenByDescending(u => u.LastName)
+                ? query.OrderBy(u => u.User.FirstName).ThenBy(u => u.User.LastName)
+                : query.OrderByDescending(u => u.User.FirstName).ThenByDescending(u => u.User.LastName)
         };
 
         // Get total count for pagination
@@ -77,14 +85,6 @@ public class MembersModel : TenantPageModel
         var users = await query
             .Skip((PageNum - 1) * PageSize)
             .Take(PageSize)
-            .Select(u => new
-            {
-                User = u,
-                MembershipPlanName = _dbContext.MembershipPlans
-                    .Where(p => p.Id == u.MembershipPlanId)
-                    .Select(p => p.Name)
-                    .FirstOrDefault()
-            })
             .ToListAsync();
 
         // Project to DTO

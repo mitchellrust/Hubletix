@@ -39,7 +39,7 @@
                                 Name
                                 @if (Model.SortField == "name")
                                 {
-                                    <i class="bi bi-arrow-@(Model.SortDirection == "asc" ? "up" : "down")"></i>
+                                    <i class="bi bi-arrow-@(Model.SortDirection == "asc" ? "down" : "up")"></i>
                                 }
                             </a>
                         </th>
@@ -48,7 +48,7 @@
                                 Email
                                 @if (Model.SortField == "email")
                                 {
-                                    <i class="bi bi-arrow-@(Model.SortDirection == "asc" ? "up" : "down")"></i>
+                                    <i class="bi bi-arrow-@(Model.SortDirection == "asc" ? "down" : "up")"></i>
                                 }
                             </a>
                         </th>
@@ -57,11 +57,19 @@
                                 Joined
                                 @if (Model.SortField == "created")
                                 {
-                                    <i class="bi bi-arrow-@(Model.SortDirection == "asc" ? "up" : "down")"></i>
+                                    <i class="bi bi-arrow-@(Model.SortDirection == "asc" ? "down" : "up")"></i>
                                 }
                             </a>
                         </th>
-                        <th>Membership</th>
+                        <th>
+                            <a asp-page="/Admin/Members" asp-route-sort="membershipplan" asp-route-dir="@(Model.SortField == "membershipplan" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" class="text-decoration-none">
+                                Membership Plan
+                                @if (Model.SortField == "membershipplan")
+                                {
+                                    <i class="bi bi-arrow-@(Model.SortDirection == "asc" ? "down" : "up")"></i>
+                                }
+                            </a>
+                        </th>
                         <th class="text-end">Actions</th>
                     </tr>
                 </thead>
