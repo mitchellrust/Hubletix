@@ -217,7 +217,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="filterModalLabel">Filter Members</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="resetFilters()" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="filterForm" asp-page="/Admin/Members" method="get">
@@ -255,11 +255,13 @@
                         @foreach (var facet in Model.MembershipPlanFacets)
                         {
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="plan" id="plan@facet.Id" value="@facet.Id" 
+                                <input class="form-check-input" type="radio" name="plan" id="plan_@facet.Id.Replace("-", "_")" value="@facet.Id" 
                                        @(Model.MembershipPlanFilter == facet.Id ? "checked" : "")>
-                                <label class="form-check-label d-flex justify-content-between align-items-center" for="plan@facet.Id">
-                                    <span>@facet.Name</span>
-                                    <span class="badge bg-secondary rounded-pill">@facet.Count</span>
+                                <label class="form-check-label w-100" for="plan_@facet.Id.Replace("-", "_")">
+                                    <span class="d-flex justify-content-between align-items-center">
+                                        <span>@facet.Name</span>
+                                        <span class="badge bg-secondary rounded-pill">@facet.Count</span>
+                                    </span>
                                 </label>
                             </div>
                         }
@@ -267,7 +269,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="resetFilters()">Cancel</button>
                 <button type="button" class="btn btn-outline-secondary" onclick="clearFilters()">Clear All</button>
                 <button type="button" class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
             </div>
@@ -277,6 +279,10 @@
 
 @section Scripts {
     <script>
+        // Store the initial filter values when the modal is shown
+        let initialStatus = '@Model.StatusFilter';
+        let initialPlan = '@Model.MembershipPlanFilter';
+        
         function applyFilters() {
             document.getElementById('filterForm').submit();
         }
@@ -286,6 +292,20 @@
             const sortField = form.querySelector('input[name="sort"]').value;
             const sortDir = form.querySelector('input[name="dir"]').value;
             window.location.href = `/admin/members?sort=${sortField}&dir=${sortDir}`;
+        }
+        
+        function resetFilters() {
+            // Reset status radio buttons to initial value
+            const statusRadios = document.querySelectorAll('input[name="status"]');
+            statusRadios.forEach(radio => {
+                radio.checked = (radio.value === initialStatus);
+            });
+            
+            // Reset plan radio buttons to initial value
+            const planRadios = document.querySelectorAll('input[name="plan"]');
+            planRadios.forEach(radio => {
+                radio.checked = (radio.value === initialPlan);
+            });
         }
     </script>
 }
