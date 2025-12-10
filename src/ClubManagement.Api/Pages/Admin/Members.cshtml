@@ -16,8 +16,8 @@
     }
     
     <div class="row">
-        <!-- Facet Filter Panel -->
-        <div class="col-auto mb-4" style="max-width: 280px; min-width: 250px;">
+        <!-- Facet Filter Panel (Desktop) -->
+        <div class="col-auto mb-4 d-none d-xl-block" style="max-width: 280px; min-width: 250px;">
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
                     <h6 class="mb-0">Filters</h6>
@@ -74,7 +74,16 @@
         <div class="card-header bg-white border-bottom">
             <div class="d-flex justify-content-between align-items-center">
                 <h3 class="mb-0">Members</h3>
-                <a class="btn btn-sm btn-primary" href="/admin/members/create">Add Member</a>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-outline-secondary d-xl-none" data-bs-toggle="modal" data-bs-target="#filterModal">
+                        <i class="bi bi-funnel"></i> Filters
+                        @if (!string.IsNullOrEmpty(Model.StatusFilter) && Model.StatusFilter != "all" || !string.IsNullOrEmpty(Model.MembershipPlanFilter))
+                        {
+                            <span class="badge bg-primary rounded-pill ms-1">•</span>
+                        }
+                    </button>
+                    <a class="btn btn-sm btn-primary" href="/admin/members/create">Add Member</a>
+                </div>
             </div>
         </div>
         <div class="table-responsive">
@@ -201,3 +210,82 @@
         </div>
     </div>
 </div>
+
+<!-- Filter Modal (Mobile) -->
+<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filterModalLabel">Filter Members</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="filterForm" asp-page="/Admin/Members" method="get">
+                    <input type="hidden" name="sort" value="@Model.SortField" />
+                    <input type="hidden" name="dir" value="@Model.SortDirection" />
+                    
+                    <!-- Status Filter -->
+                    <div class="mb-4">
+                        <h6 class="fw-semibold text-uppercase text-muted small mb-3">Status</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="status" id="statusAll" value="all" 
+                                   @(Model.StatusFilter == "all" ? "checked" : "")>
+                            <label class="form-check-label" for="statusAll">All</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="status" id="statusActive" value="active" 
+                                   @(Model.StatusFilter == "active" ? "checked" : "")>
+                            <label class="form-check-label" for="statusActive">Active</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="status" id="statusInactive" value="inactive" 
+                                   @(Model.StatusFilter == "inactive" ? "checked" : "")>
+                            <label class="form-check-label" for="statusInactive">Inactive</label>
+                        </div>
+                    </div>
+                    
+                    <!-- Membership Plan Filter -->
+                    <div class="mb-3">
+                        <h6 class="fw-semibold text-uppercase text-muted small mb-3">Membership Plan</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="plan" id="planAll" value="" 
+                                   @(string.IsNullOrEmpty(Model.MembershipPlanFilter) ? "checked" : "")>
+                            <label class="form-check-label" for="planAll">All Plans</label>
+                        </div>
+                        @foreach (var facet in Model.MembershipPlanFacets)
+                        {
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="plan" id="plan@facet.Id" value="@facet.Id" 
+                                       @(Model.MembershipPlanFilter == facet.Id ? "checked" : "")>
+                                <label class="form-check-label d-flex justify-content-between align-items-center" for="plan@facet.Id">
+                                    <span>@facet.Name</span>
+                                    <span class="badge bg-secondary rounded-pill">@facet.Count</span>
+                                </label>
+                            </div>
+                        }
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-outline-secondary" onclick="clearFilters()">Clear All</button>
+                <button type="button" class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function applyFilters() {
+            document.getElementById('filterForm').submit();
+        }
+        
+        function clearFilters() {
+            const form = document.getElementById('filterForm');
+            const sortField = form.querySelector('input[name="sort"]').value;
+            const sortDir = form.querySelector('input[name="dir"]').value;
+            window.location.href = `/admin/members?sort=${sortField}&dir=${sortDir}`;
+        }
+    </script>
+}
