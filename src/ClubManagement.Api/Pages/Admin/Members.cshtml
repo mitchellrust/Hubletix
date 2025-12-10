@@ -15,19 +15,66 @@
         </div>
     }
     
+    <div class="row">
+        <!-- Facet Filter Panel -->
+        <div class="col-auto mb-4" style="max-width: 280px; min-width: 250px;">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">Filters</h6>
+                    @if (!string.IsNullOrEmpty(Model.StatusFilter) && Model.StatusFilter != "all" || !string.IsNullOrEmpty(Model.MembershipPlanFilter))
+                    {
+                        <a asp-page="/Admin/Members" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" class="btn btn-sm btn-link text-decoration-none p-0">Clear</a>
+                    }
+                </div>
+                <div class="card-body p-0">
+                    <!-- Status Facet -->
+                    <div class="border-bottom p-3">
+                        <h6 class="mb-2 fw-semibold small text-uppercase text-muted">Status</h6>
+                        <div class="list-group list-group-flush small">
+                            <a asp-page="/Admin/Members" asp-route-status="all" asp-route-plan="@Model.MembershipPlanFilter" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
+                               class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.StatusFilter == "all" ? "fw-bold text-primary" : "")">
+                                All
+                            </a>
+                            <a asp-page="/Admin/Members" asp-route-status="active" asp-route-plan="@Model.MembershipPlanFilter" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
+                               class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.StatusFilter == "active" ? "fw-bold text-primary" : "")">
+                                Active
+                            </a>
+                            <a asp-page="/Admin/Members" asp-route-status="inactive" asp-route-plan="@Model.MembershipPlanFilter" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
+                               class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.StatusFilter == "inactive" ? "fw-bold text-primary" : "")">
+                                Inactive
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Membership Plan Facet -->
+                    <div class="p-3">
+                        <h6 class="mb-2 fw-semibold small text-uppercase text-muted">Membership Plan</h6>
+                        <div class="list-group list-group-flush small">
+                            <a asp-page="/Admin/Members" asp-route-status="@Model.StatusFilter" asp-route-plan="" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
+                               class="list-group-item list-group-item-action border-0 py-1 px-0 d-flex justify-content-between align-items-center @(string.IsNullOrEmpty(Model.MembershipPlanFilter) ? "fw-bold text-primary" : "")">
+                                <span>All Plans</span>
+                            </a>
+                            @foreach (var facet in Model.MembershipPlanFacets)
+                            {
+                                <a asp-page="/Admin/Members" asp-route-status="@Model.StatusFilter" asp-route-plan="@facet.Id" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
+                                   class="list-group-item list-group-item-action border-0 py-1 px-0 d-flex justify-content-between align-items-center @(Model.MembershipPlanFilter == facet.Id ? "fw-bold text-primary" : "")">
+                                    <span>@facet.Name</span>
+                                    <span class="badge bg-secondary rounded-pill">@facet.Count</span>
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Members Table -->
+        <div class="col">
     <div class="card border-0 shadow-sm">
         <div class="card-header bg-white border-bottom">
-            <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex justify-content-between align-items-center">
                 <h3 class="mb-0">Members</h3>
                 <a class="btn btn-sm btn-primary" href="/admin/members/create">Add Member</a>
-            </div>
-            <div class="btn-group btn-group-sm" role="group" aria-label="Status filter">
-                <a asp-page="/Admin/Members" asp-route-status="all" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
-                   class="btn @(Model.StatusFilter == "all" ? "btn-primary" : "btn-outline-primary")">All</a>
-                <a asp-page="/Admin/Members" asp-route-status="active" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
-                   class="btn @(Model.StatusFilter == "active" ? "btn-primary" : "btn-outline-primary")">Active</a>
-                <a asp-page="/Admin/Members" asp-route-status="inactive" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
-                   class="btn @(Model.StatusFilter == "inactive" ? "btn-primary" : "btn-outline-primary")">Inactive</a>
             </div>
         </div>
         <div class="table-responsive">
@@ -35,7 +82,7 @@
                 <thead class="table-light">
                     <tr>
                         <th>
-                            <a asp-page="/Admin/Members" asp-route-sort="name" asp-route-dir="@(Model.SortField == "name" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" class="text-decoration-none">
+                            <a asp-page="/Admin/Members" asp-route-sort="name" asp-route-dir="@(Model.SortField == "name" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" asp-route-plan="@Model.MembershipPlanFilter" class="text-decoration-none">
                                 Name
                                 @if (Model.SortField == "name")
                                 {
@@ -44,7 +91,7 @@
                             </a>
                         </th>
                         <th>
-                            <a asp-page="/Admin/Members" asp-route-sort="email" asp-route-dir="@(Model.SortField == "email" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" class="text-decoration-none">
+                            <a asp-page="/Admin/Members" asp-route-sort="email" asp-route-dir="@(Model.SortField == "email" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" asp-route-plan="@Model.MembershipPlanFilter" class="text-decoration-none">
                                 Email
                                 @if (Model.SortField == "email")
                                 {
@@ -53,7 +100,7 @@
                             </a>
                         </th>
                         <th>
-                            <a asp-page="/Admin/Members" asp-route-sort="created" asp-route-dir="@(Model.SortField == "created" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" class="text-decoration-none">
+                            <a asp-page="/Admin/Members" asp-route-sort="created" asp-route-dir="@(Model.SortField == "created" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" asp-route-plan="@Model.MembershipPlanFilter" class="text-decoration-none">
                                 Joined
                                 @if (Model.SortField == "created")
                                 {
@@ -62,7 +109,7 @@
                             </a>
                         </th>
                         <th>
-                            <a asp-page="/Admin/Members" asp-route-sort="membershipplan" asp-route-dir="@(Model.SortField == "membershipplan" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" class="text-decoration-none">
+                            <a asp-page="/Admin/Members" asp-route-sort="membershipplan" asp-route-dir="@(Model.SortField == "membershipplan" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" asp-route-plan="@Model.MembershipPlanFilter" class="text-decoration-none">
                                 Membership Plan
                                 @if (Model.SortField == "membershipplan")
                                 {
@@ -135,20 +182,22 @@
                 <nav aria-label="Page navigation">
                     <ul class="pagination pagination-sm mb-0">
                         <li class="page-item @(Model.PageNum == 1 ? "disabled" : "")">
-                            <a class="page-link" asp-page="/Admin/Members" asp-route-pageNum="@(Model.PageNum - 1)" asp-route-pageSize="@Model.PageSize" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" asp-route-status="@Model.StatusFilter">Previous</a>
+                            <a class="page-link" asp-page="/Admin/Members" asp-route-pageNum="@(Model.PageNum - 1)" asp-route-pageSize="@Model.PageSize" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" asp-route-status="@Model.StatusFilter" asp-route-plan="@Model.MembershipPlanFilter">Previous</a>
                         </li>
                         @for (int i = Math.Max(1, Model.PageNum - 2); i <= Math.Min(Model.TotalPages, Model.PageNum + 2); i++)
                         {
                             <li class="page-item @(i == Model.PageNum ? "active" : "")">
-                                <a class="page-link" asp-page="/Admin/Members" asp-route-pageNum="@i" asp-route-pageSize="@Model.PageSize" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" asp-route-status="@Model.StatusFilter">@i</a>
+                                <a class="page-link" asp-page="/Admin/Members" asp-route-pageNum="@i" asp-route-pageSize="@Model.PageSize" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" asp-route-status="@Model.StatusFilter" asp-route-plan="@Model.MembershipPlanFilter">@i</a>
                             </li>
                         }
                         <li class="page-item @(Model.PageNum == Model.TotalPages ? "disabled" : "")">
-                            <a class="page-link" asp-page="/Admin/Members" asp-route-pageNum="@(Model.PageNum + 1)" asp-route-pageSize="@Model.PageSize" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" asp-route-status="@Model.StatusFilter">Next</a>
+                            <a class="page-link" asp-page="/Admin/Members" asp-route-pageNum="@(Model.PageNum + 1)" asp-route-pageSize="@Model.PageSize" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" asp-route-status="@Model.StatusFilter" asp-route-plan="@Model.MembershipPlanFilter">Next</a>
                         </li>
                     </ul>
                 </nav>
             </div>
+        </div>
+    </div>
         </div>
     </div>
 </div>

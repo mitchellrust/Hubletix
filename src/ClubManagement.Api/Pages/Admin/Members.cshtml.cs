@@ -17,6 +17,8 @@ public class MembersModel : TenantPageModel
     private readonly string _sortDirectionDesc = "desc";
     private readonly string _sortDirectionAsc = "asc";
     public string? StatusFilter { get; set; } = "all"; // all, active, inactive
+    public string? MembershipPlanFilter { get; set; }
+    public List<MembershipPlanFacet> MembershipPlanFacets { get; set; } = new();
     public string? StatusMessage { get; set; }
 
     public MembersModel(
@@ -27,7 +29,7 @@ public class MembersModel : TenantPageModel
         _dbContext = dbContext;
     }
 
-    public async Task OnGetAsync(string? sort = null, string? dir = null, int pageNum = 1, int pageSize = 10, string? status = null, string? message = null)
+    public async Task OnGetAsync(string? sort = null, string? dir = null, int pageNum = 1, int pageSize = 10, string? status = null, string? plan = null, string? message = null)
     {
         // Capture status message from redirect
         StatusMessage = message;
@@ -38,6 +40,7 @@ public class MembersModel : TenantPageModel
         SortField = string.IsNullOrWhiteSpace(sort) ? _defaultSortField : sort.ToLowerInvariant();
         SortDirection = string.Equals(dir, _sortDirectionDesc, StringComparison.OrdinalIgnoreCase) ? _sortDirectionDesc : _sortDirectionAsc;
         StatusFilter = string.IsNullOrWhiteSpace(status) ? "all" : status.ToLowerInvariant();
+        MembershipPlanFilter = plan;
 
         // Build a deferred query for users
         var query = _dbContext.Users
@@ -59,6 +62,22 @@ public class MembersModel : TenantPageModel
             "inactive" => query.Where(u => !u.User.IsActive),
             _ => query // "all" - no filter
         };
+        
+        // Apply membership plan filter
+        if (!string.IsNullOrWhiteSpace(MembershipPlanFilter))
+        {
+            if (MembershipPlanFilter == "none")
+            {
+                query = query.Where(u => u.User.MembershipPlanId == null);
+            }
+            else
+            {
+                query = query.Where(u => u.User.MembershipPlanId == MembershipPlanFilter);
+            }
+        }
+
+        // Get facet counts before applying pagination
+        await LoadMembershipPlanFacetsAsync();
 
         // Apply sorting
         query = SortField switch
@@ -101,6 +120,42 @@ public class MembersModel : TenantPageModel
             MembershipPlanName = u.MembershipPlanName
         }).ToList();
     }
+    
+    private async Task LoadMembershipPlanFacetsAsync()
+    {
+        // Get all membership plans with member counts
+        var planFacets = await _dbContext.MembershipPlans
+            .OrderBy(p => p.DisplayOrder)
+            .ThenBy(p => p.Name)
+            .Select(p => new MembershipPlanFacet
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Count = _dbContext.Users.Count(u => u.MembershipPlanId == p.Id)
+            })
+            .ToListAsync();
+        
+        // Add "No Plan" facet
+        var noPlanCount = await _dbContext.Users.CountAsync(u => u.MembershipPlanId == null);
+        planFacets.Add(new MembershipPlanFacet
+        {
+            Id = "none",
+            Name = "No Plan",
+            Count = noPlanCount
+        });
+        
+        MembershipPlanFacets = planFacets;
+    }
+}
+
+/// <summary>
+/// DTO for membership plan facets.
+/// </summary>
+public class MembershipPlanFacet
+{
+    public string Id { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public int Count { get; set; }
 }
 
 /// <summary>
