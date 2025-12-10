@@ -123,7 +123,20 @@ public class MembersModel : TenantPageModel
     
     private async Task LoadMembershipPlanFacetsAsync()
     {
-        // Get all membership plans with member counts
+        // Build base query with status filter applied
+        var userQuery = _dbContext.Users.AsQueryable();
+        
+        if (StatusFilter == "active")
+        {
+            userQuery = userQuery.Where(u => u.IsActive);
+        }
+        else if (StatusFilter == "inactive")
+        {
+            userQuery = userQuery.Where(u => !u.IsActive);
+        }
+        // "all" or null - no filter applied
+        
+        // Get all membership plans with filtered member counts
         var planFacets = await _dbContext.MembershipPlans
             .OrderBy(p => p.DisplayOrder)
             .ThenBy(p => p.Name)
@@ -131,12 +144,12 @@ public class MembersModel : TenantPageModel
             {
                 Id = p.Id,
                 Name = p.Name,
-                Count = _dbContext.Users.Count(u => u.MembershipPlanId == p.Id)
+                Count = userQuery.Count(u => u.MembershipPlanId == p.Id)
             })
             .ToListAsync();
         
-        // Add "No Plan" facet
-        var noPlanCount = await _dbContext.Users.CountAsync(u => u.MembershipPlanId == null);
+        // Add "No Plan" facet with filtered count
+        var noPlanCount = await userQuery.CountAsync(u => u.MembershipPlanId == null);
         planFacets.Add(new MembershipPlanFacet
         {
             Id = "none",
