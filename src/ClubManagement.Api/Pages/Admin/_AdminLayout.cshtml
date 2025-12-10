@@ -20,6 +20,16 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.0/font/bootstrap-icons.css" />
         <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
     </environment>
+    
+    <script>
+        // Check localStorage and set initial classes before page renders to prevent flicker
+        (function() {
+            const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+            if (isCollapsed) {
+                document.documentElement.classList.add('sidebar-collapsed-initial');
+            }
+        })();
+    </script>
 </head>
 <body>
 
@@ -151,6 +161,29 @@
         top: 0;
         left: 0;
         transition: width 0.3s ease, transform 0.3s ease;
+    }
+    
+    /* Initial collapsed state (set by inline script before render) */
+    html.sidebar-collapsed-initial .sidebar {
+        width: 70px;
+    }
+    
+    html.sidebar-collapsed-initial .sidebar .nav-text {
+        display: none;
+    }
+    
+    html.sidebar-collapsed-initial .sidebar .nav-link {
+        padding-left: 1.25rem !important;
+        padding-right: 1.25rem !important;
+        text-align: center;
+    }
+    
+    html.sidebar-collapsed-initial .sidebar .nav-link i {
+        margin-right: 0 !important;
+    }
+    
+    html.sidebar-collapsed-initial .d-flex.min-vh-100 {
+        padding-left: 70px;
     }
     
     .sidebar.collapsed {
@@ -290,19 +323,25 @@
     // Restore sidebar state on page load
     document.addEventListener('DOMContentLoaded', function() {
         const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+        
         if (isCollapsed) {
             const sidebar = document.getElementById('adminSidebar');
             const mainContent = document.querySelector('.d-flex.min-vh-100');
             const collapseBtn = document.getElementById('collapseBtn');
             
+            // Add collapsed classes (initial CSS already applied via html class)
             sidebar.classList.add('collapsed');
             mainContent.classList.add('sidebar-collapsed');
             
+            // Update button state
             const icon = collapseBtn.querySelector('i');
             const text = collapseBtn.querySelector('.nav-text');
             icon.className = 'bi bi-chevron-right';
             text.textContent = 'Expand';
         }
+        
+        // Remove the initial class now that proper classes are applied
+        document.documentElement.classList.remove('sidebar-collapsed-initial');
         
         // Initialize Bootstrap tooltips
         initializeTooltips();
