@@ -27,6 +27,18 @@ public class EventDetailModel : TenantPageModel
     public List<SelectListItem> TimeZoneOptions { get; set; } = new();
     public string? StatusMessage { get; set; }
     public string? ErrorMessage { get; set; }
+    
+    // Registration properties
+    public List<EventRegistrationDto> Registrations { get; set; } = new();
+    public int PageNum { get; set; }
+    public int PageSize { get; set; }
+    public int TotalPages { get; set; }
+    public string SortField { get; set; } = "date";
+    private readonly string _defaultSortField = "date";
+    public string SortDirection { get; set; } = "desc";
+    private readonly string _sortDirectionDesc = "desc";
+    private readonly string _sortDirectionAsc = "asc";
+    public string? RegistrationStatusFilter { get; set; } = "all";
 
     public EventDetailModel(
         AppDbContext dbContext,
@@ -36,7 +48,7 @@ public class EventDetailModel : TenantPageModel
         _dbContext = dbContext;
     }
 
-    public async Task<IActionResult> OnGetAsync(string? id)
+    public async Task<IActionResult> OnGetAsync(string? id, string? sort = null, string? dir = null, int pageNum = 1, int pageSize = 10, string? regStatus = null)
     {
         // ID wasn't provided, 404 not found feels right.
         if (string.IsNullOrEmpty(id))
@@ -61,7 +73,74 @@ public class EventDetailModel : TenantPageModel
 
         PopulateEventTypeOptions();
         PopulateTimeZoneOptions();
+        
+        // Load registrations for this event
+        await LoadEventRegistrationsAsync(id, sort, dir, pageNum, pageSize, regStatus);
+        
         return Page();
+    }
+    
+    private async Task LoadEventRegistrationsAsync(string eventId, string? sort, string? dir, int pageNum, int pageSize, string? regStatus)
+    {
+        // Calculate pagination and sorting
+        PageNum = Math.Max(1, pageNum);
+        PageSize = Math.Clamp(pageSize, 5, 50);
+        SortField = string.IsNullOrWhiteSpace(sort) ? _defaultSortField : sort.ToLowerInvariant();
+        SortDirection = string.Equals(dir, _sortDirectionDesc, StringComparison.OrdinalIgnoreCase) ? _sortDirectionDesc : _sortDirectionAsc;
+        RegistrationStatusFilter = string.IsNullOrWhiteSpace(regStatus) ? "all" : regStatus.ToLowerInvariant();
+
+        // Build query for registrations of this specific event
+        var query = _dbContext.EventRegistrations
+            .Where(r => r.EventId == eventId)
+            .Include(r => r.User)
+            .Select(r => new
+            {
+                Registration = r,
+                UserName = r.User.FirstName + " " + r.User.LastName
+            })
+            .AsQueryable();
+
+        // Apply status filter
+        if (RegistrationStatusFilter != "all")
+        {
+            query = query.Where(r => r.Registration.Status.ToLower() == RegistrationStatusFilter);
+        }
+
+        // Apply sorting
+        query = SortField switch
+        {
+            "user" => SortDirection == _sortDirectionAsc
+                ? query.OrderBy(r => r.UserName)
+                : query.OrderByDescending(r => r.UserName),
+            "status" => SortDirection == _sortDirectionAsc
+                ? query.OrderBy(r => r.Registration.Status)
+                : query.OrderByDescending(r => r.Registration.Status),
+            _ => SortDirection == _sortDirectionAsc // date
+                ? query.OrderBy(r => r.Registration.SignedUpAt)
+                : query.OrderByDescending(r => r.Registration.SignedUpAt)
+        };
+
+        // Get total count for pagination
+        var totalCount = await query.CountAsync();
+        TotalPages = (int)Math.Ceiling(totalCount / (double)PageSize);
+
+        // Fetch paginated registrations
+        var results = await query
+            .Skip((PageNum - 1) * PageSize)
+            .Take(PageSize)
+            .ToListAsync();
+
+        // Project to DTO
+        Registrations = results.Select(r => new EventRegistrationDto
+        {
+            Id = r.Registration.Id,
+            UserId = r.Registration.UserId,
+            UserName = r.UserName,
+            EventId = r.Registration.EventId,
+            Status = r.Registration.Status,
+            SignedUpAt = r.Registration.SignedUpAt,
+            CancellationReason = r.Registration.CancellationReason
+        }).ToList();
     }
 
     public async Task<IActionResult> OnPostAsync()

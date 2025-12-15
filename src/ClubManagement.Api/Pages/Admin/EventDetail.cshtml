@@ -169,5 +169,138 @@
             document.getElementById('statusLabel').textContent = checkbox.checked ? 'Active' : 'Inactive';
         }
     </script>
+    
+    <!-- Event Registrations Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">Registrations</h4>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <a asp-page="/Admin/EventDetail" asp-route-id="@Model.Event.Id" asp-route-regStatus="all" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
+                               class="btn @(Model.RegistrationStatusFilter == "all" ? "btn-primary" : "btn-outline-primary")">All</a>
+                            <a asp-page="/Admin/EventDetail" asp-route-id="@Model.Event.Id" asp-route-regStatus="registered" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
+                               class="btn @(Model.RegistrationStatusFilter == "registered" ? "btn-primary" : "btn-outline-primary")">Registered</a>
+                            <a asp-page="/Admin/EventDetail" asp-route-id="@Model.Event.Id" asp-route-regStatus="attended" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
+                               class="btn @(Model.RegistrationStatusFilter == "attended" ? "btn-primary" : "btn-outline-primary")">Attended</a>
+                            <a asp-page="/Admin/EventDetail" asp-route-id="@Model.Event.Id" asp-route-regStatus="waitlist" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
+                               class="btn @(Model.RegistrationStatusFilter == "waitlist" ? "btn-primary" : "btn-outline-primary")">Waitlist</a>
+                            <a asp-page="/Admin/EventDetail" asp-route-id="@Model.Event.Id" asp-route-regStatus="cancelled" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
+                               class="btn @(Model.RegistrationStatusFilter == "cancelled" ? "btn-primary" : "btn-outline-primary")">Cancelled</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>
+                                    <a asp-page="/Admin/EventDetail" asp-route-id="@Model.Event.Id" asp-route-sort="user" asp-route-dir="@(Model.SortField == "user" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-regStatus="@Model.RegistrationStatusFilter" class="text-decoration-none">
+                                        Member
+                                        @if (Model.SortField == "user")
+                                        {
+                                            <i class="bi bi-arrow-@(Model.SortDirection == "asc" ? "down" : "up")"></i>
+                                        }
+                                    </a>
+                                </th>
+                                <th>
+                                    <a asp-page="/Admin/EventDetail" asp-route-id="@Model.Event.Id" asp-route-sort="date" asp-route-dir="@(Model.SortField == "date" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-regStatus="@Model.RegistrationStatusFilter" class="text-decoration-none">
+                                        Registered
+                                        @if (Model.SortField == "date")
+                                        {
+                                            <i class="bi bi-arrow-@(Model.SortDirection == "asc" ? "down" : "up")"></i>
+                                        }
+                                    </a>
+                                </th>
+                                <th>
+                                    <a asp-page="/Admin/EventDetail" asp-route-id="@Model.Event.Id" asp-route-sort="status" asp-route-dir="@(Model.SortField == "status" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-regStatus="@Model.RegistrationStatusFilter" class="text-decoration-none">
+                                        Status
+                                        @if (Model.SortField == "status")
+                                        {
+                                            <i class="bi bi-arrow-@(Model.SortDirection == "asc" ? "down" : "up")"></i>
+                                        }
+                                    </a>
+                                </th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Registrations.Any())
+                            {
+                                @foreach (var reg in Model.Registrations)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="fw-semibold">@reg.UserName</div>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted">@reg.SignedUpAt.ToString("MMM d, yyyy")</span>
+                                        </td>
+                                        <td>
+                                            @{
+                                                var badgeClass = reg.Status.ToLower() switch
+                                                {
+                                                    "registered" => "bg-success",
+                                                    "attended" => "bg-primary",
+                                                    "waitlist" => "bg-warning",
+                                                    "cancelled" => "bg-secondary",
+                                                    _ => "bg-secondary"
+                                                };
+                                            }
+                                            <span class="badge @badgeClass">@reg.Status</span>
+                                            @if (!string.IsNullOrEmpty(reg.CancellationReason))
+                                            {
+                                                <div><small class="text-muted">@reg.CancellationReason</small></div>
+                                            }
+                                        </td>
+                                        <td class="text-end">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="alert('TODO: Manage registration')">Manage</button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-4">
+                                        <i class="bi bi-calendar-check fs-1 d-block mb-2"></i>
+                                        No registrations found for this event.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                @if (Model.TotalPages > 1)
+                {
+                    <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+                        <div class="text-muted small">
+                            Page @Model.PageNum of @Model.TotalPages
+                        </div>
+                        <div>
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination pagination-sm mb-0">
+                                    <li class="page-item @(Model.PageNum == 1 ? "disabled" : "")">
+                                        <a class="page-link" asp-page="/Admin/EventDetail" asp-route-id="@Model.Event.Id" asp-route-pageNum="@(Model.PageNum - 1)" asp-route-pageSize="@Model.PageSize" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" asp-route-regStatus="@Model.RegistrationStatusFilter">Previous</a>
+                                    </li>
+                                    @for (int i = Math.Max(1, Model.PageNum - 2); i <= Math.Min(Model.TotalPages, Model.PageNum + 2); i++)
+                                    {
+                                        <li class="page-item @(i == Model.PageNum ? "active" : "")">
+                                            <a class="page-link" asp-page="/Admin/EventDetail" asp-route-id="@Model.Event.Id" asp-route-pageNum="@i" asp-route-pageSize="@Model.PageSize" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" asp-route-regStatus="@Model.RegistrationStatusFilter">@i</a>
+                                        </li>
+                                    }
+                                    <li class="page-item @(Model.PageNum == Model.TotalPages ? "disabled" : "")">
+                                        <a class="page-link" asp-page="/Admin/EventDetail" asp-route-id="@Model.Event.Id" asp-route-pageNum="@(Model.PageNum + 1)" asp-route-pageSize="@Model.PageSize" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" asp-route-regStatus="@Model.RegistrationStatusFilter">Next</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
     }
 </div>
