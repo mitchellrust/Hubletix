@@ -21,9 +21,9 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
                     <h6 class="mb-0">Filters</h6>
-                    @if (!string.IsNullOrEmpty(Model.StatusFilter) && Model.StatusFilter != "all" || Model.TimeFilter != "upcoming")
+                    @if (!string.IsNullOrEmpty(Model.StatusFilter) && Model.StatusFilter != "all" || Model.TimeFilter != "all")
                     {
-                        <a asp-page="/Admin/EventRegistrations" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" class="btn btn-sm btn-link text-decoration-none p-0">Clear</a>
+                        <a asp-page="/Admin/EventRegistrations" asp-route-time="all" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" class="btn btn-sm btn-link text-decoration-none p-0">Clear</a>
                     }
                 </div>
                 <div class="card-body p-0">
@@ -85,7 +85,7 @@
                         <div class="d-flex gap-2">
                             <button class="btn btn-sm btn-outline-secondary d-xl-none" data-bs-toggle="modal" data-bs-target="#filterModal">
                                 <i class="bi bi-funnel"></i> Filters
-                                @if (!string.IsNullOrEmpty(Model.StatusFilter) && Model.StatusFilter != "all" || Model.TimeFilter != "upcoming")
+                                @if (!string.IsNullOrEmpty(Model.StatusFilter) && Model.StatusFilter != "all" || Model.TimeFilter != "all")
                                 {
                                     <span class="badge bg-primary rounded-pill ms-1">•</span>
                                 }
@@ -282,7 +282,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="resetFilters()">Cancel</button>
-                <button type="button" class="btn btn-outline-secondary" onclick="clearFilters()">Clear All</button>
+                <button type="button" class="btn btn-outline-secondary" onclick="clearFilters()">Clear</button>
                 <button type="button" class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
             </div>
         </div>
@@ -302,7 +302,7 @@
             const form = document.getElementById('filterForm');
             const sortField = form.querySelector('input[name="sort"]').value;
             const sortDir = form.querySelector('input[name="dir"]').value;
-            window.location.href = `/admin/event-registrations?sort=${sortField}&dir=${sortDir}`;
+            window.location.href = `/admin/event-registrations?time=all&sort=${sortField}&dir=${sortDir}`;
         }
         
         function resetFilters() {
