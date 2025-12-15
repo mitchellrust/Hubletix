@@ -48,11 +48,27 @@ if (builder.Environment.IsDevelopment())
 {
     builder.Services
         .AddRazorPages()
-        .AddRazorRuntimeCompilation();
+        .AddRazorRuntimeCompilation()
+        .AddRazorPagesOptions(options =>
+        {
+            options.RootDirectory = "/Pages";
+        })
+        .AddRazorOptions(options =>
+        {
+            options.PageViewLocationFormats.Add("/Pages/Admin/Shared/{0}.cshtml");
+        });
 }
 else
 {
-    builder.Services.AddRazorPages();
+    builder.Services.AddRazorPages()
+        .AddRazorPagesOptions(options =>
+        {
+            options.RootDirectory = "/Pages";
+        })
+        .AddRazorOptions(options =>
+        {
+            options.PageViewLocationFormats.Add("/Pages/Admin/Shared/{0}.cshtml");
+        });
 }
 
 builder.Services.AddControllers();

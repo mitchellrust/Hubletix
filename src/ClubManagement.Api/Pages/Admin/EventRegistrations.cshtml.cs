@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using ClubManagement.Infrastructure.Persistence;
 using Finbuckle.MultiTenant.Abstractions;
 using ClubManagement.Core.Constants;
+using ClubManagement.Api.Models;
 
 namespace ClubManagement.Api.Pages.Admin;
 
@@ -155,6 +156,34 @@ public class EventRegistrationsModel : TenantPageModel
         
         EventFacets = events;
     }
+    
+    public EventRegistrationsTableViewModel GetRegistrationsTableViewModel()
+    {
+        return new EventRegistrationsTableViewModel
+        {
+            Title = "Event Registrations",
+            ContainerClass = "col",
+            EmptyMessage = "No registrations found.",
+            Registrations = Registrations,
+            PageNum = PageNum,
+            PageSize = PageSize,
+            TotalPages = TotalPages,
+            SortField = SortField,
+            SortDirection = SortDirection,
+            StatusFilter = StatusFilter ?? "all",
+            TimeFilter = TimeFilter,
+            ShowEventColumn = true,
+            ShowTopFilters = false,
+            ShowSideFacets = true,
+            ShowFilterModal = true,
+            HasActiveFilters = (!string.IsNullOrEmpty(StatusFilter) && StatusFilter != "all") || TimeFilter != "all",
+            PageName = "/admin/event-registrations",
+            RouteValues = new Dictionary<string, string>
+            {
+                ["time"] = TimeFilter ?? "all"
+            }
+        };
+    }
 }
 
 /// <summary>
@@ -166,20 +195,4 @@ public class EventFacet
     public string Name { get; set; } = string.Empty;
     public DateTime StartTime { get; set; }
     public int Count { get; set; }
-}
-
-/// <summary>
-/// DTO for displaying event registrations.
-/// </summary>
-public class EventRegistrationDto
-{
-    public string Id { get; set; } = string.Empty;
-    public string UserId { get; set; } = string.Empty;
-    public string UserName { get; set; } = string.Empty;
-    public string EventId { get; set; } = string.Empty;
-    public string EventName { get; set; } = string.Empty;
-    public DateTime EventStartTime { get; set; }
-    public string Status { get; set; } = string.Empty;
-    public DateTime SignedUpAt { get; set; }
-    public string? CancellationReason { get; set; }
 }

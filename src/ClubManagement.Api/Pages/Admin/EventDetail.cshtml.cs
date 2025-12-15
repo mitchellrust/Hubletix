@@ -6,6 +6,7 @@ using ClubManagement.Core.Entities;
 using ClubManagement.Infrastructure.Persistence;
 using Finbuckle.MultiTenant.Abstractions;
 using ClubManagement.Api.Utils;
+using ClubManagement.Api.Models;
 
 namespace ClubManagement.Api.Pages.Admin;
 
@@ -318,5 +319,30 @@ public class EventDetailModel : TenantPageModel
                 Selected = Event?.TimeZoneId == tzId
             };
         }).ToList();
+    }
+    
+    public EventRegistrationsTableViewModel GetRegistrationsTableViewModel()
+    {
+        return new EventRegistrationsTableViewModel
+        {
+            Title = "Registrations",
+            ContainerClass = "col-12 order-2 order-lg-3 my-5",
+            EmptyMessage = "No registrations found for this event.",
+            Registrations = Registrations,
+            PageNum = PageNum,
+            PageSize = PageSize,
+            TotalPages = TotalPages,
+            SortField = SortField,
+            SortDirection = SortDirection,
+            StatusFilter = RegistrationStatusFilter ?? "all",
+            ShowEventColumn = false, // Don't show event column since we're already on an event page
+            ShowTopFilters = true, // Show status filters as button group at top
+            HasActiveFilters = false,
+            PageName = $"/admin/events/{Event?.Id}",
+            RouteValues = new Dictionary<string, string>
+            {
+                ["id"] = Event?.Id ?? string.Empty
+            }
+        };
     }
 }
