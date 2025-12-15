@@ -21,7 +21,7 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
                     <h6 class="mb-0">Filters</h6>
-                    @if (!string.IsNullOrEmpty(Model.StatusFilter) && Model.StatusFilter != "all" || !string.IsNullOrEmpty(Model.EventFilter))
+                    @if (!string.IsNullOrEmpty(Model.StatusFilter) && Model.StatusFilter != "all" || Model.TimeFilter != "upcoming")
                     {
                         <a asp-page="/Admin/EventRegistrations" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" class="btn btn-sm btn-link text-decoration-none p-0">Clear</a>
                     }
@@ -31,48 +31,45 @@
                     <div class="border-bottom p-3">
                         <h6 class="mb-2 fw-semibold small text-uppercase text-muted">Status</h6>
                         <div class="list-group list-group-flush small">
-                            <a asp-page="/Admin/EventRegistrations" asp-route-status="all" asp-route-eventId="@Model.EventFilter" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
+                            <a asp-page="/Admin/EventRegistrations" asp-route-status="all" asp-route-time="@Model.TimeFilter" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
                                class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.StatusFilter == "all" ? "fw-bold text-primary" : "")">
                                 All
                             </a>
-                            <a asp-page="/Admin/EventRegistrations" asp-route-status="registered" asp-route-eventId="@Model.EventFilter" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
+                            <a asp-page="/Admin/EventRegistrations" asp-route-status="registered" asp-route-time="@Model.TimeFilter" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
                                class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.StatusFilter == "registered" ? "fw-bold text-primary" : "")">
                                 Registered
                             </a>
-                            <a asp-page="/Admin/EventRegistrations" asp-route-status="attended" asp-route-eventId="@Model.EventFilter" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
+                            <a asp-page="/Admin/EventRegistrations" asp-route-status="attended" asp-route-time="@Model.TimeFilter" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
                                class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.StatusFilter == "attended" ? "fw-bold text-primary" : "")">
                                 Attended
                             </a>
-                            <a asp-page="/Admin/EventRegistrations" asp-route-status="waitlist" asp-route-eventId="@Model.EventFilter" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
+                            <a asp-page="/Admin/EventRegistrations" asp-route-status="waitlist" asp-route-time="@Model.TimeFilter" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
                                class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.StatusFilter == "waitlist" ? "fw-bold text-primary" : "")">
                                 Waitlist
                             </a>
-                            <a asp-page="/Admin/EventRegistrations" asp-route-status="cancelled" asp-route-eventId="@Model.EventFilter" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
+                            <a asp-page="/Admin/EventRegistrations" asp-route-status="cancelled" asp-route-time="@Model.TimeFilter" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
                                class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.StatusFilter == "cancelled" ? "fw-bold text-primary" : "")">
                                 Cancelled
                             </a>
                         </div>
                     </div>
                     
-                    <!-- Event Facet -->
-                    <div class="p-3">
-                        <h6 class="mb-2 fw-semibold small text-uppercase text-muted">Upcoming Events</h6>
+                    <!-- Time Period Facet -->
+                    <div class="border-bottom p-3">
+                        <h6 class="mb-2 fw-semibold small text-uppercase text-muted">Time Period</h6>
                         <div class="list-group list-group-flush small">
-                            <a asp-page="/Admin/EventRegistrations" asp-route-status="@Model.StatusFilter" asp-route-eventId="" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
-                               class="list-group-item list-group-item-action border-0 py-1 px-0 d-flex justify-content-between align-items-center @(string.IsNullOrEmpty(Model.EventFilter) ? "fw-bold text-primary" : "")">
-                                <span>All Events</span>
+                            <a asp-page="/Admin/EventRegistrations" asp-route-status="@Model.StatusFilter" asp-route-time="all" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
+                               class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.TimeFilter == "all" ? "fw-bold text-primary" : "")">
+                                All Events
                             </a>
-                            @foreach (var facet in Model.EventFacets)
-                            {
-                                <a asp-page="/Admin/EventRegistrations" asp-route-status="@Model.StatusFilter" asp-route-eventId="@facet.Id" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
-                                   class="list-group-item list-group-item-action border-0 py-1 px-0 d-flex justify-content-between align-items-center @(Model.EventFilter == facet.Id ? "fw-bold text-primary" : "")">
-                                    <span class="text-truncate me-2">
-                                        @facet.Name
-                                        <small class="text-muted d-block">@facet.StartTime.ToString("MMM d, h:mm tt")</small>
-                                    </span>
-                                    <span class="badge bg-secondary rounded-pill">@facet.Count</span>
-                                </a>
-                            }
+                            <a asp-page="/Admin/EventRegistrations" asp-route-status="@Model.StatusFilter" asp-route-time="upcoming" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
+                               class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.TimeFilter == "upcoming" ? "fw-bold text-primary" : "")">
+                                Upcoming Events
+                            </a>
+                            <a asp-page="/Admin/EventRegistrations" asp-route-status="@Model.StatusFilter" asp-route-time="previous" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
+                               class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.TimeFilter == "previous" ? "fw-bold text-primary" : "")">
+                                Previous Events
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -88,7 +85,7 @@
                         <div class="d-flex gap-2">
                             <button class="btn btn-sm btn-outline-secondary d-xl-none" data-bs-toggle="modal" data-bs-target="#filterModal">
                                 <i class="bi bi-funnel"></i> Filters
-                                @if (!string.IsNullOrEmpty(Model.StatusFilter) && Model.StatusFilter != "all" || !string.IsNullOrEmpty(Model.EventFilter))
+                                @if (!string.IsNullOrEmpty(Model.StatusFilter) && Model.StatusFilter != "all" || Model.TimeFilter != "upcoming")
                                 {
                                     <span class="badge bg-primary rounded-pill ms-1">•</span>
                                 }
@@ -101,7 +98,7 @@
                         <thead class="table-light">
                             <tr>
                                 <th>
-                                    <a asp-page="/Admin/EventRegistrations" asp-route-sort="user" asp-route-dir="@(Model.SortField == "user" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" asp-route-eventId="@Model.EventFilter" class="text-decoration-none">
+                                    <a asp-page="/Admin/EventRegistrations" asp-route-sort="user" asp-route-dir="@(Model.SortField == "user" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" asp-route-time="@Model.TimeFilter" class="text-decoration-none">
                                         Member
                                         @if (Model.SortField == "user")
                                         {
@@ -110,7 +107,7 @@
                                     </a>
                                 </th>
                                 <th>
-                                    <a asp-page="/Admin/EventRegistrations" asp-route-sort="event" asp-route-dir="@(Model.SortField == "event" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" asp-route-eventId="@Model.EventFilter" class="text-decoration-none">
+                                    <a asp-page="/Admin/EventRegistrations" asp-route-sort="event" asp-route-dir="@(Model.SortField == "event" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" asp-route-time="@Model.TimeFilter" class="text-decoration-none">
                                         Event
                                         @if (Model.SortField == "event")
                                         {
@@ -119,7 +116,7 @@
                                     </a>
                                 </th>
                                 <th>
-                                    <a asp-page="/Admin/EventRegistrations" asp-route-sort="date" asp-route-dir="@(Model.SortField == "date" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" asp-route-eventId="@Model.EventFilter" class="text-decoration-none">
+                                    <a asp-page="/Admin/EventRegistrations" asp-route-sort="date" asp-route-dir="@(Model.SortField == "date" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" asp-route-time="@Model.TimeFilter" class="text-decoration-none">
                                         Registered
                                         @if (Model.SortField == "date")
                                         {
@@ -128,7 +125,7 @@
                                     </a>
                                 </th>
                                 <th>
-                                    <a asp-page="/Admin/EventRegistrations" asp-route-sort="status" asp-route-dir="@(Model.SortField == "status" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" asp-route-eventId="@Model.EventFilter" class="text-decoration-none">
+                                    <a asp-page="/Admin/EventRegistrations" asp-route-sort="status" asp-route-dir="@(Model.SortField == "status" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" asp-route-time="@Model.TimeFilter" class="text-decoration-none">
                                         Status
                                         @if (Model.SortField == "status")
                                         {
@@ -199,16 +196,16 @@
                         <nav aria-label="Page navigation">
                             <ul class="pagination pagination-sm mb-0">
                                 <li class="page-item @(Model.PageNum == 1 ? "disabled" : "")">
-                                    <a class="page-link" asp-page="/Admin/EventRegistrations" asp-route-pageNum="@(Model.PageNum - 1)" asp-route-pageSize="@Model.PageSize" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" asp-route-status="@Model.StatusFilter" asp-route-eventId="@Model.EventFilter">Previous</a>
+                                    <a class="page-link" asp-page="/Admin/EventRegistrations" asp-route-pageNum="@(Model.PageNum - 1)" asp-route-pageSize="@Model.PageSize" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" asp-route-status="@Model.StatusFilter" asp-route-time="@Model.TimeFilter">Previous</a>
                                 </li>
                                 @for (int i = Math.Max(1, Model.PageNum - 2); i <= Math.Min(Model.TotalPages, Model.PageNum + 2); i++)
                                 {
                                     <li class="page-item @(i == Model.PageNum ? "active" : "")">
-                                        <a class="page-link" asp-page="/Admin/EventRegistrations" asp-route-pageNum="@i" asp-route-pageSize="@Model.PageSize" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" asp-route-status="@Model.StatusFilter" asp-route-eventId="@Model.EventFilter">@i</a>
+                                        <a class="page-link" asp-page="/Admin/EventRegistrations" asp-route-pageNum="@i" asp-route-pageSize="@Model.PageSize" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" asp-route-status="@Model.StatusFilter" asp-route-time="@Model.TimeFilter">@i</a>
                                     </li>
                                 }
                                 <li class="page-item @(Model.PageNum == Model.TotalPages ? "disabled" : "")">
-                                    <a class="page-link" asp-page="/Admin/EventRegistrations" asp-route-pageNum="@(Model.PageNum + 1)" asp-route-pageSize="@Model.PageSize" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" asp-route-status="@Model.StatusFilter" asp-route-eventId="@Model.EventFilter">Next</a>
+                                    <a class="page-link" asp-page="/Admin/EventRegistrations" asp-route-pageNum="@(Model.PageNum + 1)" asp-route-pageSize="@Model.PageSize" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" asp-route-status="@Model.StatusFilter" asp-route-time="@Model.TimeFilter">Next</a>
                                 </li>
                             </ul>
                         </nav>
@@ -262,30 +259,24 @@
                         </div>
                     </div>
                     
-                    <!-- Event Filter -->
-                    <div class="mb-3">
-                        <h6 class="fw-semibold text-uppercase text-muted small mb-3">Event</h6>
+                    <!-- Time Period Filter -->
+                    <div class="mb-4">
+                        <h6 class="fw-semibold text-uppercase text-muted small mb-3">Time Period</h6>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="eventId" id="eventAll" value="" 
-                                   @(string.IsNullOrEmpty(Model.EventFilter) ? "checked" : "")>
-                            <label class="form-check-label" for="eventAll">All Events</label>
+                            <input class="form-check-input" type="radio" name="time" id="timeAll" value="all" 
+                                   @(Model.TimeFilter == "all" ? "checked" : "")>
+                            <label class="form-check-label" for="timeAll">All Events</label>
                         </div>
-                        @foreach (var facet in Model.EventFacets)
-                        {
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="eventId" id="event_@facet.Id.Replace("-", "_")" value="@facet.Id" 
-                                       @(Model.EventFilter == facet.Id ? "checked" : "")>
-                                <label class="form-check-label w-100" for="event_@facet.Id.Replace("-", "_")">
-                                    <span class="d-flex justify-content-between align-items-center">
-                                        <span>
-                                            @facet.Name
-                                            <small class="text-muted d-block">@facet.StartTime.ToString("MMM d, h:mm tt")</small>
-                                        </span>
-                                        <span class="badge bg-secondary rounded-pill">@facet.Count</span>
-                                    </span>
-                                </label>
-                            </div>
-                        }
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="time" id="timeUpcoming" value="upcoming" 
+                                   @(Model.TimeFilter == "upcoming" ? "checked" : "")>
+                            <label class="form-check-label" for="timeUpcoming">Upcoming Events</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="time" id="timePrevious" value="previous" 
+                                   @(Model.TimeFilter == "previous" ? "checked" : "")>
+                            <label class="form-check-label" for="timePrevious">Previous Events</label>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -301,7 +292,7 @@
 @section Scripts {
     <script>
         let initialStatus = '@Model.StatusFilter';
-        let initialEvent = '@Model.EventFilter';
+        let initialTime = '@Model.TimeFilter';
         
         function applyFilters() {
             document.getElementById('filterForm').submit();
@@ -320,9 +311,9 @@
                 radio.checked = (radio.value === initialStatus);
             });
             
-            const eventRadios = document.querySelectorAll('input[name="eventId"]');
-            eventRadios.forEach(radio => {
-                radio.checked = (radio.value === initialEvent);
+            const timeRadios = document.querySelectorAll('input[name="time"]');
+            timeRadios.forEach(radio => {
+                radio.checked = (radio.value === initialTime);
             });
         }
     </script>

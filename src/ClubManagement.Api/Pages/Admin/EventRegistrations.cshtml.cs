@@ -18,7 +18,7 @@ public class EventRegistrationsModel : TenantPageModel
     private readonly string _sortDirectionDesc = "desc";
     private readonly string _sortDirectionAsc = "asc";
     public string? StatusFilter { get; set; } = "all";
-    public string? EventFilter { get; set; }
+    public string? TimeFilter { get; set; } = "upcoming"; // all, upcoming, previous
     public List<EventFacet> EventFacets { get; set; } = new();
     public string? StatusMessage { get; set; }
 
@@ -30,17 +30,17 @@ public class EventRegistrationsModel : TenantPageModel
         _dbContext = dbContext;
     }
 
-    public async Task OnGetAsync(string? sort = null, string? dir = null, int pageNum = 1, int pageSize = 10, string? status = null, string? eventId = null, string? message = null)
+    public async Task OnGetAsync(string? sort = null, string? dir = null, int pageNum = 1, int pageSize = 10, string? status = null, string? time = null, string? eventId = null, string? message = null)
     {
         StatusMessage = message;
         
         // Calculate pagination and sorting
         PageNum = Math.Max(1, pageNum);
-        PageSize = 2;
+        PageSize = Math.Clamp(pageSize, 5, 50);
         SortField = string.IsNullOrWhiteSpace(sort) ? _defaultSortField : sort.ToLowerInvariant();
         SortDirection = string.Equals(dir, _sortDirectionDesc, StringComparison.OrdinalIgnoreCase) ? _sortDirectionDesc : _sortDirectionAsc;
         StatusFilter = string.IsNullOrWhiteSpace(status) ? "all" : status.ToLowerInvariant();
-        EventFilter = eventId;
+        TimeFilter = string.IsNullOrWhiteSpace(time) ? "upcoming" : time.ToLowerInvariant();
 
         // Build query
         var query = _dbContext.EventRegistrations
@@ -60,15 +60,20 @@ public class EventRegistrationsModel : TenantPageModel
         {
             query = query.Where(r => r.Registration.Status.ToLower() == StatusFilter);
         }
-        
-        // Apply event filter
-        if (!string.IsNullOrWhiteSpace(EventFilter))
+
+        // Apply event time filter
+        var nowUtc = DateTime.UtcNow;
+        if (TimeFilter == "upcoming")
         {
-            query = query.Where(r => r.Registration.EventId == EventFilter);
+            query = query.Where(r => r.EventStartTime >= nowUtc);
+        }
+        else if (TimeFilter == "previous")
+        {
+            query = query.Where(r => r.EventStartTime < nowUtc);
         }
 
         // Get facet counts
-        await LoadEventFacetsAsync(StatusFilter);
+        await LoadEventFacetsAsync(nowUtc, StatusFilter, TimeFilter);
 
         // Apply sorting
         query = SortField switch
@@ -112,7 +117,7 @@ public class EventRegistrationsModel : TenantPageModel
         }).ToList();
     }
     
-    private async Task LoadEventFacetsAsync(string? statusFilter)
+    private async Task LoadEventFacetsAsync(DateTime nowUtc, string? statusFilter, string? timeFilter)
     {
         // Build base query with status filter applied
         var registrationQuery = _dbContext.EventRegistrations.AsQueryable();
@@ -122,10 +127,22 @@ public class EventRegistrationsModel : TenantPageModel
             registrationQuery = registrationQuery.Where(r => r.Status.ToLower() == statusFilter);
         }
         
-        // Get upcoming events with registration counts
-        var upcomingEvents = await _dbContext.Events
-            .Where(e => e.StartTimeUtc >= DateTime.UtcNow)
-            .OrderBy(e => e.StartTimeUtc)
+        // Build event query with time filter
+        var eventQuery = _dbContext.Events.AsQueryable();
+        
+        if (timeFilter == "upcoming")
+        {
+            eventQuery = eventQuery.Where(e => e.StartTimeUtc >= nowUtc);
+        }
+        else if (timeFilter == "previous")
+        {
+            eventQuery = eventQuery.Where(e => e.StartTimeUtc < nowUtc);
+        }
+        // "all" - no time filter
+        
+        // Get events with registration counts
+        var events = await eventQuery
+            .OrderByDescending(e => e.StartTimeUtc)
             .Select(e => new EventFacet
             {
                 Id = e.Id,
@@ -136,7 +153,7 @@ public class EventRegistrationsModel : TenantPageModel
             .Take(20)
             .ToListAsync();
         
-        EventFacets = upcomingEvents;
+        EventFacets = events;
     }
 }
 

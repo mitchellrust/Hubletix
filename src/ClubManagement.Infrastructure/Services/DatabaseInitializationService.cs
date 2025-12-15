@@ -167,6 +167,20 @@ public class DatabaseInitializationService
                     EndTimeUtc = DateTime.UtcNow.AddDays(3).AddHours(1),
                     TimeZoneId = "America/Denver",
                     CreatedBy = "System"
+                },
+                new Event
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    TenantId = demoTenant.Id,
+                    Name = "Super Fun Volleyball Event",
+                    Description = "An event that occurred in the past.",
+                    EventType = Core.Constants.EventType.Social,
+                    Capacity = 25,
+                    IsActive = true,
+                    StartTimeUtc = DateTime.UtcNow.AddDays(-3),
+                    EndTimeUtc = DateTime.UtcNow.AddDays(-3).AddHours(1),
+                    TimeZoneId = "America/Denver",
+                    CreatedBy = "System"
                 }
             };
 
@@ -253,7 +267,7 @@ public class DatabaseInitializationService
                     Id = Guid.NewGuid().ToString(),
                     EventId = demoEvents[1].Id,
                     UserId = demoUsers[0].Id,
-                    Status = Core.Constants.EventRegistrationStatus.Attended,
+                    Status = Core.Constants.EventRegistrationStatus.Waitlist,
                     SignedUpAt = DateTime.UtcNow.AddDays(-2).AddMinutes(-30),
                     CreatedBy = "System"
                 },
@@ -283,6 +297,15 @@ public class DatabaseInitializationService
                     UserId = demoUsers[2].Id,
                     Status = Core.Constants.EventRegistrationStatus.Waitlist,
                     SignedUpAt = DateTime.UtcNow.AddMinutes(-2),
+                    CreatedBy = "System"
+                },
+                new EventRegistration
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    EventId = demoEvents[3].Id,
+                    UserId = demoUsers[5].Id,
+                    Status = Core.Constants.EventRegistrationStatus.Attended,
+                    SignedUpAt = DateTime.UtcNow.AddDays(-11),
                     CreatedBy = "System"
                 }
             };
