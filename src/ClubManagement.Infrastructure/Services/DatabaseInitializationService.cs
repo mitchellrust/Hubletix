@@ -237,10 +237,61 @@ public class DatabaseInitializationService
                 }
             );
 
+            var demoEventRegistrations = new List<EventRegistration>
+            {
+                new EventRegistration
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    EventId = demoEvents[0].Id,
+                    UserId = demoUsers[0].Id,
+                    Status = Core.Constants.EventRegistrationStatus.Registered,
+                    SignedUpAt = DateTime.UtcNow.AddDays(-1).AddHours(-2),
+                    CreatedBy = "System"
+                },
+                new EventRegistration
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    EventId = demoEvents[1].Id,
+                    UserId = demoUsers[0].Id,
+                    Status = Core.Constants.EventRegistrationStatus.Attended,
+                    SignedUpAt = DateTime.UtcNow.AddDays(-2).AddMinutes(-30),
+                    CreatedBy = "System"
+                },
+                new EventRegistration
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    EventId = demoEvents[0].Id,
+                    UserId = demoUsers[1].Id,
+                    Status = Core.Constants.EventRegistrationStatus.Cancelled,
+                    CancellationReason = "Scheduling conflict",
+                    SignedUpAt = DateTime.UtcNow.AddDays(-10),
+                    CreatedBy = "System"
+                },
+                new EventRegistration
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    EventId = demoEvents[0].Id,
+                    UserId = demoUsers[2].Id,
+                    Status = Core.Constants.EventRegistrationStatus.Registered,
+                    SignedUpAt = DateTime.UtcNow.AddMinutes(-2),
+                    CreatedBy = "System"
+                },
+                new EventRegistration
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    EventId = demoEvents[1].Id,
+                    UserId = demoUsers[2].Id,
+                    Status = Core.Constants.EventRegistrationStatus.Waitlist,
+                    SignedUpAt = DateTime.UtcNow.AddMinutes(-2),
+                    CreatedBy = "System"
+                }
+            };
+
             context.Tenants.Add(demoTenant);
             context.Events.AddRange(demoEvents);
             context.MembershipPlans.AddRange(demoPlans);
             context.Users.AddRange(demoUsers);
+            context.EventRegistrations.AddRange(demoEventRegistrations);
             await context.SaveChangesAsync();
 
             _logger.LogInformation("Demo tenant created with identifier: {Subdomain}", demoTenant.Id);

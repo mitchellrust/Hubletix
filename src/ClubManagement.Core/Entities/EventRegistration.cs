@@ -21,7 +21,7 @@ public class EventRegistration: BaseEntity
     /// <summary>
     /// Signup status: "registered", "cancelled", "attended"
     /// </summary>
-    public string Status { get; set; } = "registered";
+    public string Status { get; set; } = Constants.EventRegistrationStatus.Registered;
     
     /// <summary>
     /// Cancellation reason (if cancelled)

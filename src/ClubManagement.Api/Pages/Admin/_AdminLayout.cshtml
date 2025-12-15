@@ -60,6 +60,13 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link text-white px-4 py-2 @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("EventRegistrations") == true ? "active bg-primary" : "")" 
+                       href="/admin/event-registrations" data-bs-toggle="tooltip" data-bs-placement="right" title="Event Registrations">
+                        <i class="bi bi-calendar-check me-2"></i>
+                        <span class="nav-text">Event Registrations</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link text-white px-4 py-2 @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Plans") == true ? "active bg-primary" : "")" 
                        href="/admin/plans" data-bs-toggle="tooltip" data-bs-placement="right" title="Membership Plans">
                         <i class="bi bi-door-open me-2"></i>
@@ -67,7 +74,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white px-4 py-2 @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Members") == true ? "active bg-primary" : "")" 
+                    <a class="nav-link text-white px-4 py-2 @(ViewContext.RouteData.Values["page"]?.ToString()?.Contains("Members") == true && !ViewContext.RouteData.Values["page"]?.ToString()?.Contains("EventRegistrations") == true ? "active bg-primary" : "")" 
                        href="/admin/members" data-bs-toggle="tooltip" data-bs-placement="right" title="Members">
                         <i class="bi bi-people me-2"></i>
                         <span class="nav-text">Members</span>
