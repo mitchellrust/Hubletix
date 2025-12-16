@@ -1,7 +1,7 @@
 @using ClubManagement.Api.Models
 @model EventRegistrationsTableViewModel
 
-<div class="@Model.ContainerClass">
+<div class="row p-0 m-0 @Model.ContainerClass">
     @if (Model.ShowFilterFacets)
     {
         <!-- Facet Filter Panel (Desktop) -->
@@ -230,27 +230,27 @@
                         <div class="mb-4">
                             <h6 class="fw-semibold text-uppercase text-muted small mb-3">Status</h6>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="status" id="statusAll" value="all" 
+                                <input class="form-check-input" type="radio" name="regStatus" id="statusAll" value="all" 
                                        @(Model.StatusFilter == "all" ? "checked" : "")>
                                 <label class="form-check-label" for="statusAll">All</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="status" id="statusRegistered" value="registered" 
+                                <input class="form-check-input" type="radio" name="regStatus" id="statusRegistered" value="registered" 
                                        @(Model.StatusFilter == "registered" ? "checked" : "")>
                                 <label class="form-check-label" for="statusRegistered">Registered</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="status" id="statusAttended" value="attended" 
+                                <input class="form-check-input" type="radio" name="regStatus" id="statusAttended" value="attended" 
                                        @(Model.StatusFilter == "attended" ? "checked" : "")>
                                 <label class="form-check-label" for="statusAttended">Attended</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="status" id="statusWaitlist" value="waitlist" 
+                                <input class="form-check-input" type="radio" name="regStatus" id="statusWaitlist" value="waitlist" 
                                        @(Model.StatusFilter == "waitlist" ? "checked" : "")>
                                 <label class="form-check-label" for="statusWaitlist">Waitlist</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="status" id="statusCancelled" value="cancelled" 
+                                <input class="form-check-input" type="radio" name="regStatus" id="statusCancelled" value="cancelled" 
                                        @(Model.StatusFilter == "cancelled" ? "checked" : "")>
                                 <label class="form-check-label" for="statusCancelled">Cancelled</label>
                             </div>

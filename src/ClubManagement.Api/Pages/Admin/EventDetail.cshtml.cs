@@ -326,7 +326,7 @@ public class EventDetailModel : TenantPageModel
         return new EventRegistrationsTableViewModel
         {
             Title = "Registrations",
-            ContainerClass = "row my-5",
+            ContainerClass = "col-12 order-2 order-lg-3 my-5",
             EmptyMessage = "No registrations found for this event.",
             Registrations = Registrations,
             PageNum = PageNum,
