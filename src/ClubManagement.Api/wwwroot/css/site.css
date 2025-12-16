@@ -27,3 +27,66 @@
   --bs-body-bg: #ffffff;
   --bs-body-color: #374151;
 }
+
+/* Public Homepage Styles */
+.hero-section {
+  position: relative;
+}
+
+.min-vh-50 {
+  min-height: 50vh;
+}
+
+.navbar-brand img {
+  max-height: 40px;
+  width: auto;
+}
+
+.btn-rounded {
+  border-radius: 50px;
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Card hover effects */
+.card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 1rem 3rem rgba(0,0,0,.175) !important;
+}
+
+/* Stat items */
+.stat-item {
+  padding: 1rem;
+}
+
+/* Service cards */
+.service-card {
+  transition: all 0.3s ease;
+}
+
+.service-card:hover {
+  box-shadow: 0 1rem 3rem rgba(0,0,0,.175) !important;
+}
+
+/* Footer links */
+footer a:hover {
+  color: #fff !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991.98px) {
+  .hero-section h1 {
+    font-size: 2.5rem;
+  }
+  
+  .hero-section p {
+    font-size: 1.1rem;
+  }
+}

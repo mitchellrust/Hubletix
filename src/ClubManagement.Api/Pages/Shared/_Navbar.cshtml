@@ -1,0 +1,36 @@
+@using ClubManagement.Api.Models
+@model NavbarViewModel
+
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand d-flex align-items-center" href="/">
+            @if (!string.IsNullOrEmpty(Model.LogoUrl))
+            {
+                <img src="@Model.LogoUrl" alt="@Model.TenantName" height="40" class="me-2">
+            }
+            else
+            {
+                <span class="fw-bold fs-5" style="@(!string.IsNullOrEmpty(Model.PrimaryColor) ? $"color: {Model.PrimaryColor};" : "")">@Model.TenantName</span>
+            }
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto me-3">
+                @foreach (var item in Model.NavItems)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link @(item.IsActive ? "active" : "")" href="@item.Url">@item.Text</a>
+                    </li>
+                }
+            </ul>
+            @if (Model.ShowBookNowButton)
+            {
+                <a href="/events" class="btn btn-primary rounded-pill px-4" style="@(!string.IsNullOrEmpty(Model.PrimaryColor) ? $"background-color: {Model.PrimaryColor}; border-color: {Model.PrimaryColor};" : "")">
+                    Book now <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            }
+        </div>
+    </div>
+</nav>

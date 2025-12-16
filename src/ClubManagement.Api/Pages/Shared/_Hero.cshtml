@@ -1,0 +1,27 @@
+@using ClubManagement.Api.Models
+@model HeroViewModel
+
+<section class="hero-section position-relative overflow-hidden" style="min-height: 500px; @(!string.IsNullOrEmpty(Model.BackgroundImageUrl) ? $"background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('{Model.BackgroundImageUrl}');" : "background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);") background-size: cover; background-position: center;">
+    <div class="container">
+        <div class="row min-vh-50 align-items-center py-5">
+            <div class="col-lg-8 col-xl-7 text-white">
+                <h1 class="display-3 fw-bold mb-4" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
+                    @Model.Heading
+                </h1>
+                <p class="lead mb-4 fs-4" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">
+                    @Model.Subheading
+                </p>
+                <a href="@Model.CtaUrl" class="btn btn-lg btn-light px-5 py-3 rounded-pill shadow-lg" style="@(!string.IsNullOrEmpty(Model.PrimaryColor) ? $"background-color: {Model.PrimaryColor}; border-color: {Model.PrimaryColor}; color: white;" : "")">
+                    @Model.CtaText <i class="bi bi-arrow-right ms-2"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Decorative wave -->
+    <div class="position-absolute bottom-0 start-0 w-100">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" style="display: block;">
+            <path fill="#ffffff" fill-opacity="1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+        </svg>
+    </div>
+</section>

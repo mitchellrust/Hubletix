@@ -54,6 +54,26 @@ public class ThemeConfig
     /// Logo URL or path
     /// </summary>
     public string? LogoUrl { get; set; }
+
+    /// <summary>
+    /// Hero background image URL
+    /// </summary>
+    public string? HeroImageUrl { get; set; }
+
+    /// <summary>
+    /// Custom hero heading text
+    /// </summary>
+    public string? HeroHeading { get; set; }
+
+    /// <summary>
+    /// Custom hero subheading text
+    /// </summary>
+    public string? HeroSubheading { get; set; }
+
+    /// <summary>
+    /// About section description
+    /// </summary>
+    public string? AboutDescription { get; set; }
 }
 
 /// <summary>
