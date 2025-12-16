@@ -2,6 +2,7 @@ using Microsoft.Extensions.Caching.Memory;
 using ClubManagement.Core.Entities;
 using ClubManagement.Infrastructure.Persistence;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Hosting;
 
 namespace ClubManagement.Infrastructure.Services;
 
@@ -28,21 +29,31 @@ public class TenantConfigCacheService : ITenantConfigCacheService
     private readonly AppDbContext _dbContext;
     private readonly IMemoryCache _cache;
     private readonly ILogger<TenantConfigCacheService> _logger;
+    private readonly bool _isDevelopment;
 
     public TenantConfigCacheService(
         AppDbContext dbContext,
         IMemoryCache cache,
-        ILogger<TenantConfigCacheService> logger
+        ILogger<TenantConfigCacheService> logger,
+        IHostEnvironment environment
     )
     {
         _dbContext = dbContext;
         _cache = cache;
         _logger = logger;
+        _isDevelopment = environment.IsDevelopment();
     }
 
     public async Task<Tenant?> GetTenantConfigAsync(string tenantId)
     {
         var cacheKey = $"{CacheKeyPrefix}{tenantId}";
+
+        // In development, skip cache to always get fresh data
+        if (_isDevelopment)
+        {
+            _logger.LogDebug("Development mode: fetching fresh tenant config for {TenantId}", tenantId);
+            return await _dbContext.Tenants.FindAsync(tenantId);
+        }
 
         if (_cache.TryGetValue(cacheKey, out Tenant? cachedTenant))
         {

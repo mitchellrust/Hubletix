@@ -9,7 +9,7 @@ public class NavbarViewModel
     public string? LogoUrl { get; set; }
     public string? PrimaryColor { get; set; }
     public List<NavItem> NavItems { get; set; } = new();
-    public bool ShowBookNowButton { get; set; } = true;
+    public bool ShowLogInButton { get; set; } = false;
 }
 
 public class NavItem

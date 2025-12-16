@@ -25,10 +25,10 @@
                     </li>
                 }
             </ul>
-            @if (Model.ShowBookNowButton)
+            @if (Model.ShowLogInButton)
             {
-                <a href="/events" class="btn btn-primary rounded-pill px-4" style="@(!string.IsNullOrEmpty(Model.PrimaryColor) ? $"background-color: {Model.PrimaryColor}; border-color: {Model.PrimaryColor};" : "")">
-                    Book now <i class="bi bi-arrow-right ms-1"></i>
+                <a href="/login" class="btn btn-outline-primary rounded-pill px-4 me-2" style="@(!string.IsNullOrEmpty(Model.PrimaryColor) ? $"border-color: {Model.PrimaryColor}; color: {Model.PrimaryColor};" : "")">
+                    Log In
                 </a>
             }
         </div>

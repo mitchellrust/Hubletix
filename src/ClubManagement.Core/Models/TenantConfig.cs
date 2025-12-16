@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace ClubManagement.Core.Models;
 
 /// <summary>
@@ -81,6 +83,15 @@ public class ThemeConfig
 /// </summary>
 public class FeatureFlags
 {
+    /// <summary>
+    /// Whether user signup is enabled
+    /// </summary>
+    [NotMapped]
+    public bool EnableUserSignup =>
+        EnableEventRegistration ||
+        EnablePayments || 
+        EnableMemberships;
+        
     /// <summary>
     /// Enable event registration functionality
     /// </summary>

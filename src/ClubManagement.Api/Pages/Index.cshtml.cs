@@ -28,7 +28,7 @@ public class IndexModel : TenantPageModel
 
     public async Task OnGetAsync()
     {
-      // Fetch tenant config for defaults
+       // Fetch tenant for config
         var tenant = await _tenantConfigCache.GetTenantConfigAsync(_currentTenantInfo.Id);
         if (tenant == null)
         {
@@ -49,20 +49,18 @@ public class IndexModel : TenantPageModel
             PrimaryColor = primaryColor,
             NavItems = new List<NavItem>
             {
-                new() { Text = "About Us", Url = "#about", IsActive = false },
-                new() { Text = "Services", Url = "#services", IsActive = false },
-                new() { Text = "Coaches", Url = "/coaches", IsActive = false },
+                new() { Text = "Memberships", Url = "/membership-plans", IsActive = false },
                 new() { Text = "Events", Url = "/events", IsActive = false },
-                new() { Text = "Contact", Url = "/contact", IsActive = false }
+                new() { Text = "Contact Us", Url = "/contact", IsActive = false }
             },
-            ShowBookNowButton = TenantConfig?.Features?.EnableEventRegistration ?? true
+            ShowLogInButton = TenantConfig?.Features?.EnableUserSignup ?? false
         };
 
         // Build hero section
         HomePage.Hero = new HeroViewModel
         {
-            Heading = TenantConfig?.Theme?.HeroHeading ?? $"Unleash Your Inner Champion Today. All In One Place.",
-            Subheading = TenantConfig?.Theme?.HeroSubheading ?? "Join the ultimate sports experience — where passion meets performance, and every swing brings you closer to victory.",
+            Heading = TenantConfig?.Theme?.HeroHeading ?? "Unleash Your Inner Champion Today. All In One Place.",
+            Subheading = TenantConfig?.Theme?.HeroSubheading ?? "Join the ultimate sports experience. Train, compete, and connect with fellow athletes.",
             BackgroundImageUrl = TenantConfig?.Theme?.HeroImageUrl,
             CtaText = "Start your own journey",
             CtaUrl = "/events",
