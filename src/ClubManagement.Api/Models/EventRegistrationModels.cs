@@ -28,9 +28,7 @@ public class EventRegistrationsTableViewModel
     public string StatusFilter { get; set; } = "all";
     
     public bool ShowEventColumn { get; set; } = true;
-    public bool ShowTopFilters { get; set; } = false;
-    public bool ShowSideFacets { get; set; } = false;
-    public bool ShowFilterModal { get; set; } = false;
+    public bool ShowFilterFacets { get; set; } = false;
     public bool HasActiveFilters { get; set; } = false;
     
     // Additional filter properties for facets

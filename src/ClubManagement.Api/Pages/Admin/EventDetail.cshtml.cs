@@ -326,7 +326,7 @@ public class EventDetailModel : TenantPageModel
         return new EventRegistrationsTableViewModel
         {
             Title = "Registrations",
-            ContainerClass = "col-12 order-2 order-lg-3 my-5",
+            ContainerClass = "row my-5",
             EmptyMessage = "No registrations found for this event.",
             Registrations = Registrations,
             PageNum = PageNum,
@@ -336,8 +336,8 @@ public class EventDetailModel : TenantPageModel
             SortDirection = SortDirection,
             StatusFilter = RegistrationStatusFilter ?? "all",
             ShowEventColumn = false, // Don't show event column since we're already on an event page
-            ShowTopFilters = true, // Show status filters as button group at top
-            HasActiveFilters = false,
+            ShowFilterFacets = true,
+            HasActiveFilters = !string.IsNullOrEmpty(RegistrationStatusFilter) && RegistrationStatusFilter != "all",
             PageName = $"/admin/events/{Event?.Id}",
             RouteValues = new Dictionary<string, string>
             {

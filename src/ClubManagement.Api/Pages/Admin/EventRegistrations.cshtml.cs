@@ -162,7 +162,7 @@ public class EventRegistrationsModel : TenantPageModel
         return new EventRegistrationsTableViewModel
         {
             Title = "Event Registrations",
-            ContainerClass = "col",
+            ContainerClass = "row",
             EmptyMessage = "No registrations found.",
             Registrations = Registrations,
             PageNum = PageNum,
@@ -173,9 +173,7 @@ public class EventRegistrationsModel : TenantPageModel
             StatusFilter = StatusFilter ?? "all",
             TimeFilter = TimeFilter,
             ShowEventColumn = true,
-            ShowTopFilters = false,
-            ShowSideFacets = true,
-            ShowFilterModal = true,
+            ShowFilterFacets = true,
             HasActiveFilters = (!string.IsNullOrEmpty(StatusFilter) && StatusFilter != "all") || TimeFilter != "all",
             PageName = "/admin/event-registrations",
             RouteValues = new Dictionary<string, string>
