@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using ClubManagement.Infrastructure.Persistence;
 using Finbuckle.MultiTenant.Abstractions;
 using ClubManagement.Api.Utils;
+using ClubManagement.Api.Models;
 
 namespace ClubManagement.Api.Pages.Admin;
 
@@ -18,7 +19,7 @@ public class EventsModel : TenantPageModel
     private readonly string _sortDirectionDesc = "desc";
     private readonly string _sortDirectionAsc = "asc";
     public string? StatusFilter { get; set; } = "all"; // all, active, inactive
-    public string? DateFilter { get; set; } = "upcoming"; // upcoming, past, all
+    public string? DateFilter { get; set; } = "upcoming"; // all, upcoming, past
     public string? StatusMessage { get; set; }
 
     public EventsModel(
@@ -59,8 +60,9 @@ public class EventsModel : TenantPageModel
         var nowUtc = DateTime.UtcNow;
         query = DateFilter switch
         {
+            "upcoming" => query.Where(e => e.StartTimeUtc >= nowUtc),
             "past" => query.Where(e => e.StartTimeUtc < nowUtc),
-            _ => query.Where(e => e.StartTimeUtc >= nowUtc) // default to upcoming only
+            _ => query // "all" - no filter
         };
 
         // Apply sorting
@@ -113,21 +115,26 @@ public class EventsModel : TenantPageModel
             };
         }).ToList();
     }
-}
-
-/// <summary>
-/// DTO for displaying events.
-/// </summary>
-public class EventDto
-{
-    public string Id { get; set; } = string.Empty;
-    public string Name { get; set; } = string.Empty;
-    public DateTime Date { get; set; }
-    public string Time { get; set; } = string.Empty;
-    public string Location { get; set; } = string.Empty;
-    public int Registrations { get; set; }
-    public string EventType { get; set; } = string.Empty;
-    public int Capacity { get; set; }
-    public bool IsActive { get; set; }
+    
+    public EventsTableViewModel GetEventsTableViewModel()
+    {
+        return new EventsTableViewModel
+        {
+            Title = "Events",
+            ContainerClass = "",
+            EmptyMessage = "No events found. Create your first event to get started.",
+            Events = Events,
+            PageNum = PageNum,
+            PageSize = PageSize,
+            TotalPages = TotalPages,
+            SortField = SortField,
+            SortDirection = SortDirection,
+            StatusFilter = StatusFilter ?? "all",
+            DateFilter = DateFilter ?? "upcoming",
+            ShowFilterFacets = true,
+            PageName = "/admin/events",
+            RouteValues = new Dictionary<string, string>()
+        };
+    }
 }
 
