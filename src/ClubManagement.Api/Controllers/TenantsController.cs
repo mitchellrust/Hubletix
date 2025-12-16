@@ -55,6 +55,25 @@ public class TenantsController : ControllerBase
         });
     }
 
+    [HttpPost("invalidate-cache")]
+    [AllowAnonymous] // TODO: Secure this endpoint with admin authorization
+    public IActionResult InvalidateCache()
+    {
+        if (_multiTenantContextAccessor.MultiTenantContext.TenantInfo == null)
+        {
+            return NotFound("No tenant context set");
+        }
+
+        var tenantId = _multiTenantContextAccessor.MultiTenantContext.TenantInfo.Id;
+        _tenantConfigCache.InvalidateCache(tenantId);
+
+        return Ok(new { 
+            message = "Cache invalidated successfully", 
+            tenantId,
+            timestamp = DateTime.UtcNow 
+        });
+    }
+
     [HttpGet("health")]
     [AllowAnonymous]
     public IActionResult Health()

@@ -61,8 +61,8 @@ public class TenantConfigCacheService : ITenantConfigCacheService
                 tenant,
                 new MemoryCacheEntryOptions
                 {
-                    SlidingExpiration = TimeSpan.FromMinutes(5),
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
+                    SlidingExpiration = TimeSpan.FromMinutes(2),
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
                 });
         }
 
