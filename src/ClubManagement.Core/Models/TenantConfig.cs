@@ -22,6 +22,11 @@ public class TenantConfig
     /// Feature flags for enabling/disabling functionality
     /// </summary>
     public FeatureFlags Features { get; set; } = new();
+
+    /// <summary>
+    /// Homepage content configuration
+    /// </summary>
+    public HomePageConfig HomePage { get; set; } = new();
 }
 
 public class SettingsConfig
@@ -56,26 +61,6 @@ public class ThemeConfig
     /// Logo URL or path
     /// </summary>
     public string? LogoUrl { get; set; }
-
-    /// <summary>
-    /// Hero background image URL
-    /// </summary>
-    public string? HeroImageUrl { get; set; }
-
-    /// <summary>
-    /// Custom hero heading text
-    /// </summary>
-    public string? HeroHeading { get; set; }
-
-    /// <summary>
-    /// Custom hero subheading text
-    /// </summary>
-    public string? HeroSubheading { get; set; }
-
-    /// <summary>
-    /// About section description
-    /// </summary>
-    public string? AboutDescription { get; set; }
 }
 
 /// <summary>
@@ -91,7 +76,7 @@ public class FeatureFlags
         EnableEventRegistration ||
         EnablePayments || 
         EnableMemberships;
-        
+
     /// <summary>
     /// Enable event registration functionality
     /// </summary>
@@ -106,4 +91,80 @@ public class FeatureFlags
     /// Enable membership plans
     /// </summary>
     public bool EnableMemberships { get; set; } = true;
+}
+
+/// <summary>
+/// Homepage content configuration
+/// </summary>
+public class HomePageConfig
+{
+    /// <summary>
+    /// Hero section configuration
+    /// </summary>
+    public HeroConfig? Hero { get; set; }
+
+    /// <summary>
+    /// About section configuration
+    /// </summary>
+    public AboutConfig? About { get; set; }
+
+    /// <summary>
+    /// Services section cards
+    /// </summary>
+    public List<ServiceCardConfig>? Services { get; set; }
+
+    /// <summary>
+    /// Section visibility controls
+    /// </summary>
+    public SectionVisibility Visibility { get; set; } = new();
+}
+
+public class HeroConfig
+{
+    public string? ImageUrl { get; set; }
+    public string Heading { get; set; } = string.Empty;
+    public string Subheading { get; set; } = string.Empty;
+    public string? CtaText { get; set; }
+    public string? CtaUrl { get; set; }
+}
+
+public class AboutConfig
+{
+    public string Heading { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+
+    /// <summary>
+    /// About section feature cards
+    /// </summary>
+    public List<FeatureCardConfig>? FeatureCards { get; set; }
+}
+
+public class FeatureCardConfig
+{
+    public string Title { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public string? ImageUrl { get; set; }
+    public string? Icon { get; set; }
+    public string? BackgroundColor { get; set; }
+    public int DisplayOrder { get; set; }
+}
+
+public class ServiceCardConfig
+{
+    public string Title { get; set; } = string.Empty;
+    public string Subtitle { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public string? ImageUrl { get; set; }
+    public string? Icon { get; set; }
+    public string? BackgroundColor { get; set; }
+    public string? LinkUrl { get; set; }
+    public string? LinkText { get; set; }
+    public int DisplayOrder { get; set; }
+}
+
+public class SectionVisibility
+{
+    public bool ShowHero { get; set; } = true;
+    public bool ShowAbout { get; set; } = true;
+    public bool ShowServices { get; set; } = true;
 }

@@ -24,11 +24,11 @@ public class NavItem
 /// </summary>
 public class HeroViewModel
 {
-    public string Heading { get; set; } = "Welcome to Your Club";
-    public string Subheading { get; set; } = "Join us for the ultimate sports experience";
+    public string? Heading { get; set; } = "Your Hero Heading Here.";
+    public string? Subheading { get; set; } = "Your Hero Subheading here.";
     public string? BackgroundImageUrl { get; set; }
-    public string CtaText { get; set; } = "Get Started";
-    public string CtaUrl { get; set; } = "#";
+    public string? CtaText { get; set; } = "Get Started";
+    public string? CtaUrl { get; set; } = "#";
     public string? PrimaryColor { get; set; }
     public string? SecondaryColor { get; set; }
 }
