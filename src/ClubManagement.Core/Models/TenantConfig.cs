@@ -80,17 +80,17 @@ public class FeatureFlags
     /// <summary>
     /// Enable event registration functionality
     /// </summary>
-    public bool EnableEventRegistration { get; set; } = true;
+    public bool EnableEventRegistration { get; set; } = false;
 
     /// <summary>
     /// Enable payment processing
     /// </summary>
-    public bool EnablePayments { get; set; } = true;
+    public bool EnablePayments { get; set; } = false;
 
     /// <summary>
     /// Enable membership plans
     /// </summary>
-    public bool EnableMemberships { get; set; } = true;
+    public bool EnableMemberships { get; set; } = false;
 }
 
 /// <summary>

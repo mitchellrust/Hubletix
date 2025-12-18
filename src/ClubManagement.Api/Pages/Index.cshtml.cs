@@ -42,17 +42,24 @@ public class IndexModel : TenantPageModel
         var logoUrl = TenantConfig?.Theme?.LogoUrl;
 
         // Build navbar
+        var navItems = new List<NavItem>();
+        
+        if (TenantConfig?.Features?.EnableMemberships ?? false)
+        {
+            navItems.Add(new() { Text = "Memberships", Url = "/membership-plans", IsActive = false });
+        }
+        if (TenantConfig?.Features?.EnableEventRegistration ?? false)
+        {
+            navItems.Add(new() { Text = "Events", Url = "/events", IsActive = false });
+        }
+        navItems.Add(new() { Text = "Contact Us", Url = "/contact", IsActive = false });
+        
         HomePage.Navbar = new NavbarViewModel
         {
             TenantName = CurrentTenantInfo.Name ?? "Club",
             LogoUrl = logoUrl,
             PrimaryColor = primaryColor,
-            NavItems = new List<NavItem>
-            {
-                new() { Text = "Memberships", Url = "/membership-plans", IsActive = false },
-                new() { Text = "Events", Url = "/events", IsActive = false },
-                new() { Text = "Contact Us", Url = "/contact", IsActive = false }
-            },
+            NavItems = navItems,
             ShowLogInButton = TenantConfig?.Features?.EnableUserSignup ?? false
         };
 
