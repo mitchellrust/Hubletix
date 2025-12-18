@@ -6,6 +6,7 @@ using ClubManagement.Infrastructure.Persistence;
 using Finbuckle.MultiTenant.Abstractions;
 using ClubManagement.Core.Constants;
 using ClubManagement.Api.Utils;
+using ClubManagement.Infrastructure.Services;
 
 namespace ClubManagement.Api.Pages.Admin;
 
@@ -25,8 +26,13 @@ public class PlanDetailModel : TenantPageModel
 
     public PlanDetailModel(
         AppDbContext dbContext,
+        ITenantConfigService tenantConfigService,
         IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor
-    ) : base(multiTenantContextAccessor)
+    ) : base(
+        multiTenantContextAccessor,
+        tenantConfigService,
+        dbContext
+    )
     {
         _dbContext = dbContext;
     }

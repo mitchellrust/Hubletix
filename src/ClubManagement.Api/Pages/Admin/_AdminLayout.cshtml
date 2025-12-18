@@ -37,7 +37,16 @@
     <!-- Sidebar -->
     <nav class="sidebar bg-dark text-white d-flex flex-column" id="adminSidebar">
         <div class="p-4 border-bottom border-secondary d-flex justify-content-between align-items-center flex-shrink-0">
-            <h4 class="mb-0 fw-bold"><span class="nav-text">@ViewData["TenantName"]</span></h4>
+            <div class="d-flex align-items-center">
+                @if (!string.IsNullOrEmpty(ViewData["TenantLogoUrl"] as string))
+                {
+                    <img src="@ViewData["TenantLogoUrl"]" alt="@ViewData["TenantName"]" height="32" class="nav-text">
+                }
+                else
+                {
+                    <h4 class="mb-0 fw-bold"><span class="nav-text">@ViewData["TenantName"]</span></h4>
+                }
+            </div>
             <button class="btn btn-dark d-lg-none" type="button" onclick="toggleSidebar()">
                 <i class="bi bi-x-lg"></i>
             </button>

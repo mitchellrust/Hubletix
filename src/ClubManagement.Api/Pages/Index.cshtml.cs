@@ -12,24 +12,27 @@ public class IndexModel : TenantPageModel
     public HomePageViewModel HomePage { get; set; } = new();
     private readonly AppDbContext _dbContext;
     private readonly ClubTenantInfo _currentTenantInfo;
-    private readonly ITenantConfigCacheService _tenantConfigCache;
-    public TenantConfig? TenantConfig { get; set; }
+    private readonly ITenantConfigService _tenantConfigService;
 
     public IndexModel(
         AppDbContext dbContext,
-        ITenantConfigCacheService tenantConfigCache,
+        ITenantConfigService tenantConfigService,
         IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor
-    ) : base(multiTenantContextAccessor)
+    ) : base(
+        multiTenantContextAccessor,
+        tenantConfigService,
+        dbContext
+    )
     {
         _dbContext = dbContext;
-        _tenantConfigCache = tenantConfigCache;
+        _tenantConfigService = tenantConfigService;
         _currentTenantInfo = multiTenantContextAccessor.MultiTenantContext.TenantInfo!;
     }
 
     public async Task OnGetAsync()
     {
-       // Fetch tenant for config
-        var tenant = await _tenantConfigCache.GetTenantConfigAsync(_currentTenantInfo.Id);
+        // Fetch tenant for config
+        var tenant = await _tenantConfigService.GetTenantAsync(_currentTenantInfo.Id);
         if (tenant == null)
         {
             throw new InvalidOperationException("Tenant configuration not found.");

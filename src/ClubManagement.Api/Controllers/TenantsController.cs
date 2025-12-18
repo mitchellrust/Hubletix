@@ -11,18 +11,18 @@ namespace ClubManagement.Api.Controllers;
 public class TenantsController : ControllerBase
 {
     private readonly IMultiTenantContextAccessor<ClubTenantInfo> _multiTenantContextAccessor;
-    private readonly ITenantConfigCacheService _tenantConfigCache;
+    private readonly ITenantConfigService _tenantConfigService;
     private readonly ILogger<TenantsController> _logger;
 
     public TenantsController(
         AppDbContext dbContext,
         IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
-        ITenantConfigCacheService tenantConfigCache,
+        ITenantConfigService tenantConfigService,
         ILogger<TenantsController> logger
     )
     {
         _multiTenantContextAccessor = multiTenantContextAccessor;
-        _tenantConfigCache = tenantConfigCache;
+        _tenantConfigService = tenantConfigService;
         _logger = logger;
     }
 
@@ -35,7 +35,7 @@ public class TenantsController : ControllerBase
             return NotFound("No tenant context set");
         }
 
-        var tenant = await _tenantConfigCache.GetTenantConfigAsync(
+        var tenant = await _tenantConfigService.GetTenantAsync(
             _multiTenantContextAccessor.MultiTenantContext.TenantInfo.Id);
 
         if (tenant == null)
@@ -65,7 +65,7 @@ public class TenantsController : ControllerBase
         }
 
         var tenantId = _multiTenantContextAccessor.MultiTenantContext.TenantInfo.Id;
-        _tenantConfigCache.InvalidateCache(tenantId);
+        _tenantConfigService.InvalidateCache(tenantId);
 
         return Ok(new { 
             message = "Cache invalidated successfully", 

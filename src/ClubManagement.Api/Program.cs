@@ -39,9 +39,10 @@ builder.Services.AddScoped<ITenantOnboardingService, TenantOnboardingService>();
 // Register database initialization service
 builder.Services.AddScoped<DatabaseInitializationService>();
 
-// Add in memory caching (for tenant info caching)
+// Add in memory caching
 builder.Services.AddMemoryCache();
-builder.Services.AddScoped<ITenantConfigCacheService, TenantConfigCacheService>();
+builder.Services.AddScoped<ICacheService, CacheService>();
+builder.Services.AddScoped<ITenantConfigService, TenantConfigService>();
 
 // Enable hot reload of razor pages in development
 if (builder.Environment.IsDevelopment())
