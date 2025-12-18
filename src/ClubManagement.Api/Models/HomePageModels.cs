@@ -40,15 +40,8 @@ public class AboutSectionViewModel
 {
     public string Heading { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public List<StatItem> Stats { get; set; } = new();
     public List<FeatureCard> Features { get; set; } = new();
-}
-
-public class StatItem
-{
-    public string Value { get; set; } = string.Empty;
-    public string Label { get; set; } = string.Empty;
-    public string? Icon { get; set; }
+    public string? AccentColor { get; set; }
 }
 
 public class FeatureCard
@@ -56,7 +49,6 @@ public class FeatureCard
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string? ImageUrl { get; set; }
-    public string? BackgroundColor { get; set; }
     public string? Icon { get; set; }
 }
 
@@ -68,7 +60,7 @@ public class ServicesSectionViewModel
     public string Heading { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public List<ServiceCard> Services { get; set; } = new();
-    public string? PrimaryColor { get; set; }
+    public string? AccentColor { get; set; }
 }
 
 public class ServiceCard
@@ -77,7 +69,6 @@ public class ServiceCard
     public string Subtitle { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string? ImageUrl { get; set; }
-    public string? BackgroundColor { get; set; }
     public string? Icon { get; set; }
     public string? LinkUrl { get; set; }
     public string? LinkText { get; set; }

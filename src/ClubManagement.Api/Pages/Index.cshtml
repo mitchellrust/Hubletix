@@ -5,80 +5,24 @@
     Layout = "_PublicLayout";
 }
 
-@section Styles {
-    @* Dynamic tenant-specific styles *@
-    @if (!string.IsNullOrEmpty(Model.TenantConfig?.Theme?.PrimaryColor))
-    {
-        <style>
-            :root {
-                --tenant-primary: @Model.TenantConfig.Theme.PrimaryColor;
-                --bs-primary: @Model.TenantConfig.Theme.PrimaryColor;
-                --bs-link-color: @Model.TenantConfig.Theme.PrimaryColor;
-            }
-            .btn-primary {
-                background-color: @Model.TenantConfig.Theme.PrimaryColor !important;
-                border-color: @Model.TenantConfig.Theme.PrimaryColor !important;
-            }
-        </style>
-    }
+<!-- Hero Section -->
+@if (Model.HomePage.ShowHero)
+{
+    <partial name="_Hero" model="Model.HomePage.Hero" />
 }
-    <!-- Navbar -->
-    <partial name="_Navbar" model="Model.HomePage.Navbar" />
 
-    <!-- Hero Section -->
-    @if (Model.HomePage.ShowHero)
-    {
-        <partial name="_Hero" model="Model.HomePage.Hero" />
-    }
+<!-- About Section -->
+@if (Model.HomePage.ShowAbout)
+{
+    <section id="about">
+        <partial name="_AboutSection" model="Model.HomePage.About" />
+    </section>
+}
 
-    <!-- About Section -->
-    @if (Model.HomePage.ShowAbout)
-    {
-        <section id="about">
-            <partial name="_AboutSection" model="Model.HomePage.About" />
-        </section>
-    }
-
-    <!-- Services Section -->
-    @if (Model.HomePage.ShowServices)
-    {
-        <section id="services">
-            <partial name="_ServicesSection" model="Model.HomePage.Services" />
-        </section>
-    }
-
-    <!-- Footer -->
-    <footer class="bg-dark text-white py-5 mt-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4 mb-4 mb-md-0">
-                    <h5 class="fw-bold mb-3">@Model.CurrentTenantInfo.Name</h5>
-                    <p class="text-muted">Your premier sports club experience.</p>
-                </div>
-                <div class="col-md-4 mb-4 mb-md-0">
-                    <h5 class="fw-bold mb-3">Quick Links</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="#about" class="text-muted text-decoration-none">About Us</a></li>
-                        <li><a href="#services" class="text-muted text-decoration-none">Services</a></li>
-                        <li><a href="/events" class="text-muted text-decoration-none">Events</a></li>
-                        <li><a href="/contact" class="text-muted text-decoration-none">Contact</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-4">
-                    <h5 class="fw-bold mb-3">Connect With Us</h5>
-                    <div class="d-flex gap-3">
-                        <a href="#" class="text-white fs-4"><i class="bi bi-facebook"></i></a>
-                        <a href="#" class="text-white fs-4"><i class="bi bi-instagram"></i></a>
-                        <a href="#" class="text-white fs-4"><i class="bi bi-twitter"></i></a>
-                        <a href="#" class="text-white fs-4"><i class="bi bi-youtube"></i></a>
-                    </div>
-                </div>
-            </div>
-            <hr class="my-4 border-secondary">
-            <div class="row">
-                <div class="col-12 text-center text-muted">
-                    <small>&copy; @DateTime.Now.Year @Model.CurrentTenantInfo.Name. All rights reserved.</small>
-                </div>
-            </div>
-        </div>
-    </footer>
+<!-- Services Section -->
+@if (Model.HomePage.ShowServices)
+{
+    <section id="services">
+        <partial name="_ServicesSection" model="Model.HomePage.Services" />
+    </section>
+}

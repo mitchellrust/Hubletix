@@ -5,7 +5,10 @@
     <div class="container py-4">
         <div class="row mb-5">
             <div class="col-lg-8 mx-auto text-center">
-                <h2 class="display-5 fw-bold mb-4">@Model.Heading</h2>
+                @if (!string.IsNullOrEmpty(Model.Heading))
+                {
+                    <h2 class="display-5 fw-bold mb-4">@Model.Heading</h2>
+                }
                 @if (!string.IsNullOrEmpty(Model.Description))
                 {
                     <p class="lead text-muted">@Model.Description</p>
@@ -16,7 +19,7 @@
         @if (Model.Services.Any())
         {
             <div class="row g-4">
-                @foreach (var service in Model.Services)
+                @foreach (ServiceCard service in Model.Services)
                 {
                     <div class="col-md-6 col-lg-4">
                         <div class="card h-100 border-0 shadow-sm overflow-hidden service-card">
@@ -27,7 +30,7 @@
                                     @if (!string.IsNullOrEmpty(service.Subtitle))
                                     {
                                         <div class="position-absolute top-0 start-0 m-3">
-                                            <span class="badge rounded-pill px-3 py-2" style="@(!string.IsNullOrEmpty(service.BackgroundColor) ? $"background-color: {service.BackgroundColor};" : "background-color: rgba(255,255,255,0.9); color: #333;")">
+                                            <span class="badge rounded-pill px-3 py-2" style="background-color: rgba(255,255,255,0.9); color: #333;"">
                                                 @service.Subtitle
                                             </span>
                                         </div>
@@ -36,20 +39,20 @@
                             }
                             else if (!string.IsNullOrEmpty(service.Icon))
                             {
-                                <div class="card-body text-center pt-5" style="@(!string.IsNullOrEmpty(service.BackgroundColor) ? $"background-color: {service.BackgroundColor};" : "")">
-                                    <i class="@service.Icon display-1 mb-3" style="@(!string.IsNullOrEmpty(service.BackgroundColor) ? "color: white;" : $"color: {Model.PrimaryColor ?? "var(--bs-primary)"};")"></i>
+                                <div class="card-body text-center pt-5">
+                                    <i class="bi bi-@service.Icon display-1 mb-3" style="@($"color: {Model.AccentColor ?? "var(--bs-secondary)"};")"></i>
                                 </div>
                             }
                             <div class="card-body">
                                 @if (!string.IsNullOrEmpty(service.Subtitle) && string.IsNullOrEmpty(service.ImageUrl))
                                 {
-                                    <span class="badge mb-2" style="@(!string.IsNullOrEmpty(Model.PrimaryColor) ? $"background-color: {Model.PrimaryColor};" : "")">@service.Subtitle</span>
+                                    <span class="badge mb-2">@service.Subtitle</span>
                                 }
                                 <h5 class="card-title fw-bold mb-3">@service.Title</h5>
                                 <p class="card-text text-muted">@service.Description</p>
                                 @if (!string.IsNullOrEmpty(service.LinkUrl))
                                 {
-                                    <a href="@service.LinkUrl" class="btn btn-link text-decoration-none p-0" style="@(!string.IsNullOrEmpty(Model.PrimaryColor) ? $"color: {Model.PrimaryColor};" : "")">
+                                    <a href="@service.LinkUrl" class="btn btn-link text-decoration-none p-0" style="@($"color: {Model.AccentColor ?? "var(--bs-primary)"};")">
                                         @(service.LinkText ?? "Learn more") <i class="bi bi-arrow-right ms-1"></i>
                                     </a>
                                 }

@@ -1,4 +1,10 @@
 @using ClubManagement.Api.Models
+@using ClubManagement.Core.Models
+@{
+    var tenantConfig = ViewData["TenantConfig"] as TenantConfig;
+    var navbar = ViewData["Navbar"] as NavbarViewModel;
+    var tenantName = ViewData["TenantName"] as string ?? string.Empty;
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,10 +15,72 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     
+    @* Dynamic tenant-specific styles *@
+    @if (!string.IsNullOrEmpty(tenantConfig?.Theme?.PrimaryColor))
+    {
+        <style>
+            :root {
+                --tenant-primary: @tenantConfig.Theme.PrimaryColor;
+                --bs-primary: @tenantConfig.Theme.PrimaryColor;
+                --bs-link-color: @tenantConfig.Theme.PrimaryColor;
+                --tenant-secondary: @tenantConfig.Theme.SecondaryColor;
+                --bs-secondary: @tenantConfig.Theme.SecondaryColor;
+            }
+            .btn-primary {
+                background-color: @tenantConfig.Theme.PrimaryColor !important;
+                border-color: @tenantConfig.Theme.PrimaryColor !important;
+            }
+        </style>
+    }
+    
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
+    @* Navbar *@
+    @if (navbar != null)
+    {
+        <partial name="_Navbar" model="navbar" />
+    }
+
     @RenderBody()
+
+    @* Footer *@
+    <footer class="bg-dark text-white py-5 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5 class="fw-bold mb-3">@tenantName</h5>
+                </div>
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5 class="fw-bold mb-3">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        @if (navbar != null && tenantConfig != null)
+                        {
+                            foreach (NavItem item in navbar.NavItems)
+                            {
+                                <li><a href="@item.Url" class="text-white text-decoration-none">@item.Text</a></li>
+                            }
+                        }
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    @* <h5 class="fw-bold mb-3">Connect With Us</h5>
+                    <div class="d-flex gap-3">
+                        <a href="#" class="text-white fs-4"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="text-white fs-4"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="text-white fs-4"><i class="bi bi-twitter"></i></a>
+                        <a href="#" class="text-white fs-4"><i class="bi bi-youtube"></i></a>
+                    </div> *@
+                </div>
+            </div>
+            <hr class="my-4 border-secondary">
+            <div class="row">
+                <div class="col-12 text-center text-white">
+                    <small>&copy; @DateTime.Now.Year @tenantName. All rights reserved.</small>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

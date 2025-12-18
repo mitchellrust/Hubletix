@@ -5,56 +5,40 @@
     <div class="container py-4">
         <div class="row mb-5">
             <div class="col-lg-8 mx-auto text-center">
-                <h2 class="display-5 fw-bold mb-4">@Model.Heading</h2>
-                <p class="lead text-muted">@Model.Description</p>
+                @if (!string.IsNullOrEmpty(Model.Heading))
+                {
+                    <h2 class="display-5 fw-bold mb-4">@Model.Heading</h2>
+                }
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                    <p class="lead text-muted">@Model.Description</p>
+                }
             </div>
         </div>
 
         @if (Model.Features.Any())
         {
             <div class="row g-4 mb-5">
-                @foreach (var feature in Model.Features)
+                @foreach (FeatureCard feature in Model.Features)
                 {
                     <div class="col-md-6 col-lg-4">
-                        <div class="card h-100 border-0 shadow-sm" style="@(!string.IsNullOrEmpty(feature.BackgroundColor) ? $"background-color: {feature.BackgroundColor};" : "")">
+                        <div class="card h-100 border-0 shadow-sm overflow-hidden feature-card">
                             @if (!string.IsNullOrEmpty(feature.ImageUrl))
                             {
-                                <img src="@feature.ImageUrl" class="card-img-top" alt="@feature.Title" style="height: 200px; object-fit: cover;">
+                                <div class="position-relative" style="height: 250px; overflow: hidden;">
+                                    <img src="@feature.ImageUrl" class="card-img-top w-100 h-100" alt="@feature.Title" style="object-fit: cover; transition: transform 0.3s ease;">
+                                </div>
                             }
                             else if (!string.IsNullOrEmpty(feature.Icon))
                             {
                                 <div class="card-body text-center pt-5">
-                                    <i class="@feature.Icon display-1 mb-3" style="@(!string.IsNullOrEmpty(feature.BackgroundColor) ? "color: white;" : "")"></i>
+                                    <i class="bi bi-@feature.Icon display-1 mb-3" style="@($"color: {Model.AccentColor ?? "var(--bs-primary)"};")"></i>
                                 </div>
                             }
                             <div class="card-body @(string.IsNullOrEmpty(feature.ImageUrl) && string.IsNullOrEmpty(feature.Icon) ? "pt-4" : "")">
-                                <h5 class="card-title fw-bold mb-3" style="@(!string.IsNullOrEmpty(feature.BackgroundColor) ? "color: white;" : "")">@feature.Title</h5>
-                                <p class="card-text" style="@(!string.IsNullOrEmpty(feature.BackgroundColor) ? "color: rgba(255,255,255,0.9);" : "")">@feature.Description</p>
+                                <h5 class="card-title fw-bold mb-3">@feature.Title</h5>
+                                <p class="card-text text-muted">@feature.Description</p>
                             </div>
-                        </div>
-                    </div>
-                }
-            </div>
-        }
-
-        @if (Model.Stats.Any())
-        {
-            <div class="row mt-5 pt-4">
-                <div class="col-12">
-                    <h4 class="text-center mb-4 text-muted">A few more facts about us in numbers</h4>
-                </div>
-            </div>
-            <div class="row g-4 text-center">
-                @foreach (var stat in Model.Stats)
-                {
-                    <div class="col-6 col-md-3">
-                        <div class="stat-item">
-                            @if (!string.IsNullOrEmpty(stat.Icon))
-                            {
-                                <i class="@stat.Icon fs-2 mb-2 text-primary"></i>
-                            }
-                            <h3 class="display-4 fw-bold mb-2">@stat.Value</h3>
-                            <p class="text-muted mb-0">@stat.Label</p>
                         </div>
                     </div>
                 }
@@ -62,3 +46,9 @@
         }
     </div>
 </section>
+
+<style>
+    .feature-card:hover img {
+        transform: scale(1.05);
+    }
+</style>

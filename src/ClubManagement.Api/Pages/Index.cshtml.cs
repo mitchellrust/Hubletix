@@ -83,8 +83,9 @@ public class IndexModel : TenantPageModel
         {
             HomePage.About = new AboutSectionViewModel
             {
-                Heading = TenantConfig?.HomePage.About?.Heading ?? $"About {CurrentTenantInfo.Name}",
-                Description = TenantConfig?.HomePage.About?.Description ?? $"At {CurrentTenantInfo.Name}, we don't just play — we live it. Since our founding, our club has been a home for players of all levels, from eager beginners to seasoned pros.",
+                Heading = TenantConfig?.HomePage.About?.Heading ?? string.Empty,
+                Description = TenantConfig?.HomePage.About?.Description ?? string.Empty,
+                AccentColor = primaryColor,
                 Features = GetFeatureCards(TenantConfig?.HomePage.About?.FeatureCards, primaryColor),
             };
         }
@@ -94,10 +95,10 @@ public class IndexModel : TenantPageModel
         {
             HomePage.Services = new ServicesSectionViewModel
             {
-                Heading = "Our Services",
-                Description = "Explore our full range of coaching, training, and sports experiences. From first serve to match point — we've got the right program for you.",
-                PrimaryColor = primaryColor,
-                Services = GetServiceCards(TenantConfig?.HomePage?.Services, primaryColor)
+                Heading = TenantConfig?.HomePage.Services?.Heading ?? string.Empty,
+                Description = TenantConfig?.HomePage.Services?.Description ?? string.Empty,
+                AccentColor = secondaryColor,
+                Services = GetServiceCards(TenantConfig?.HomePage?.Services?.ServiceCards, primaryColor)
             };
         }
 
@@ -105,6 +106,11 @@ public class IndexModel : TenantPageModel
         HomePage.ShowHero = TenantConfig?.HomePage?.Visibility.ShowHero ?? true;
         HomePage.ShowAbout = TenantConfig?.HomePage?.Visibility.ShowAbout ?? true;
         HomePage.ShowServices = TenantConfig?.HomePage?.Visibility.ShowServices ?? true;
+        
+        // Pass data to layout via ViewData
+        ViewData["TenantConfig"] = TenantConfig;
+        ViewData["Navbar"] = HomePage.Navbar;
+        ViewData["TenantName"] = CurrentTenantInfo.Name;
     }
 
     private List<FeatureCard> GetFeatureCards(List<FeatureCardConfig>? configs, string? primaryColor)
@@ -120,7 +126,6 @@ public class IndexModel : TenantPageModel
                     Description = c.Description,
                     ImageUrl = c.ImageUrl,
                     Icon = c.Icon,
-                    BackgroundColor = c.BackgroundColor
                 })
                 .ToList();
         }
@@ -143,7 +148,6 @@ public class IndexModel : TenantPageModel
                     Description = c.Description,
                     ImageUrl = c.ImageUrl,
                     Icon = c.Icon,
-                    BackgroundColor = c.BackgroundColor,
                     LinkUrl = c.LinkUrl,
                     LinkText = c.LinkText
                 })

@@ -110,9 +110,9 @@ public class HomePageConfig
     public AboutConfig? About { get; set; }
 
     /// <summary>
-    /// Services section cards
+    /// Services section configuration
     /// </summary>
-    public List<ServiceCardConfig>? Services { get; set; }
+    public ServicesConfig? Services { get; set; }
 
     /// <summary>
     /// Section visibility controls
@@ -146,8 +146,18 @@ public class FeatureCardConfig
     public string Description { get; set; } = string.Empty;
     public string? ImageUrl { get; set; }
     public string? Icon { get; set; }
-    public string? BackgroundColor { get; set; }
     public int DisplayOrder { get; set; }
+}
+
+public class ServicesConfig
+{
+    public string Heading { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Services section service cards
+    /// </summary>
+    public List<ServiceCardConfig>? ServiceCards { get; set; }
 }
 
 public class ServiceCardConfig
@@ -157,7 +167,6 @@ public class ServiceCardConfig
     public string Description { get; set; } = string.Empty;
     public string? ImageUrl { get; set; }
     public string? Icon { get; set; }
-    public string? BackgroundColor { get; set; }
     public string? LinkUrl { get; set; }
     public string? LinkText { get; set; }
     public int DisplayOrder { get; set; }

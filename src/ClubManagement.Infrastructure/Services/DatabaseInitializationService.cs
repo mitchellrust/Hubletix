@@ -447,9 +447,7 @@ public class DatabaseInitializationService
                         {
                             Title = "Competitive Play",
                             Description = "Join our competitive leagues and tournaments to test your skills.",
-                            ImageUrl = "https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=800&q=80",
-                            BackgroundColor = "#E0F2FE",
-                            Icon = "volleyball",
+                            Icon = "balloon-fill",
                             DisplayOrder = 0
                         },
                         new FeatureCardConfig
@@ -457,8 +455,7 @@ public class DatabaseInitializationService
                             Title = "Social Events",
                             Description = "Participate in fun social events and meet fellow volleyball enthusiasts.",
                             ImageUrl = "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80",
-                            BackgroundColor = "#FEF3C7",
-                            Icon = "handshake",
+                            Icon = "balloon-fill",
                             DisplayOrder = 1
                         },
                         new FeatureCardConfig
@@ -466,39 +463,43 @@ public class DatabaseInitializationService
                             Title = "Training Programs",
                             Description = "Improve your skills with our expert-led training sessions.",
                             ImageUrl = "https://images.unsplash.com/photo-1521412644187-c49fa049e84d?auto=format&fit=crop&w=800&q=80",
-                            BackgroundColor = "#DCFCE7",
-                            Icon = "chart-line",
+                            Icon = "balloon-fill",
                             DisplayOrder = 2
                         }
                     }
                 },
-                Services = new List<ServiceCardConfig>
+                Services = new ServicesConfig
                 {
-                    new ServiceCardConfig
+                    Heading = "Our Services",
+                    Description = "Explore our full range of coaching, training, and sports experiences. From first serve to match point — we've got the right program for you.",
+                    ServiceCards = new List<ServiceCardConfig>
                     {
-                        Title = "Private Coaching",
-                        Description = "One-on-one coaching sessions tailored to your skill level.",
-                        ImageUrl = "https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=800&q=80",
-                        BackgroundColor = "#FEE2E2",
-                        Icon = "user-tie",
-                        DisplayOrder = 0
-                    },
-                    new ServiceCardConfig
-                    {
-                        Title = "Group Clinics",
-                        Subtitle = "Improve together!",
-                        Description = "Join group clinics to learn and practice with others.",
-                        ImageUrl = "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80",
-                        BackgroundColor = "#E0E7FF",
-                        Icon = "users",
-                        DisplayOrder = 1
-                    },
-                    new ServiceCardConfig
-                    {
-                        Title = "Fitness Training",
-                        BackgroundColor = "#FFF7ED",
-                        Icon = "dumbbell",
-                        DisplayOrder = 2
+                        new ServiceCardConfig
+                        {
+                            Title = "Private Coaching",
+                            Description = "One-on-one coaching sessions tailored to your skill level.",
+                            ImageUrl = "https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=800&q=80",
+                            Icon = "balloon-fill",
+                            DisplayOrder = 0
+                        },
+                        new ServiceCardConfig
+                        {
+                            Title = "Group Clinics",
+                            Subtitle = "Improve together!",
+                            Description = "Join group clinics to learn and practice with others.",
+                            ImageUrl = "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80",
+                            Icon = "balloon-fill",
+                            LinkText = "Learn More",
+                            LinkUrl = "/events",
+                            DisplayOrder = 1
+                        },
+                        new ServiceCardConfig
+                        {
+                            Title = "Fitness Training",
+                            Description = "This is a description.",
+                            Icon = "balloon-fill",
+                            DisplayOrder = 2
+                        }
                     }
                 },
                 Visibility = new SectionVisibility
