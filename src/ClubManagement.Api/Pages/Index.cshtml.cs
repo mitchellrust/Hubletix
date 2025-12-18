@@ -41,7 +41,7 @@ public class IndexModel : TenantPageModel
         var secondaryColor = TenantConfig?.Theme?.SecondaryColor;
         var logoUrl = TenantConfig?.Theme?.LogoUrl;
 
-        // Build navbar
+        // Build navbar, conditionally adding items based on feature flags
         var navItems = new List<NavItem>();
         
         if (TenantConfig?.Features?.EnableMemberships ?? false)
@@ -53,10 +53,10 @@ public class IndexModel : TenantPageModel
             navItems.Add(new() { Text = "Events", Url = "/events", IsActive = false });
         }
         navItems.Add(new() { Text = "Contact Us", Url = "/contact", IsActive = false });
-        
+
         HomePage.Navbar = new NavbarViewModel
         {
-            TenantName = CurrentTenantInfo.Name ?? "Club",
+            TenantName = CurrentTenantInfo.Name ?? CurrentTenantInfo.Identifier,
             LogoUrl = logoUrl,
             PrimaryColor = primaryColor,
             NavItems = navItems,

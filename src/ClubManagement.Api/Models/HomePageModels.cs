@@ -24,11 +24,11 @@ public class NavItem
 /// </summary>
 public class HeroViewModel
 {
-    public string? Heading { get; set; } = "Your Hero Heading Here.";
-    public string? Subheading { get; set; } = "Your Hero Subheading here.";
+    public string? Heading { get; set; } = string.Empty;
+    public string? Subheading { get; set; } = string.Empty;
     public string? BackgroundImageUrl { get; set; }
-    public string? CtaText { get; set; } = "Get Started";
-    public string? CtaUrl { get; set; } = "#";
+    public string? CtaText { get; set; } = string.Empty;
+    public string? CtaUrl { get; set; } = string.Empty;
     public string? PrimaryColor { get; set; }
     public string? SecondaryColor { get; set; }
 }
@@ -38,7 +38,7 @@ public class HeroViewModel
 /// </summary>
 public class AboutSectionViewModel
 {
-    public string Heading { get; set; } = "About Us";
+    public string Heading { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public List<StatItem> Stats { get; set; } = new();
     public List<FeatureCard> Features { get; set; } = new();
@@ -65,7 +65,7 @@ public class FeatureCard
 /// </summary>
 public class ServicesSectionViewModel
 {
-    public string Heading { get; set; } = "Our Services";
+    public string Heading { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public List<ServiceCard> Services { get; set; } = new();
     public string? PrimaryColor { get; set; }

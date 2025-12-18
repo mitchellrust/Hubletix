@@ -69,7 +69,8 @@ public class ThemeConfig
 public class FeatureFlags
 {
     /// <summary>
-    /// Whether user signup is enabled
+    /// Whether user signup is enabled. Users are required for any of the included
+    /// features to function.
     /// </summary>
     [NotMapped]
     public bool EnableUserSignup =>

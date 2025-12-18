@@ -43,13 +43,28 @@ public class DatabaseInitializationService
           await appContext.Database.MigrateAsync();
           _logger.LogInformation("App database migrations applied successfully");
 
-          // Seed tenant store data
-          ClubTenantInfo? demoTenantInfo = await SeedTenantStoreAsync(tenantStoreContext);
+          // Seed tenant store data with demo tenant if needed
+          ClubTenantInfo? demoTenantInfo = await SeedTenantStoreAsync(
+            tenantStoreContext,
+            "demo"
+          );
 
           if (demoTenantInfo != null)
           {
             // Seed application data with demo tenant info.
-            await SeedAppAsync(appContext, demoTenantInfo);
+            await SeedAppDemoAsync(appContext, demoTenantInfo);
+          }
+
+          // Seed tenant store data with basic tenant info if needed
+          ClubTenantInfo? basicTenantInfo = await SeedTenantStoreAsync(
+            tenantStoreContext,
+            "basic"
+          );
+
+          if (basicTenantInfo != null)
+          {
+            // Seed application data with basic tenant info.
+            await SeedAppBasicAsync(appContext, basicTenantInfo);
           }
 
           _logger.LogInformation("Database initialization completed successfully");
@@ -62,31 +77,34 @@ public class DatabaseInitializationService
     }
 
     /// <summary>
-    /// Seed tenant store with demo tenant data if needed.
+    /// Seed tenant store with tenant data if needed.
     /// </summary>
-    private async Task<ClubTenantInfo?> SeedTenantStoreAsync(TenantStoreDbContext context)
+    private async Task<ClubTenantInfo?> SeedTenantStoreAsync(
+        TenantStoreDbContext context,
+        string tenantIdentifier
+    )
     {
-        ClubTenantInfo? demoTenant = null;
+        ClubTenantInfo? tenant = null;
         try
         {
-            // Check if any tenants exist
-            var tenantExists = await context.TenantInfo.AnyAsync();
+            // Check if tenant exists
+            var tenantExists = await context.TenantInfo.AnyAsync(t => t.Identifier == tenantIdentifier);
             
             if (!tenantExists)
             {
-                _logger.LogInformation("No tenants found. Creating demo tenant...");
+                _logger.LogInformation("No tenants found. Creating tenant...");
 
-                demoTenant = new ClubTenantInfo(
+                tenant = new ClubTenantInfo(
                     Id: Guid.NewGuid().ToString(),
-                    Identifier: "demo",  // This is the subdomain
-                    Name: "Demo VB Club"
+                    Identifier: tenantIdentifier,  // This is the subdomain
+                    Name: $"{tenantIdentifier} VB Club"
                 );
 
-                context.TenantInfo.Add(demoTenant);
+                context.TenantInfo.Add(tenant);
                 await context.SaveChangesAsync();
 
-                _logger.LogInformation("Demo tenant created with identifier: {Subdomain}", demoTenant.Identifier);
-                _logger.LogInformation("Access the demo tenant at: https://{Subdomain}.localhost:5001", demoTenant.Identifier);
+                _logger.LogInformation("Tenant created with identifier: {Subdomain}", tenant.Identifier);
+                _logger.LogInformation("Access the tenant at: https://{Subdomain}.localhost:5001", tenant.Identifier);
             }
             else
             {
@@ -99,14 +117,48 @@ public class DatabaseInitializationService
             throw;
         }
 
-        return demoTenant;
+        return tenant;
     }
 
     /// <summary>
     /// Seed application database with demo tenant data if needed.
     /// This runs in a tenant-agnostic context.
     /// </summary>
-    private async Task SeedAppAsync(
+    private async Task SeedAppBasicAsync(
+      AppDbContext context,
+      ClubTenantInfo basicTenantInfo
+    )
+    {
+        try
+        {
+            // Add any global seed data here (lookup tables, reference data, etc.)
+            var basicTenant = new Tenant
+            {
+                Id = basicTenantInfo.Id,
+                TenantId = basicTenantInfo.Id,
+                Name = basicTenantInfo.Name!,
+                Subdomain = basicTenantInfo.Identifier,
+                IsActive = true,
+                ConfigJson = GetBasicConfig()
+            };
+
+            context.Tenants.Add(basicTenant);
+            await context.SaveChangesAsync();
+
+            _logger.LogInformation("Basic tenant created with identifier: {Subdomain}", basicTenant.Id);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error seeding app database");
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Seed application database with demo tenant data if needed.
+    /// This runs in a tenant-agnostic context.
+    /// </summary>
+    private async Task SeedAppDemoAsync(
       AppDbContext context,
       ClubTenantInfo demoTenantInfo
     )
@@ -115,6 +167,15 @@ public class DatabaseInitializationService
         {
             // Add any global seed data here (lookup tables, reference data, etc.)
             var demoTenant = new Tenant
+            {
+                Id = demoTenantInfo.Id,
+                TenantId = demoTenantInfo.Id,
+                Name = demoTenantInfo.Name!,
+                Subdomain = demoTenantInfo.Identifier,
+                IsActive = true,
+                ConfigJson = GetDemoConfig()
+            };
+            var basicTenant = new Tenant
             {
                 Id = demoTenantInfo.Id,
                 TenantId = demoTenantInfo.Id,
@@ -327,6 +388,22 @@ public class DatabaseInitializationService
     }
 
     /// <summary>
+    /// Get basic configuration JSON string for basic (empty) tenant.
+    /// </summary>
+    private static string GetBasicConfig()
+    {
+        var basicConfig = new TenantConfig();
+
+        return JsonSerializer.Serialize(
+            basicConfig,
+            new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            }
+        );
+    }
+
+    /// <summary>
     /// Get default configuration JSON string for demo tenant.
     /// </summary>
     private static string GetDemoConfig()
@@ -342,13 +419,94 @@ public class DatabaseInitializationService
             {
                 PrimaryColor = "#4F46E5",
                 SecondaryColor = "#06B6D4",
-                LogoUrl = null
+                LogoUrl = "https://ui-avatars.com/api/?name=Demo+Club&size=200&background=283845&color=fff"
             },
             Features = new FeatureFlags
             {
                 EnableMemberships = true,
                 EnableEventRegistration = true,
                 EnablePayments = true
+            },
+            HomePage = new HomePageConfig
+            {
+                Hero = new HeroConfig
+                {
+                    Heading = "Welcome to the Demo VB Club",
+                    Subheading = "Join us for fun and competitive volleyball events!",
+                    ImageUrl = "https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=800&q=80",
+                    CtaText = "View Events",
+                    CtaUrl = "/events"
+                },
+                About = new AboutConfig
+                {
+                    Heading = "About Demo VB Club",
+                    Description = "Demo VB Club is dedicated to promoting volleyball in a fun and inclusive environment. Whether you're a beginner or a seasoned player, we have something for everyone.",
+                    FeatureCards = new List<FeatureCardConfig>
+                    {
+                        new FeatureCardConfig
+                        {
+                            Title = "Competitive Play",
+                            Description = "Join our competitive leagues and tournaments to test your skills.",
+                            ImageUrl = "https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=800&q=80",
+                            BackgroundColor = "#E0F2FE",
+                            Icon = "volleyball",
+                            DisplayOrder = 0
+                        },
+                        new FeatureCardConfig
+                        {
+                            Title = "Social Events",
+                            Description = "Participate in fun social events and meet fellow volleyball enthusiasts.",
+                            ImageUrl = "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80",
+                            BackgroundColor = "#FEF3C7",
+                            Icon = "handshake",
+                            DisplayOrder = 1
+                        },
+                        new FeatureCardConfig
+                        {
+                            Title = "Training Programs",
+                            Description = "Improve your skills with our expert-led training sessions.",
+                            ImageUrl = "https://images.unsplash.com/photo-1521412644187-c49fa049e84d?auto=format&fit=crop&w=800&q=80",
+                            BackgroundColor = "#DCFCE7",
+                            Icon = "chart-line",
+                            DisplayOrder = 2
+                        }
+                    }
+                },
+                Services = new List<ServiceCardConfig>
+                {
+                    new ServiceCardConfig
+                    {
+                        Title = "Private Coaching",
+                        Description = "One-on-one coaching sessions tailored to your skill level.",
+                        ImageUrl = "https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=800&q=80",
+                        BackgroundColor = "#FEE2E2",
+                        Icon = "user-tie",
+                        DisplayOrder = 0
+                    },
+                    new ServiceCardConfig
+                    {
+                        Title = "Group Clinics",
+                        Subtitle = "Improve together!",
+                        Description = "Join group clinics to learn and practice with others.",
+                        ImageUrl = "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80",
+                        BackgroundColor = "#E0E7FF",
+                        Icon = "users",
+                        DisplayOrder = 1
+                    },
+                    new ServiceCardConfig
+                    {
+                        Title = "Fitness Training",
+                        BackgroundColor = "#FFF7ED",
+                        Icon = "dumbbell",
+                        DisplayOrder = 2
+                    }
+                },
+                Visibility = new SectionVisibility
+                {
+                    ShowHero = true,
+                    ShowAbout = true,
+                    ShowServices = true
+                }
             }
         };
 

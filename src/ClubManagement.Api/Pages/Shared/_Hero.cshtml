@@ -11,9 +11,13 @@
                 <p class="lead mb-4 fs-4" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">
                     @Model.Subheading
                 </p>
-                <a href="@Model.CtaUrl" class="btn btn-lg btn-light px-5 py-3 rounded-pill shadow-lg" style="@(!string.IsNullOrEmpty(Model.PrimaryColor) ? $"background-color: {Model.PrimaryColor}; border-color: {Model.PrimaryColor}; color: white;" : "")">
-                    @Model.CtaText <i class="bi bi-arrow-right ms-2"></i>
-                </a>
+                @{if (!string.IsNullOrEmpty(Model.CtaUrl))
+                {
+                    <a href="@Model.CtaUrl" class="btn btn-lg btn-light px-5 py-3 rounded-pill shadow-lg" style="@(!string.IsNullOrEmpty(Model.PrimaryColor) ? $"background-color: {Model.PrimaryColor}; border-color: {Model.PrimaryColor}; color: white;" : "")">
+                        @Model.CtaText <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
+                }
+                }
             </div>
         </div>
     </div>
