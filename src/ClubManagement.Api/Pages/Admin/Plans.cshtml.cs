@@ -8,7 +8,6 @@ namespace ClubManagement.Api.Pages.Admin;
 
 public class PlansModel : TenantPageModel
 {
-    private readonly AppDbContext _dbContext;
     public List<PlanDto> Plans { get; set; } = new();
     public int PageNum { get; set; }
     public int PageSize { get; set; }
@@ -30,9 +29,7 @@ public class PlansModel : TenantPageModel
         tenantConfigService,
         dbContext
     )
-    {
-        _dbContext = dbContext;
-    }
+    { }
 
     public async Task OnGetAsync(string? sort = null, string? dir = null, int pageNum = 1, int pageSize = 10, string? status = null, string? message = null)
     {
@@ -47,7 +44,7 @@ public class PlansModel : TenantPageModel
         StatusFilter = string.IsNullOrWhiteSpace(status) ? "all" : status.ToLowerInvariant();
 
         // Build a deferred query for membership plans
-        var query = _dbContext.MembershipPlans
+        var query = DbContext.MembershipPlans
             .AsQueryable();
 
         // Apply status filter

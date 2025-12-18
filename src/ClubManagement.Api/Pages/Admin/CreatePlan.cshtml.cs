@@ -11,9 +11,6 @@ namespace ClubManagement.Api.Pages.Admin;
 
 public class CreatePlanModel : TenantPageModel
 {
-    private readonly AppDbContext _dbContext;
-    private readonly ClubTenantInfo _currentTenantInfo;
-
     [BindProperty]
     public MembershipPlan Plan { get; set; } = new MembershipPlan();
 
@@ -32,10 +29,7 @@ public class CreatePlanModel : TenantPageModel
         tenantConfigService,
         dbContext
     )
-    {
-        _dbContext = dbContext;
-        _currentTenantInfo = multiTenantContextAccessor.MultiTenantContext.TenantInfo!;
-    }
+    { }
 
     public IActionResult OnGet()
     {
@@ -71,13 +65,13 @@ public class CreatePlanModel : TenantPageModel
         Plan.PriceInCents = (int)Math.Round(PriceInDollars * 100, MidpointRounding.AwayFromZero);
 
         // Set tenant ID
-        Plan.TenantId = _currentTenantInfo.Id;
+        Plan.TenantId = CurrentTenantInfo.Id;
         Plan.Id = Guid.NewGuid().ToString();
 
         try
         {
-            _dbContext.MembershipPlans.Add(Plan);
-            await _dbContext.SaveChangesAsync();
+            DbContext.MembershipPlans.Add(Plan);
+            await DbContext.SaveChangesAsync();
             return RedirectToPage("/Admin/Plans", new { message = "Plan created successfully." });
         }
         catch (Exception)

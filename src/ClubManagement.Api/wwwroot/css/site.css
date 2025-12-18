@@ -52,11 +52,11 @@ html {
 }
 
 /* Card hover effects */
-.card {
+.card-hover {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.card:hover {
+.card-hover:hover {
   transform: translateY(-5px);
   box-shadow: 0 1rem 3rem rgba(0,0,0,.175) !important;
 }
@@ -64,15 +64,6 @@ html {
 /* Stat items */
 .stat-item {
   padding: 1rem;
-}
-
-/* Service cards */
-.service-card {
-  transition: all 0.3s ease;
-}
-
-.service-card:hover {
-  box-shadow: 0 1rem 3rem rgba(0,0,0,.175) !important;
 }
 
 /* Footer links */

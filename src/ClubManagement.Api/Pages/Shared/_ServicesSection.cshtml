@@ -22,7 +22,7 @@
                 @foreach (ServiceCard service in Model.Services)
                 {
                     <div class="col-md-6 col-lg-4">
-                        <div class="card h-100 border-0 shadow-sm overflow-hidden service-card">
+                        <div class="card card-hover h-100 border-0 shadow-sm overflow-hidden service-card">
                             @if (!string.IsNullOrEmpty(service.ImageUrl))
                             {
                                 <div class="position-relative" style="height: 250px; overflow: hidden;">

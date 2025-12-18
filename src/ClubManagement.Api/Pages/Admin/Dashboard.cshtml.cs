@@ -8,7 +8,6 @@ namespace ClubManagement.Api.Pages.Admin;
 
 public class DashboardModel : TenantPageModel
 {
-    private readonly AppDbContext _dbContext;
     public List<UpcomingEventDto> UpcomingEvents { get; set; } = new();
     public TenantStatsDto TenantStats { get; set; } = new();
 
@@ -21,23 +20,21 @@ public class DashboardModel : TenantPageModel
         tenantConfigService,
         dbContext
     )
-    {
-        _dbContext = dbContext;
-    }
+    { }
 
     public async Task OnGetAsync()
     {
         // Fetch tenant statistics
-        TenantStats.TotalMembers = await _dbContext.Users
+        TenantStats.TotalMembers = await DbContext.Users
             .Where(u => u.TenantId == CurrentTenantInfo.Id)
             .CountAsync();
 
-        TenantStats.ActiveEvents = await _dbContext.Events
+        TenantStats.ActiveEvents = await DbContext.Events
             .Where(e => e.TenantId == CurrentTenantInfo.Id && e.IsActive)
             .CountAsync();
 
         // Fetch the next 5 active events from the database
-        var events = await _dbContext.Events
+        var events = await DbContext.Events
             .Where(e => e.StartTimeUtc > DateTime.UtcNow)
             .Include(e => e.EventRegistrations)
             .OrderBy(e => e.StartTimeUtc)

@@ -13,22 +13,22 @@ namespace ClubManagement.Api.Pages;
 /// </summary>
 public class TenantPageModel : PageModel
 {
-    private readonly IMultiTenantContextAccessor<ClubTenantInfo> _multiTenantContextAccessor;
-    public readonly AppDbContext AppDbContext;
-    private readonly ITenantConfigService _tenantConfigService;
-    public required TenantConfig TenantConfig { get; set; }
+    private IMultiTenantContextAccessor<ClubTenantInfo> _multiTenantContextAccessor { get; }
+    protected AppDbContext DbContext { get; }
+    protected ITenantConfigService TenantConfigService { get; }
+    protected TenantConfig TenantConfig { get; set; } = new TenantConfig();
     public ClubTenantInfo CurrentTenantInfo => _multiTenantContextAccessor.MultiTenantContext?.TenantInfo
       ?? throw new InvalidOperationException("Tenant information is not available in the current context.");
 
     public TenantPageModel(
       IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
       ITenantConfigService tenantConfigService,
-      AppDbContext appDbContext
+      AppDbContext dbContext
     )
     {
         _multiTenantContextAccessor = multiTenantContextAccessor;
-        _tenantConfigService = tenantConfigService;
-        AppDbContext = appDbContext;
+        TenantConfigService = tenantConfigService;
+        DbContext = dbContext;
     }
 
     public override async Task OnPageHandlerExecutionAsync(
@@ -40,10 +40,12 @@ public class TenantPageModel : PageModel
         ViewData["TenantName"] = CurrentTenantInfo.Name;
 
         // Fetch tenant config before page handler executes
-        var tenant = await _tenantConfigService.GetTenantAsync(CurrentTenantInfo.Id);
+        var tenant = await TenantConfigService.GetTenantAsync(CurrentTenantInfo.Id);
         if (tenant != null)
         {
             TenantConfig = tenant.GetConfig();
+            // Set view data for layout usage
+            ViewData["TenantConfig"] = TenantConfig;
             
             // Set logo URL if available in tenant config
             if (!string.IsNullOrEmpty(TenantConfig.Theme.LogoUrl))

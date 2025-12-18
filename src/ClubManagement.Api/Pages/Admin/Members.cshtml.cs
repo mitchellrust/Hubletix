@@ -7,7 +7,6 @@ namespace ClubManagement.Api.Pages.Admin;
 
 public class MembersModel : TenantPageModel
 {
-    private readonly AppDbContext _dbContext;
     public List<MemberDto> Members { get; set; } = new();
     public int PageNum { get; set; }
     public int PageSize { get; set; }
@@ -31,9 +30,7 @@ public class MembersModel : TenantPageModel
         tenantConfigService,
         dbContext
     )
-    {
-        _dbContext = dbContext;
-    }
+    { }
 
     public async Task OnGetAsync(string? sort = null, string? dir = null, int pageNum = 1, int pageSize = 10, string? status = null, string? plan = null, string? message = null)
     {
@@ -49,11 +46,11 @@ public class MembersModel : TenantPageModel
         MembershipPlanFilter = plan;
 
         // Build a deferred query for users
-        var query = _dbContext.Users
+        var query = DbContext.Users
             .Select(u => new
                 {
                     User = u,
-                    MembershipPlanName = _dbContext.MembershipPlans
+                    MembershipPlanName = DbContext.MembershipPlans
                         .Where(p => p.Id == u.MembershipPlanId)
                         .Select(p => p.Name)
                         .FirstOrDefault()
@@ -130,7 +127,7 @@ public class MembersModel : TenantPageModel
     private async Task LoadMembershipPlanFacetsAsync()
     {
         // Build base query with status filter applied
-        var userQuery = _dbContext.Users.AsQueryable();
+        var userQuery = DbContext.Users.AsQueryable();
         
         if (StatusFilter == "active")
         {
@@ -143,7 +140,7 @@ public class MembersModel : TenantPageModel
         // "all" or null - no filter applied
         
         // Get all membership plans with filtered member counts
-        var planFacets = await _dbContext.MembershipPlans
+        var planFacets = await DbContext.MembershipPlans
             .OrderBy(p => p.DisplayOrder)
             .ThenBy(p => p.Name)
             .Select(p => new MembershipPlanFacet

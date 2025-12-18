@@ -8,7 +8,6 @@ namespace ClubManagement.Api.Pages.Admin;
 
 public class EventRegistrationsModel : TenantPageModel
 {
-    private readonly AppDbContext _dbContext;
     public List<EventRegistrationDto> Registrations { get; set; } = new();
     public int PageNum { get; set; }
     public int PageSize { get; set; }
@@ -32,9 +31,7 @@ public class EventRegistrationsModel : TenantPageModel
         tenantConfigService,
         dbContext
     )
-    {
-        _dbContext = dbContext;
-    }
+    { }
 
     public async Task OnGetAsync(string? sort = null, string? dir = null, int pageNum = 1, int pageSize = 10, string? status = null, string? time = null, string? eventId = null, string? message = null)
     {
@@ -49,7 +46,7 @@ public class EventRegistrationsModel : TenantPageModel
         TimeFilter = string.IsNullOrWhiteSpace(time) ? "upcoming" : time.ToLowerInvariant();
 
         // Build query
-        var query = _dbContext.EventRegistrations
+        var query = DbContext.EventRegistrations
             .Include(r => r.User)
             .Include(r => r.Event)
             .Select(r => new
@@ -126,7 +123,7 @@ public class EventRegistrationsModel : TenantPageModel
     private async Task LoadEventFacetsAsync(DateTime nowUtc, string? statusFilter, string? timeFilter)
     {
         // Build base query with status filter applied
-        var registrationQuery = _dbContext.EventRegistrations.AsQueryable();
+        var registrationQuery = DbContext.EventRegistrations.AsQueryable();
         
         if (statusFilter != "all")
         {
@@ -134,7 +131,7 @@ public class EventRegistrationsModel : TenantPageModel
         }
         
         // Build event query with time filter
-        var eventQuery = _dbContext.Events.AsQueryable();
+        var eventQuery = DbContext.Events.AsQueryable();
         
         if (timeFilter == "upcoming")
         {

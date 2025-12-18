@@ -11,10 +11,6 @@ namespace ClubManagement.Api.Pages.Admin;
 
 public class CreateEventModel : TenantPageModel
 {
-    private readonly AppDbContext _dbContext;
-    private readonly ClubTenantInfo _currentTenantInfo;
-    private readonly ITenantConfigService _tenantConfigService;
-
     [BindProperty]
     public Event Event { get; set; } = new Event();
 
@@ -38,31 +34,18 @@ public class CreateEventModel : TenantPageModel
         tenantConfigService,
         dbContext
     )
-    {
-        _dbContext = dbContext;
-        _tenantConfigService = tenantConfigService;
-        _currentTenantInfo = multiTenantContextAccessor.MultiTenantContext.TenantInfo!;
-    }
+    { }
 
     public async Task<IActionResult> OnGetAsync()
     {
-        // Fetch tenant config for defaults
-        var tenant = await _tenantConfigService.GetTenantAsync(_currentTenantInfo.Id);
-        if (tenant == null)
-        {
-            throw new InvalidOperationException("Tenant configuration not found.");
-        }
-
-        // Initialize with default values
-        var tenantConfig = tenant.GetConfig();
-        Event.TimeZoneId = tenantConfig.Settings.TimeZoneId;
+        Event.TimeZoneId = TenantConfig.Settings.TimeZoneId;
         Event.Capacity = 15;
         Event.EventType = EventType.Class;
         Event.IsActive = true;
 
         // Set default times based on tenant's timezone
         // TODO: Not sure if this the best, but setting to now seems reasonable
-        var tzNow = DateTime.UtcNow.ToTimeZone(tenantConfig.Settings.TimeZoneId);
+        var tzNow = DateTime.UtcNow.ToTimeZone(TenantConfig.Settings.TimeZoneId);
         LocalStartTime = tzNow.ToString("yyyy-MM-ddTHH:mm");
         LocalEndTime = tzNow.ToString("yyyy-MM-ddTHH:mm");
 
@@ -115,13 +98,13 @@ public class CreateEventModel : TenantPageModel
         Event.EndTimeUtc = TimeZoneInfo.ConvertTimeToUtc(localEnd, timeZone);
 
         // Set tenant ID
-        Event.TenantId = _currentTenantInfo.Id;
+        Event.TenantId = CurrentTenantInfo.Id;
         Event.Id = Guid.NewGuid().ToString();
 
         try
         {
-            _dbContext.Events.Add(Event);
-            await _dbContext.SaveChangesAsync();
+            DbContext.Events.Add(Event);
+            await DbContext.SaveChangesAsync();
             return RedirectToPage("/Admin/Events", new { id = Event.Id });
         }
         catch (Exception ex)

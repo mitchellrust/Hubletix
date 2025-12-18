@@ -2,7 +2,6 @@ using ClubManagement.Api.Models;
 using Finbuckle.MultiTenant.Abstractions;
 using ClubManagement.Infrastructure.Persistence;
 using ClubManagement.Infrastructure.Services;
-using ClubManagement.Api.Utils;
 using ClubManagement.Core.Models;
 
 namespace ClubManagement.Api.Pages;
@@ -10,9 +9,6 @@ namespace ClubManagement.Api.Pages;
 public class IndexModel : TenantPageModel
 {
     public HomePageViewModel HomePage { get; set; } = new();
-    private readonly AppDbContext _dbContext;
-    private readonly ClubTenantInfo _currentTenantInfo;
-    private readonly ITenantConfigService _tenantConfigService;
 
     public IndexModel(
         AppDbContext dbContext,
@@ -23,23 +19,10 @@ public class IndexModel : TenantPageModel
         tenantConfigService,
         dbContext
     )
-    {
-        _dbContext = dbContext;
-        _tenantConfigService = tenantConfigService;
-        _currentTenantInfo = multiTenantContextAccessor.MultiTenantContext.TenantInfo!;
-    }
+    { }
 
     public async Task OnGetAsync()
     {
-        // Fetch tenant for config
-        var tenant = await _tenantConfigService.GetTenantAsync(_currentTenantInfo.Id);
-        if (tenant == null)
-        {
-            throw new InvalidOperationException("Tenant configuration not found.");
-        }
-
-        // Get tenant config
-        TenantConfig = tenant.GetConfig();
         var primaryColor = TenantConfig?.Theme?.PrimaryColor;
         var secondaryColor = TenantConfig?.Theme?.SecondaryColor;
         var logoUrl = TenantConfig?.Theme?.LogoUrl;
@@ -111,9 +94,7 @@ public class IndexModel : TenantPageModel
         HomePage.ShowServices = TenantConfig?.HomePage?.Visibility.ShowServices ?? true;
         
         // Pass data to layout via ViewData
-        ViewData["TenantConfig"] = TenantConfig;
         ViewData["Navbar"] = HomePage.Navbar;
-        ViewData["TenantName"] = CurrentTenantInfo.Name;
     }
 
     private List<FeatureCard> GetFeatureCards(List<FeatureCardConfig>? configs, string? primaryColor)

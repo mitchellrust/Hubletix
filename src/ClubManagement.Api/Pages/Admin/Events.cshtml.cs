@@ -9,7 +9,6 @@ namespace ClubManagement.Api.Pages.Admin;
 
 public class EventsModel : TenantPageModel
 {
-    private readonly AppDbContext _dbContext;
     public List<EventDto> Events { get; set; } = new();
     public int PageNum { get; set; }
     public int PageSize { get; set; }
@@ -32,9 +31,7 @@ public class EventsModel : TenantPageModel
         tenantConfigService,
         dbContext
     )
-    {
-        _dbContext = dbContext;
-    }
+    { }
 
     public async Task OnGetAsync(string? sort = null, string? dir = null, int pageNum = 1, int pageSize = 10, string? status = null, string? date = null, string? message = null)
     {
@@ -50,7 +47,7 @@ public class EventsModel : TenantPageModel
         DateFilter = string.IsNullOrWhiteSpace(date) ? "upcoming" : date.ToLowerInvariant();
 
         // Build a deferred query for events
-        var query = _dbContext.Events
+        var query = DbContext.Events
             .Include(e => e.EventRegistrations)
             .AsQueryable();
 

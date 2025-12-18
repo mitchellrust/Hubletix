@@ -12,8 +12,6 @@ namespace ClubManagement.Api.Pages.Admin;
 
 public class PlanDetailModel : TenantPageModel
 {
-    private readonly AppDbContext _dbContext;
-
     [BindProperty]
     public MembershipPlan? Plan { get; set; }
 
@@ -33,9 +31,7 @@ public class PlanDetailModel : TenantPageModel
         tenantConfigService,
         dbContext
     )
-    {
-        _dbContext = dbContext;
-    }
+    { }
 
     public async Task<IActionResult> OnGetAsync(string? id)
     {
@@ -45,7 +41,7 @@ public class PlanDetailModel : TenantPageModel
             return NotFound();
         }
 
-        Plan = await _dbContext.MembershipPlans
+        Plan = await DbContext.MembershipPlans
             .FirstOrDefaultAsync(p => p.Id == id);
 
         // If plan not found, should return better UI than 404.
@@ -68,7 +64,7 @@ public class PlanDetailModel : TenantPageModel
         }
 
         // Verify plan still exists in DB
-        var existingPlan = await _dbContext.MembershipPlans
+        var existingPlan = await DbContext.MembershipPlans
             .FirstOrDefaultAsync(p => p.Id == Plan.Id);
 
         // If event not found, should return better UI than 404.
@@ -128,8 +124,8 @@ public class PlanDetailModel : TenantPageModel
 
             try
             {
-                _dbContext.MembershipPlans.Update(existingPlan);
-                await _dbContext.SaveChangesAsync();
+                DbContext.MembershipPlans.Update(existingPlan);
+                await DbContext.SaveChangesAsync();
                 StatusMessage = "Plan updated successfully.";
             }
             catch (Exception ex)
@@ -154,7 +150,7 @@ public class PlanDetailModel : TenantPageModel
         }
 
         // Verify plan exists
-        var planToDelete = await _dbContext.MembershipPlans
+        var planToDelete = await DbContext.MembershipPlans
             .FirstOrDefaultAsync(p => p.Id == id);
 
         // If plan was not found, must have already been deleted.
@@ -165,8 +161,8 @@ public class PlanDetailModel : TenantPageModel
 
         try
         {
-            _dbContext.MembershipPlans.Remove(planToDelete);
-            await _dbContext.SaveChangesAsync();
+            DbContext.MembershipPlans.Remove(planToDelete);
+            await DbContext.SaveChangesAsync();
             return RedirectToPage("/Admin/Plans", new { message = "Plan deleted successfully." });
         }
         catch (Exception ex)

@@ -13,8 +13,6 @@ namespace ClubManagement.Api.Pages.Admin;
 
 public class EventDetailModel : TenantPageModel
 {
-    private readonly AppDbContext _dbContext;
-
     // Bind property so that form submission populates this object automatically based on property names
     [BindProperty]
     public Event? Event { get; set; }
@@ -51,9 +49,7 @@ public class EventDetailModel : TenantPageModel
         tenantConfigService,
         dbContext
     )
-    {
-        _dbContext = dbContext;
-    }
+    { }
 
     public async Task<IActionResult> OnGetAsync(string? id, string? sort = null, string? dir = null, int pageNum = 1, int pageSize = 10, string? regStatus = null)
     {
@@ -63,7 +59,7 @@ public class EventDetailModel : TenantPageModel
             return NotFound();
         }
 
-        Event = await _dbContext.Events
+        Event = await DbContext.Events
             .FirstOrDefaultAsync(e => e.Id == id);
 
         // If event not found, should return better UI than 404.
@@ -97,7 +93,7 @@ public class EventDetailModel : TenantPageModel
         RegistrationStatusFilter = string.IsNullOrWhiteSpace(regStatus) ? "all" : regStatus.ToLowerInvariant();
 
         // Build query for registrations of this specific event
-        var query = _dbContext.EventRegistrations
+        var query = DbContext.EventRegistrations
             .Where(r => r.EventId == eventId)
             .Include(r => r.User)
             .Select(r => new
@@ -158,7 +154,7 @@ public class EventDetailModel : TenantPageModel
         }
 
         // Verify event still exists in DB.
-        var existingEvent = await _dbContext.Events
+        var existingEvent = await DbContext.Events
             .FirstOrDefaultAsync(e => e.Id == Event.Id);
 
         // If event not found, should return better UI than 404.
@@ -222,8 +218,8 @@ public class EventDetailModel : TenantPageModel
 
             try
             {
-                _dbContext.Events.Update(existingEvent);
-                await _dbContext.SaveChangesAsync();
+                DbContext.Events.Update(existingEvent);
+                await DbContext.SaveChangesAsync();
                 StatusMessage = "Event updated successfully.";
             }
             catch (Exception ex)
@@ -256,7 +252,7 @@ public class EventDetailModel : TenantPageModel
         }
 
         // Verify event exists
-        var eventToDelete = await _dbContext.Events
+        var eventToDelete = await DbContext.Events
             .FirstOrDefaultAsync(e => e.Id == id);
 
         if (eventToDelete == null)
@@ -266,8 +262,8 @@ public class EventDetailModel : TenantPageModel
 
         try
         {
-            _dbContext.Events.Remove(eventToDelete);
-            await _dbContext.SaveChangesAsync();
+            DbContext.Events.Remove(eventToDelete);
+            await DbContext.SaveChangesAsync();
             return RedirectToPage("/Admin/Events", new { message = "Event deleted successfully." });
         }
         catch (Exception ex)
