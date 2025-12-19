@@ -323,7 +323,21 @@ public class EventDetailModel : AdminPageModel
             message += string.Join(" and ", parts) + ". Please cancel all active registrations before deleting this event.";
             
             ErrorMessage = message;
+            
+            // Clear model state to prevent validation errors from appearing
+            ModelState.Clear();
+            
             Event = eventToDelete;
+            
+            // Repopulate form values
+            LocalStartTime = eventToDelete.StartTimeUtc.ToTimeZone(eventToDelete.TimeZoneId).ToString("yyyy-MM-ddTHH:mm");
+            LocalEndTime = eventToDelete.EndTimeUtc.ToTimeZone(eventToDelete.TimeZoneId).ToString("yyyy-MM-ddTHH:mm");
+            if (eventToDelete.RegistrationDeadlineUtc.HasValue)
+            {
+                LocalRegistrationDeadline = eventToDelete.RegistrationDeadlineUtc.Value.ToTimeZone(eventToDelete.TimeZoneId).ToString("yyyy-MM-ddTHH:mm");
+            }
+            PriceInDollars = eventToDelete.PriceInDollars;
+            
             PopulateEventTypeOptions();
             PopulateTimeZoneOptions();
             
@@ -342,9 +356,24 @@ public class EventDetailModel : AdminPageModel
         catch (Exception ex)
         {
             ErrorMessage = $"Error deleting event: {ex.Message}";
+            
+            // Clear model state to prevent validation errors from appearing
+            ModelState.Clear();
+            
             Event = eventToDelete;
+            
+            // Repopulate form values
+            LocalStartTime = eventToDelete.StartTimeUtc.ToTimeZone(eventToDelete.TimeZoneId).ToString("yyyy-MM-ddTHH:mm");
+            LocalEndTime = eventToDelete.EndTimeUtc.ToTimeZone(eventToDelete.TimeZoneId).ToString("yyyy-MM-ddTHH:mm");
+            if (eventToDelete.RegistrationDeadlineUtc.HasValue)
+            {
+                LocalRegistrationDeadline = eventToDelete.RegistrationDeadlineUtc.Value.ToTimeZone(eventToDelete.TimeZoneId).ToString("yyyy-MM-ddTHH:mm");
+            }
+            PriceInDollars = eventToDelete.PriceInDollars;
+            
             PopulateEventTypeOptions();
             PopulateTimeZoneOptions();
+            
             return Page();
         }
     }
