@@ -20,6 +20,12 @@ public class CreateEventModel : AdminPageModel
     [BindProperty]
     public string? LocalEndTime { get; set; }
 
+    [BindProperty]
+    public string? LocalRegistrationDeadline { get; set; }
+
+    [BindProperty]
+    public decimal? PriceInDollars { get; set; }
+
     public List<SelectListItem> EventTypeOptions { get; set; } = new();
     public List<SelectListItem> TimeZoneOptions { get; set; } = new();
     public string? ErrorMessage { get; set; }
@@ -96,6 +102,26 @@ public class CreateEventModel : AdminPageModel
         var timeZone = TimeZoneInfo.FindSystemTimeZoneById(Event.TimeZoneId);
         Event.StartTimeUtc = TimeZoneInfo.ConvertTimeToUtc(localStart, timeZone);
         Event.EndTimeUtc = TimeZoneInfo.ConvertTimeToUtc(localEnd, timeZone);
+
+        // Handle registration deadline if provided
+        if (!string.IsNullOrEmpty(LocalRegistrationDeadline) && DateTime.TryParse(LocalRegistrationDeadline, out var localDeadline))
+        {
+            Event.RegistrationDeadlineUtc = TimeZoneInfo.ConvertTimeToUtc(localDeadline, timeZone);
+        }
+        else
+        {
+            Event.RegistrationDeadlineUtc = null;
+        }
+
+        // Handle price
+        if (PriceInDollars.HasValue && PriceInDollars.Value >= 0)
+        {
+            Event.PriceInCents = (int)(PriceInDollars.Value * 100);
+        }
+        else
+        {
+            Event.PriceInCents = 0;
+        }
 
         // Set tenant ID
         Event.TenantId = CurrentTenantInfo.Id;

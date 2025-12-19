@@ -72,6 +72,12 @@
                                 <span asp-validation-for="Event.Description" class="text-danger small"></span>
                             </div>
 
+                            <div class="mb-3">
+                                <label asp-for="Event.Location" class="form-label">Location</label>
+                                <input class="form-control" asp-for="Event.Location" placeholder="Enter event location (optional)" />
+                                <span asp-validation-for="Event.Location" class="text-danger small"></span>
+                            </div>
+
                             <div class="row">
                                 <div class="col-12 col-md-6 mb-3">
                                     <label asp-for="Event.EventType" class="form-label">Event Type</label>
@@ -83,6 +89,23 @@
                                     <label asp-for="Event.Capacity" class="form-label">Capacity</label>
                                     <input type="number" class="form-control" asp-for="Event.Capacity" min="1" placeholder="Enter max capacity" />
                                     <span asp-validation-for="Event.Capacity" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12 col-md-6 mb-3">
+                                    <label asp-for="PriceInDollars" class="form-label">Price</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" asp-for="PriceInDollars" min="0" step="0.01" placeholder="0.00" />
+                                    </div>
+                                    <span class="text-muted small">Leave blank or set to 0 for free events</span>
+                                </div>
+
+                                <div class="col-12 col-md-6 mb-3">
+                                    <label asp-for="LocalRegistrationDeadline" class="form-label">Registration Deadline</label>
+                                    <input type="datetime-local" class="form-control" asp-for="LocalRegistrationDeadline" />
+                                    <span class="text-muted small">Optional - leave blank for no deadline</span>
                                 </div>
                             </div>
 

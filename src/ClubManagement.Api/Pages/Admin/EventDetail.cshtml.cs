@@ -23,6 +23,12 @@ public class EventDetailModel : AdminPageModel
     [BindProperty]
     public string? LocalEndTime { get; set; }
 
+    [BindProperty]
+    public string? LocalRegistrationDeadline { get; set; }
+
+    [BindProperty]
+    public decimal? PriceInDollars { get; set; }
+
     public List<SelectListItem> EventTypeOptions { get; set; } = new();
     public List<SelectListItem> TimeZoneOptions { get; set; } = new();
     public string? StatusMessage { get; set; }
@@ -73,6 +79,16 @@ public class EventDetailModel : AdminPageModel
         var localEnd = Event.EndTimeUtc.ToTimeZone(Event.TimeZoneId);
         LocalStartTime = localStart.ToString("yyyy-MM-ddTHH:mm");
         LocalEndTime = localEnd.ToString("yyyy-MM-ddTHH:mm");
+
+        // Convert registration deadline if it exists
+        if (Event.RegistrationDeadlineUtc.HasValue)
+        {
+            var localDeadline = Event.RegistrationDeadlineUtc.Value.ToTimeZone(Event.TimeZoneId);
+            LocalRegistrationDeadline = localDeadline.ToString("yyyy-MM-ddTHH:mm");
+        }
+
+        // Set price in dollars
+        PriceInDollars = Event.PriceInDollars;
 
         PopulateEventTypeOptions();
         PopulateTimeZoneOptions();
@@ -189,12 +205,30 @@ public class EventDetailModel : AdminPageModel
             }
         }
 
+        // Handle registration deadline if provided
+        DateTime? registrationDeadlineUtc = null;
+        if (!string.IsNullOrEmpty(LocalRegistrationDeadline) && DateTime.TryParse(LocalRegistrationDeadline, out var localDeadline))
+        {
+            var timeZone = TimeZoneInfo.FindSystemTimeZoneById(Event.TimeZoneId);
+            registrationDeadlineUtc = TimeZoneInfo.ConvertTimeToUtc(localDeadline, timeZone);
+        }
+
+        // Handle price
+        int priceInCents = 0;
+        if (PriceInDollars.HasValue && PriceInDollars.Value >= 0)
+        {
+            priceInCents = (int)(PriceInDollars.Value * 100);
+        }
+
         // Check if any fields have actually changed
         bool hasChanges = 
             existingEvent.Name != Event.Name ||
             existingEvent.Description != Event.Description ||
             existingEvent.EventType != Event.EventType ||
+            existingEvent.Location != Event.Location ||
             existingEvent.Capacity != Event.Capacity ||
+            existingEvent.PriceInCents != priceInCents ||
+            existingEvent.RegistrationDeadlineUtc != registrationDeadlineUtc ||
             existingEvent.IsActive != Event.IsActive ||
             existingEvent.TimeZoneId != Event.TimeZoneId ||
             existingEvent.StartTimeUtc != startTimeUtc ||
@@ -210,7 +244,10 @@ public class EventDetailModel : AdminPageModel
             existingEvent.Name = Event.Name;
             existingEvent.Description = Event.Description;
             existingEvent.EventType = Event.EventType;
+            existingEvent.Location = Event.Location;
             existingEvent.Capacity = Event.Capacity;
+            existingEvent.PriceInCents = priceInCents;
+            existingEvent.RegistrationDeadlineUtc = registrationDeadlineUtc;
             existingEvent.IsActive = Event.IsActive;
             existingEvent.TimeZoneId = Event.TimeZoneId;
             existingEvent.StartTimeUtc = startTimeUtc;

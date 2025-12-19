@@ -367,7 +367,7 @@ public class DatabaseInitializationService
                 },
                 new Event
                 {
-                    Id = Guid.NewGuid().ToString(),
+                    Id = "12348765-aaaa-bbbb-cccc-0987654321ba",
                     TenantId = demoTenant.Id,
                     Name = "Past Event",
                     Description = "An event that already occurred.",
