@@ -69,23 +69,22 @@ public class PublicPageModel : PageModel
         var navItems = new List<NavItem>();
         
         // Conditionally add nav items based on feature flags
-        if (TenantConfig?.Features?.EnableMemberships ?? false)
+        if (TenantConfig.Features.EnableMemberships)
         {
             navItems.Add(new() { Text = "Memberships", Url = "/membership-plans", IsActive = false });
         }
-        if (TenantConfig?.Features?.EnableEventRegistration ?? false)
+        if (TenantConfig.Features.EnableEventRegistration)
         {
             navItems.Add(new() { Text = "Events", Url = "/events", IsActive = false });
         }
-        navItems.Add(new() { Text = "Contact Us", Url = "/contact", IsActive = false });
 
         return new NavbarViewModel
         {
             TenantName = CurrentTenantInfo.Name ?? CurrentTenantInfo.Identifier,
-            LogoUrl = TenantConfig?.Theme?.LogoUrl,
-            PrimaryColor = TenantConfig?.Theme?.PrimaryColor,
+            LogoUrl = TenantConfig.Theme.LogoUrl,
+            PrimaryColor = TenantConfig.Theme.PrimaryColor,
             NavItems = navItems,
-            ShowLogInButton = TenantConfig?.Features?.EnableUserSignup ?? false
+            ShowLogInButton = TenantConfig.Features.EnableUserSignup
         };
     }
 }

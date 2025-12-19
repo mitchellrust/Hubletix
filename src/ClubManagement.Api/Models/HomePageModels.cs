@@ -10,6 +10,7 @@ public class NavbarViewModel
     public string? PrimaryColor { get; set; }
     public List<NavItem> NavItems { get; set; } = new();
     public bool ShowLogInButton { get; set; } = false;
+    public bool ShowMenuButton => NavItems.Count > 0 && ShowLogInButton;
 }
 
 public class NavItem

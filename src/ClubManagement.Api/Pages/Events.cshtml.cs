@@ -24,7 +24,9 @@ public class EventsModel : PublicPageModel
         // Fetch upcoming active events
         var events = await DbContext.Events
             .Where(
-              e => e.IsActive && e.StartTimeUtc > DateTime.UtcNow
+              e => e.TenantId == CurrentTenantInfo.Id &&
+              e.IsActive &&
+              e.StartTimeUtc > DateTime.UtcNow
             )
             .OrderBy(e => e.StartTimeUtc)
             .ToListAsync();
