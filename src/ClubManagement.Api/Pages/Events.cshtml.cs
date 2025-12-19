@@ -21,7 +21,7 @@ public class EventsModel : PublicPageModel
     [BindProperty(SupportsGet = true)]
     public int PageNum { get; set; } = 1;
     
-    private const int PageSize = 5;
+    private const int PageSize = 20;
     
     public bool HasActiveFilters => TypeFilter != "all" || AvailabilityFilter != "all";
 
