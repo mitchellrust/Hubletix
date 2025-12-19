@@ -1,4 +1,5 @@
 @page
+@using ClubManagement.Api.Utils
 @model EventsModel
 @{
     ViewData["Title"] = "Events";
@@ -31,24 +32,12 @@
                             <a href="@Model.BuildTypeUrl("all")" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.TypeFilter == "all" ? "fw-bold text-primary" : "")">
                                 All Types
                             </a>
-                            <a href="@Model.BuildTypeUrl("Class")" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.TypeFilter == "Class" ? "fw-bold text-primary" : "")">
-                                Class
-                            </a>
-                            <a href="@Model.BuildTypeUrl("Workshop")" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.TypeFilter == "Workshop" ? "fw-bold text-primary" : "")">
-                                Workshop
-                            </a>
-                            <a href="@Model.BuildTypeUrl("GroupEvent")" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.TypeFilter == "GroupEvent" ? "fw-bold text-primary" : "")">
-                                Group Event
-                            </a>
-                            <a href="@Model.BuildTypeUrl("Social")" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.TypeFilter == "Social" ? "fw-bold text-primary" : "")">
-                                Social
-                            </a>
-                            <a href="@Model.BuildTypeUrl("Competition")" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.TypeFilter == "Competition" ? "fw-bold text-primary" : "")">
-                                Competition
-                            </a>
-                            <a href="@Model.BuildTypeUrl("Other")" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.TypeFilter == "Other" ? "fw-bold text-primary" : "")">
-                                Other
-                            </a>
+                            @foreach (var eventType in Model.AllEventTypes)
+                            {
+                                <a href="@Model.BuildTypeUrl(eventType)" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.TypeFilter == eventType ? "fw-bold text-primary" : "")">
+                                    @eventType.Humanize()
+                                </a>
+                            }
                         </div>
                     </div>
 
@@ -263,36 +252,15 @@
                                    @(Model.TypeFilter == "all" ? "checked" : "")>
                             <label class="form-check-label" for="typeAll">All Types</label>
                         </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="TypeFilter" id="typeClass" value="Class" 
-                                   @(Model.TypeFilter == "Class" ? "checked" : "")>
-                            <label class="form-check-label" for="typeClass">Class</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="TypeFilter" id="typeWorkshop" value="Workshop" 
-                                   @(Model.TypeFilter == "Workshop" ? "checked" : "")>
-                            <label class="form-check-label" for="typeWorkshop">Workshop</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="TypeFilter" id="typeGroup" value="GroupEvent" 
-                                   @(Model.TypeFilter == "GroupEvent" ? "checked" : "")>
-                            <label class="form-check-label" for="typeGroup">Group Event</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="TypeFilter" id="typeSocial" value="Social" 
-                                   @(Model.TypeFilter == "Social" ? "checked" : "")>
-                            <label class="form-check-label" for="typeSocial">Social</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="TypeFilter" id="typeCompetition" value="Competition" 
-                                   @(Model.TypeFilter == "Competition" ? "checked" : "")>
-                            <label class="form-check-label" for="typeCompetition">Competition</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="TypeFilter" id="typeOther" value="Other" 
-                                   @(Model.TypeFilter == "Other" ? "checked" : "")>
-                            <label class="form-check-label" for="typeOther">Other</label>
-                        </div>
+                        @foreach (var eventType in Model.AllEventTypes)
+                        {
+                            var sanitizedId = "type" + eventType.Replace(" ", "");
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="TypeFilter" id="@sanitizedId" value="@eventType" 
+                                       @(Model.TypeFilter == eventType ? "checked" : "")>
+                                <label class="form-check-label" for="@sanitizedId">@eventType.Humanize()</label>
+                            </div>
+                        }
                     </div>
 
                     <!-- Availability Filter -->

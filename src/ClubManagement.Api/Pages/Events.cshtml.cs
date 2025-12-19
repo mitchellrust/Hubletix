@@ -4,6 +4,7 @@ using ClubManagement.Infrastructure.Persistence;
 using ClubManagement.Infrastructure.Services;
 using Finbuckle.MultiTenant.Abstractions;
 using ClubManagement.Api.Utils;
+using System.Reflection;
 
 namespace ClubManagement.Api.Pages;
 
@@ -11,6 +12,7 @@ public class EventsModel : PublicPageModel
 {
     public List<EventCardDto> UpcomingEvents { get; set; } = new();
     public bool HasMoreEvents { get; set; }
+    public List<string> AllEventTypes { get; set; } = new();
     
     [BindProperty(SupportsGet = true)]
     public string TypeFilter { get; set; } = "all";
@@ -34,6 +36,15 @@ public class EventsModel : PublicPageModel
 
     public async Task<IActionResult> OnGetAsync()
     {
+        // Get all event types dynamically from EventType constants
+        AllEventTypes = typeof(Core.Constants.EventType)
+            .GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
+            .Where(f => f.IsLiteral && !f.IsInitOnly && f.FieldType == typeof(string))
+            .Select(f => f.GetValue(null)?.ToString() ?? string.Empty)
+            .Where(v => !string.IsNullOrEmpty(v))
+            .OrderBy(v => v)
+            .ToList();
+        
         // Build query with filters
         var query = DbContext.Events
             .Include(e => e.EventRegistrations)
