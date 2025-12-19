@@ -10,12 +10,18 @@ namespace ClubManagement.Api.Pages;
 public class EventsModel : PublicPageModel
 {
     public List<EventCardDto> UpcomingEvents { get; set; } = new();
+    public bool HasMoreEvents { get; set; }
     
     [BindProperty(SupportsGet = true)]
     public string TypeFilter { get; set; } = "all";
     
     [BindProperty(SupportsGet = true)]
     public string AvailabilityFilter { get; set; } = "all";
+    
+    [BindProperty(SupportsGet = true)]
+    public int PageNum { get; set; } = 1;
+    
+    private const int PageSize = 5;
     
     public bool HasActiveFilters => TypeFilter != "all" || AvailabilityFilter != "all";
 
@@ -41,7 +47,18 @@ public class EventsModel : PublicPageModel
             query = query.Where(e => e.EventType == TypeFilter);
         }
         
-        var events = await query.OrderBy(e => e.StartTimeUtc).ToListAsync();
+        // Get one extra to check if there are more pages
+        var events = await query
+            .OrderBy(e => e.StartTimeUtc)
+            .Skip((PageNum - 1) * PageSize)
+            .Take(PageSize + 1)
+            .ToListAsync();
+        
+        HasMoreEvents = events.Count > PageSize;
+        if (HasMoreEvents)
+        {
+            events = events.Take(PageSize).ToList();
+        }
 
         // Convert to DTOs with local time
         var eventDtos = events.Select(e =>
@@ -79,6 +96,72 @@ public class EventsModel : PublicPageModel
         UpcomingEvents = eventDtos;
 
         return Page();
+    }
+    
+    public async Task<IActionResult> OnGetLoadMoreAsync(int pageNum, string typeFilter = "all", string availabilityFilter = "all")
+    {
+        TypeFilter = typeFilter;
+        AvailabilityFilter = availabilityFilter;
+        PageNum = pageNum;
+        
+        // Build query with filters
+        var query = DbContext.Events
+            .Include(e => e.EventRegistrations)
+            .Where(e => e.TenantId == CurrentTenantInfo.Id 
+                     && e.IsActive 
+                     && e.StartTimeUtc > DateTime.UtcNow);
+        
+        // Apply event type filter
+        if (TypeFilter != "all")
+        {
+            query = query.Where(e => e.EventType == TypeFilter);
+        }
+        
+        // Get one extra to check if there are more pages
+        var events = await query
+            .OrderBy(e => e.StartTimeUtc)
+            .Skip((PageNum - 1) * PageSize)
+            .Take(PageSize + 1)
+            .ToListAsync();
+        
+        var hasMore = events.Count > PageSize;
+        if (hasMore)
+        {
+            events = events.Take(PageSize).ToList();
+        }
+
+        // Convert to DTOs with local time
+        var eventDtos = events.Select(e =>
+        {
+            var localStart = e.StartTimeUtc.ToTimeZone(e.TimeZoneId);
+            var localEnd = e.EndTimeUtc.ToTimeZone(e.TimeZoneId);
+            var registrations = e.EventRegistrations?.Count(r => r.Status == Core.Constants.EventRegistrationStatus.Registered) ?? 0;
+
+            return new EventCardDto
+            {
+                Id = e.Id,
+                Name = e.Name,
+                Description = e.Description,
+                EventType = e.EventType,
+                AccentColor = TenantConfig.Theme.PrimaryColor,
+                StartTimeLocal = localStart,
+                EndTimeLocal = localEnd,
+                MaxAttendees = e.Capacity,
+                CurrentAttendees = registrations
+            };
+        }).ToList();
+        
+        // Apply availability filter
+        if (AvailabilityFilter == "available")
+        {
+            eventDtos = eventDtos.Where(e => !e.IsFull).ToList();
+        }
+        else if (AvailabilityFilter == "full")
+        {
+            eventDtos = eventDtos.Where(e => e.IsFull).ToList();
+        }
+        
+        return new JsonResult(new { events = eventDtos, hasMore });
     }
     
     public string BuildTypeUrl(string type) => $"/events?TypeFilter={type}&AvailabilityFilter={AvailabilityFilter}";
