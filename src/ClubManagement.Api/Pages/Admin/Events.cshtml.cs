@@ -111,7 +111,7 @@ public class EventsModel : AdminPageModel
                 Name = e.Name,
                 Date = localStart,
                 Time = $"{localStart:h:mm tt} ({tzShort})",
-                Location = "Club Location",
+                Location = e.Location,
                 Registrations = e.EventRegistrations?.Count(r => 
                         r.Status == EventRegistrationStatus.Registered ||
                         r.Status == EventRegistrationStatus.Attended

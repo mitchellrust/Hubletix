@@ -141,7 +141,10 @@
                                                 <span class="badge bg-secondary ms-1">Inactive</span>
                                             }
                                         </div>
-                                        <div class="text-muted small">@evt.Location</div>
+                                        @if (!string.IsNullOrEmpty(evt.Location))
+                                        {
+                                            <div class="text-muted small">@evt.Location</div>
+                                        }
                                     </td>
                                     <td>@evt.EventType</td>
                                     <td>@evt.Capacity</td>
