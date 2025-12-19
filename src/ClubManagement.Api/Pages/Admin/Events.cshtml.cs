@@ -64,8 +64,8 @@ public class EventsModel : AdminPageModel
         var nowUtc = DateTime.UtcNow;
         query = DateFilter switch
         {
-            "upcoming" => query.Where(e => e.StartTimeUtc >= nowUtc),
-            "past" => query.Where(e => e.StartTimeUtc < nowUtc),
+            "upcoming" => query.Where(e => e.StartTimeUtc >= nowUtc || e.EndTimeUtc >= nowUtc),
+            "past" => query.Where(e => e.EndTimeUtc < nowUtc),
             _ => query // "all" - no filter
         };
 
