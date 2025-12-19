@@ -13,9 +13,81 @@
         </div>
     </div>
 
-    @if (!Model.UpcomingEvents.Any())
-    {
-        <div class="row">
+    <div class="row">
+        <!-- Filter Sidebar (Desktop) -->
+        <div class="col-lg-3 mb-4 d-none d-lg-block">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">Filters</h6>
+                    @if (Model.HasActiveFilters)
+                    {
+                        <a href="/events?TypeFilter=all&AvailabilityFilter=all" class="btn btn-sm btn-link text-decoration-none p-0">Clear</a>
+                    }
+                </div>
+                <div class="card-body p-0">
+                    <!-- Event Type Filter -->
+                    <div class="border-bottom p-3">
+                        <h6 class="mb-2 fw-semibold small text-uppercase text-muted">Event Type</h6>
+                        <div class="list-group list-group-flush small">
+                            <a href="@Model.BuildTypeUrl("all")" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.TypeFilter == "all" ? "fw-bold text-primary" : "")">
+                                All Types
+                            </a>
+                            <a href="@Model.BuildTypeUrl("Class")" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.TypeFilter == "Class" ? "fw-bold text-primary" : "")">
+                                Class
+                            </a>
+                            <a href="@Model.BuildTypeUrl("Workshop")" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.TypeFilter == "Workshop" ? "fw-bold text-primary" : "")">
+                                Workshop
+                            </a>
+                            <a href="@Model.BuildTypeUrl("GroupEvent")" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.TypeFilter == "GroupEvent" ? "fw-bold text-primary" : "")">
+                                Group Event
+                            </a>
+                            <a href="@Model.BuildTypeUrl("Social")" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.TypeFilter == "Social" ? "fw-bold text-primary" : "")">
+                                Social
+                            </a>
+                            <a href="@Model.BuildTypeUrl("Competition")" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.TypeFilter == "Competition" ? "fw-bold text-primary" : "")">
+                                Competition
+                            </a>
+                            <a href="@Model.BuildTypeUrl("Other")" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.TypeFilter == "Other" ? "fw-bold text-primary" : "")">
+                                Other
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Availability Filter -->
+                    <div class="border-bottom p-3">
+                        <h6 class="mb-2 fw-semibold small text-uppercase text-muted">Availability</h6>
+                        <div class="list-group list-group-flush small">
+                            <a href="@Model.BuildAvailabilityUrl("all")" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.AvailabilityFilter == "all" ? "fw-bold text-primary" : "")">
+                                All
+                            </a>
+                            <a href="@Model.BuildAvailabilityUrl("available")" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.AvailabilityFilter == "available" ? "fw-bold text-primary" : "")">
+                                Available
+                            </a>
+                            <a href="@Model.BuildAvailabilityUrl("soldout")" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.AvailabilityFilter == "soldout" ? "fw-bold text-primary" : "")">
+                                Sold Out
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Events List -->
+        <div class="col-lg-9">
+            <!-- Mobile Filter Button -->
+            <div class="d-lg-none mb-3">
+                <button class="btn btn-outline-secondary w-100" data-bs-toggle="modal" data-bs-target="#filterModal">
+                    <i class="bi bi-funnel me-2"></i>Filters
+                    @if (Model.HasActiveFilters)
+                    {
+                        <span class="badge bg-primary rounded-pill ms-2">Active</span>
+                    }
+                </button>
+            </div>
+
+            @if (!Model.UpcomingEvents.Any())
+            {
+                <div class="text-center py-5">
             <div class="col-lg-6 mx-auto">
                 <div class="text-center py-5">
                     <i class="bi bi-calendar-x display-1 text-muted mb-4"></i>
@@ -75,13 +147,6 @@
                                         {
                                             <p class="text-muted mb-2 event-card-description">@evt.Description</p>
                                         }
-                                        @if (!string.IsNullOrEmpty(evt.Location))
-                                        {
-                                            <div class="small text-muted">
-                                                <i class="bi bi-geo-alt me-1"></i>
-                                                @evt.Location
-                                            </div>
-                                        }
                                         @if (evt.MaxAttendees.HasValue)
                                         {
                                             <div class="small text-muted mt-1">
@@ -121,9 +186,101 @@
                     </div>
                 </div>
             }
+                </div>
+            }
         </div>
-    }
+    </div>
 </div>
+
+<!-- Filter Modal (Mobile) -->
+<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filterModalLabel">Filter Events</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="filterForm" action="/events" method="get">
+                    <!-- Event Type Filter -->
+                    <div class="mb-4">
+                        <h6 class="fw-semibold text-uppercase text-muted small mb-3">Event Type</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="TypeFilter" id="typeAll" value="all" 
+                                   @(Model.TypeFilter == "all" ? "checked" : "")>
+                            <label class="form-check-label" for="typeAll">All Types</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="TypeFilter" id="typeClass" value="Class" 
+                                   @(Model.TypeFilter == "Class" ? "checked" : "")>
+                            <label class="form-check-label" for="typeClass">Class</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="TypeFilter" id="typeWorkshop" value="Workshop" 
+                                   @(Model.TypeFilter == "Workshop" ? "checked" : "")>
+                            <label class="form-check-label" for="typeWorkshop">Workshop</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="TypeFilter" id="typeGroup" value="GroupEvent" 
+                                   @(Model.TypeFilter == "GroupEvent" ? "checked" : "")>
+                            <label class="form-check-label" for="typeGroup">Group Event</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="TypeFilter" id="typeSocial" value="Social" 
+                                   @(Model.TypeFilter == "Social" ? "checked" : "")>
+                            <label class="form-check-label" for="typeSocial">Social</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="TypeFilter" id="typeCompetition" value="Competition" 
+                                   @(Model.TypeFilter == "Competition" ? "checked" : "")>
+                            <label class="form-check-label" for="typeCompetition">Competition</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="TypeFilter" id="typeOther" value="Other" 
+                                   @(Model.TypeFilter == "Other" ? "checked" : "")>
+                            <label class="form-check-label" for="typeOther">Other</label>
+                        </div>
+                    </div>
+
+                    <!-- Availability Filter -->
+                    <div class="mb-4">
+                        <h6 class="fw-semibold text-uppercase text-muted small mb-3">Availability</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="AvailabilityFilter" id="availabilityAll" value="all" 
+                                   @(Model.AvailabilityFilter == "all" ? "checked" : "")>
+                            <label class="form-check-label" for="availabilityAll">All</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="AvailabilityFilter" id="availabilityAvailable" value="available" 
+                                   @(Model.AvailabilityFilter == "available" ? "checked" : "")>
+                            <label class="form-check-label" for="availabilityAvailable">Available</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="AvailabilityFilter" id="availabilitySoldOut" value="soldout" 
+                                   @(Model.AvailabilityFilter == "soldout" ? "checked" : "")>
+                            <label class="form-check-label" for="availabilitySoldOut">Sold Out</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-outline-secondary" onclick="clearFilters()">Clear</button>
+                <button type="button" class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function applyFilters() {
+        document.getElementById('filterForm').submit();
+    }
+    
+    function clearFilters() {
+        window.location.href = '/events?TypeFilter=all&AvailabilityFilter=all';
+    }
+</script>
 
 <style>
     .event-card-description {
