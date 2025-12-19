@@ -48,17 +48,19 @@
     
     @await RenderSectionAsync("Styles", required: false)
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
     @* Navbar *@
     @if (navbar != null)
     {
         <partial name="_Navbar" model="navbar" />
     }
 
-    @RenderBody()
+    <main class="flex-grow-1">
+        @RenderBody()
+    </main>
 
     @* Footer *@
-    <footer class="bg-dark text-white py-5 mt-5">
+    <footer class="bg-dark text-white py-5 mt-auto">
         <div class="container">
             <div class="row">
                 <div class="col-md-4 mb-4 mb-md-0">
