@@ -4,7 +4,6 @@ using ClubManagement.Infrastructure.Persistence;
 using ClubManagement.Core.Entities;
 using ClubManagement.Core.Models;
 using System.Text.Json;
-using Microsoft.EntityFrameworkCore.Migrations.Operations;
 
 namespace ClubManagement.Infrastructure.Services;
 
@@ -185,66 +184,6 @@ public class DatabaseInitializationService
                 ConfigJson = GetDemoConfig()
             };
 
-            var demoEvents = new List<Event>
-            {
-                new Event
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    TenantId = demoTenant.Id,
-                    Name = "New Player Orientation",
-                    Description = "An introductory event to welcome new members to the Demo VB Club.",
-                    EventType = Core.Constants.EventType.GroupEvent,
-                    Capacity = 200,
-                    IsActive = true,
-                    StartTimeUtc = DateTime.UtcNow.AddDays(7),
-                    EndTimeUtc = DateTime.UtcNow.AddDays(7).AddHours(2),
-                    TimeZoneId = "America/Denver",
-                    CreatedBy = "System"
-                },
-                new Event
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    TenantId = demoTenant.Id,
-                    Name = "Holiday Tournament",
-                    Description = "Join us for our annual holiday volleyball tournament! Open to all skill levels.",
-                    EventType = Core.Constants.EventType.Competition,
-                    Capacity = 400,
-                    IsActive = true,
-                    StartTimeUtc = DateTime.UtcNow.AddDays(8),
-                    EndTimeUtc = DateTime.UtcNow.AddDays(8).AddHours(2),
-                    TimeZoneId = "America/Denver",
-                    CreatedBy = "System"
-                },
-                new Event
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    TenantId = demoTenant.Id,
-                    Name = "Parent & Me Volleyball",
-                    Description = "A fun event for parents and their kids to play volleyball together.",
-                    EventType = Core.Constants.EventType.GroupEvent,
-                    Capacity = 50,
-                    IsActive = true,
-                    StartTimeUtc = DateTime.UtcNow.AddDays(3),
-                    EndTimeUtc = DateTime.UtcNow.AddDays(3).AddHours(1),
-                    TimeZoneId = "America/Denver",
-                    CreatedBy = "System"
-                },
-                new Event
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    TenantId = demoTenant.Id,
-                    Name = "Super Fun Volleyball Event",
-                    Description = "An event that occurred in the past.",
-                    EventType = Core.Constants.EventType.Social,
-                    Capacity = 25,
-                    IsActive = true,
-                    StartTimeUtc = DateTime.UtcNow.AddDays(-3),
-                    EndTimeUtc = DateTime.UtcNow.AddDays(-3).AddHours(1),
-                    TimeZoneId = "America/Denver",
-                    CreatedBy = "System"
-                }
-            };
-
             var demoPlans = new List<MembershipPlan>
             {
                 new MembershipPlan
@@ -312,70 +251,140 @@ public class DatabaseInitializationService
                 }
             );
 
-            var demoEventRegistrations = new List<EventRegistration>
+            // Get Timezone info set up for event dates
+            var tzString = "America/Denver";
+            var timeZone = TimeZoneInfo.FindSystemTimeZoneById(tzString);
+            var todayDateInTz = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone).Date;
+
+            var demoEvents = new List<Event>
             {
-                new EventRegistration
+                new Event
                 {
                     Id = Guid.NewGuid().ToString(),
-                    EventId = demoEvents[0].Id,
-                    UserId = demoUsers[0].Id,
-                    Status = Core.Constants.EventRegistrationStatus.Registered,
-                    SignedUpAt = DateTime.UtcNow.AddDays(-1).AddHours(-2),
+                    TenantId = demoTenant.Id,
+                    Name = "Free Event No Desc/Loc No Reg",
+                    EventType = Core.Constants.EventType.Other,
+                    Capacity = 10,
+                    IsActive = true,
+                    PriceInCents = 0,
+                    StartTimeUtc = todayDateInTz.AddDays(7).AddHours(10).ToUniversalTime(),
+                    EndTimeUtc = todayDateInTz.AddDays(7).AddHours(13).ToUniversalTime(),
+                    TimeZoneId = tzString,
+                    CreatedBy = "System",
+                },
+                new Event
+                {
+                    Id = "12345678-aaaa-bbbb-cccc-1234567890ab",
+                    TenantId = demoTenant.Id,
+                    Name = "Multi-Day Tournament Some Reg",
+                    Description = "Join us for our annual holiday volleyball tournament! Open to all skill levels.",
+                    EventType = Core.Constants.EventType.Tournament,
+                    PriceInCents = 2500, // $25.00
+                    Location = "TVAC Gym",
+                    Capacity = 5,
+                    RegistrationDeadlineUtc = todayDateInTz.AddDays(8).AddMinutes(-1).ToUniversalTime(), // 11:59 the night before
+                    IsActive = true,
+                    StartTimeUtc = todayDateInTz.AddDays(8).AddHours(9).ToUniversalTime(),
+                    EndTimeUtc = todayDateInTz.AddDays(9).AddHours(17).ToUniversalTime(),
+                    TimeZoneId = tzString,
+                    CreatedBy = "System",
+
+                    EventRegistrations = new List<EventRegistration>
+                    {
+                        new EventRegistration
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            EventId = "12345678-aaaa-bbbb-cccc-1234567890ab",
+                            UserId = demoUsers[0].Id,
+                            Status = Core.Constants.EventRegistrationStatus.Registered,
+                            SignedUpAt = todayDateInTz.AddDays(-1).AddHours(-2).ToUniversalTime(),
+                            CreatedBy = "System"
+                        },
+                        new EventRegistration
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            EventId = "12345678-aaaa-bbbb-cccc-1234567890ab",
+                            UserId = demoUsers[2].Id,
+                            Status = Core.Constants.EventRegistrationStatus.Registered,
+                            SignedUpAt = todayDateInTz.AddHours(-5).ToUniversalTime(),
+                            CreatedBy = "System"
+                        },
+                        new EventRegistration
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            EventId = "12345678-aaaa-bbbb-cccc-1234567890ab",
+                            UserId = demoUsers[3].Id,
+                            Status = Core.Constants.EventRegistrationStatus.Cancelled,
+                            CancellationReason = "Can't make it",
+                            SignedUpAt = todayDateInTz.AddHours(-5).ToUniversalTime(),
+                            CreatedBy = "System"
+                        }
+                    }
+                },
+                new Event
+                {
+                    Id = "87654321-bbbb-cccc-dddd-0987654321ba",
+                    TenantId = demoTenant.Id,
+                    Name = "Event Full Capacity",
+                    Description = "A fun event for parents and their kids to play volleyball together.",
+                    EventType = Core.Constants.EventType.Social,
+                    Location = "123 Piper Lane, Meridian, ID 83646",
+                    Capacity = 1, // Small capacity to demonstrate full event
+                    IsActive = true,
+                    StartTimeUtc = todayDateInTz.AddDays(3).AddHours(14).AddMinutes(30).ToUniversalTime(),
+                    EndTimeUtc = todayDateInTz.AddDays(3).AddHours(15).AddMinutes(30).ToUniversalTime(),
+                    TimeZoneId = tzString,
+                    CreatedBy = "System",
+                    EventRegistrations = new List<EventRegistration>
+                    {
+                        new EventRegistration
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            EventId = "87654321-bbbb-cccc-dddd-0987654321ba",
+                            UserId = demoUsers[0].Id,
+                            Status = Core.Constants.EventRegistrationStatus.Registered,
+                            SignedUpAt = todayDateInTz.AddHours(-1).ToUniversalTime(),
+                            CreatedBy = "System"
+                        }
+                    }
+                },
+                new Event
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    TenantId = demoTenant.Id,
+                    Name = "Inactive Event",
+                    Description = "An event that is inactive.",
+                    EventType = Core.Constants.EventType.Social,
+                    Capacity = 5,
+                    Location = "Demo Location",
+                    PriceInCents = 1499, // $14.99
+                    IsActive = false,
+                    StartTimeUtc = todayDateInTz.AddDays(3).AddHours(12).ToUniversalTime(),
+                    EndTimeUtc = todayDateInTz.AddDays(3).AddHours(13).ToUniversalTime(),
+                    RegistrationDeadlineUtc = todayDateInTz.AddDays(3).AddHours(11).ToUniversalTime(),
+                    TimeZoneId = tzString,
                     CreatedBy = "System"
                 },
-                new EventRegistration
+                new Event
                 {
                     Id = Guid.NewGuid().ToString(),
-                    EventId = demoEvents[1].Id,
-                    UserId = demoUsers[0].Id,
-                    Status = Core.Constants.EventRegistrationStatus.Waitlist,
-                    SignedUpAt = DateTime.UtcNow.AddDays(-2).AddMinutes(-30),
-                    CreatedBy = "System"
-                },
-                new EventRegistration
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    EventId = demoEvents[0].Id,
-                    UserId = demoUsers[1].Id,
-                    Status = Core.Constants.EventRegistrationStatus.Cancelled,
-                    CancellationReason = "Scheduling conflict",
-                    SignedUpAt = DateTime.UtcNow.AddDays(-10),
-                    CreatedBy = "System"
-                },
-                new EventRegistration
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    EventId = demoEvents[0].Id,
-                    UserId = demoUsers[2].Id,
-                    Status = Core.Constants.EventRegistrationStatus.Registered,
-                    SignedUpAt = DateTime.UtcNow.AddMinutes(-2),
-                    CreatedBy = "System"
-                },
-                new EventRegistration
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    EventId = demoEvents[1].Id,
-                    UserId = demoUsers[2].Id,
-                    Status = Core.Constants.EventRegistrationStatus.Waitlist,
-                    SignedUpAt = DateTime.UtcNow.AddMinutes(-2),
-                    CreatedBy = "System"
-                },
-                new EventRegistration
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    EventId = demoEvents[3].Id,
-                    UserId = demoUsers[5].Id,
-                    Status = Core.Constants.EventRegistrationStatus.Attended,
-                    SignedUpAt = DateTime.UtcNow.AddDays(-11),
+                    TenantId = demoTenant.Id,
+                    Name = "Past Event",
+                    Description = "An event that already occurred.",
+                    EventType = Core.Constants.EventType.Workshop,
+                    Capacity = 5,
+                    IsActive = true,
+                    StartTimeUtc = todayDateInTz.AddDays(-3).AddHours(12).ToUniversalTime(),
+                    EndTimeUtc = todayDateInTz.AddDays(-3).AddHours(13).ToUniversalTime(),
+                    TimeZoneId = tzString,
                     CreatedBy = "System"
                 }
             };
 
             context.Tenants.Add(demoTenant);
-            context.Events.AddRange(demoEvents);
             context.MembershipPlans.AddRange(demoPlans);
             context.Users.AddRange(demoUsers);
-            context.EventRegistrations.AddRange(demoEventRegistrations);
+            context.Events.AddRange(demoEvents);
             await context.SaveChangesAsync();
 
             _logger.LogInformation("Demo tenant created with identifier: {Subdomain}", demoTenant.Id);

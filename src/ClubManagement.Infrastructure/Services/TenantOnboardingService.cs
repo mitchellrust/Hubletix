@@ -81,12 +81,6 @@ public class TenantOnboardingService : ITenantOnboardingService
             _dbContext.Users.Add(adminUser);
             await _dbContext.SaveChangesAsync();
 
-            // Create default membership plans
-            await CreateDefaultMembershipPlansAsync(tenant.Id);
-
-            // Create demo events
-            await CreateDemoEventsAsync(tenant.Id, adminUser.Id);
-
             return tenant;
         }
         catch
@@ -94,81 +88,6 @@ public class TenantOnboardingService : ITenantOnboardingService
             // TODO: What should go here?
             throw;
         }
-    }
-
-    private async Task CreateDefaultMembershipPlansAsync(string tenantId)
-    {
-        var plans = new[]
-        {
-            new MembershipPlan
-            {
-                Id = Guid.NewGuid().ToString(),
-                TenantId = tenantId,
-                Name = "Monthly Membership",
-                Description = "Full access to all classes and events",
-                PriceInCents = 9999, // $99.99
-                BillingInterval = "month",
-                IsActive = true,
-                DisplayOrder = 1
-            },
-            new MembershipPlan
-            {
-                Id = Guid.NewGuid().ToString(),
-                TenantId = tenantId,
-                Name = "Annual Membership",
-                Description = "Full access for a full year (2 months free!)",
-                PriceInCents = 99900, // $999.00
-                BillingInterval = "year",
-                IsActive = true,
-                DisplayOrder = 2
-            }
-        };
-
-        _dbContext.MembershipPlans.AddRange(plans);
-        await _dbContext.SaveChangesAsync();
-    }
-
-    private async Task CreateDemoEventsAsync(string tenantId, string coachId)
-    {
-        var demoEvents = new[]
-        {
-            new Event
-            {
-                Id = Guid.NewGuid().ToString(),
-                TenantId = tenantId,
-                Name = "Morning CrossFit",
-                Description = "High-intensity functional fitness training",
-                EventType = Core.Constants.EventType.Class,
-                CoachId = coachId,
-                Capacity = 20,
-                IsActive = true
-            },
-            new Event
-            {
-                Id = Guid.NewGuid().ToString(),
-                TenantId = tenantId,
-                Name = "Yoga & Flexibility",
-                Description = "Low-intensity flexibility and mindfulness",
-                EventType = Core.Constants.EventType.Class,
-                CoachId = coachId,
-                Capacity = 15,
-                IsActive = true
-            },
-            new Event
-            {
-                Id = Guid.NewGuid().ToString(),
-                TenantId = tenantId,
-                Name = "Open Gym",
-                Description = "Self-directed workout time",
-                EventType = Core.Constants.EventType.Other,
-                CoachId = null,
-                Capacity = 50,
-                IsActive = true
-            }
-        };
-
-        _dbContext.Events.AddRange(demoEvents);
-        await _dbContext.SaveChangesAsync();
     }
 
     /// <summary>

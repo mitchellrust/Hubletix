@@ -88,12 +88,6 @@ public class AppDbContext : MultiTenantDbContext
             .WithMany(t => t.Events)
             .HasForeignKey(e => e.TenantId)
             .OnDelete(DeleteBehavior.Cascade);
-        builder.Entity<Event>()
-            .HasOne(e => e.Coach)
-            .WithMany(u => u.CoachingEvents)
-            .HasForeignKey(e => e.CoachId)
-            .OnDelete(DeleteBehavior.SetNull)
-            .IsRequired(false);
 
         // Configure EventRegistration
         builder.Entity<EventRegistration>()

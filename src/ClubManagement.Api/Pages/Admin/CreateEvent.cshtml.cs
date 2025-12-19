@@ -40,7 +40,7 @@ public class CreateEventModel : AdminPageModel
     {
         Event.TimeZoneId = TenantConfig.Settings.TimeZoneId;
         Event.Capacity = 15;
-        Event.EventType = EventType.Class;
+        Event.EventType = EventType.Other;
         Event.IsActive = true;
 
         // Set default times based on tenant's timezone

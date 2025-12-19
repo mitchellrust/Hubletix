@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using ClubManagement.Core.Models;
 
 namespace ClubManagement.Core.Entities;
@@ -24,16 +25,27 @@ public class Event : BaseEntity
     /// </summary>
     [Required]
     public string EventType { get; set; } = Constants.EventType.Other;
-    
+
     /// <summary>
-    /// Foreign key to coach user (optional, can be null for drop-in events)
+    /// Event location
     /// </summary>
-    public string? CoachId { get; set; }
-    
+    public string? Location { get; set; }
+        
     /// <summary>
     /// Maximum capacity for this event
     /// </summary>
     public int Capacity { get; set; } = 15;
+
+    /// <summary>
+    /// Price in cents (e.g., 9999 = $99.99)
+    /// </summary>
+    public int PriceInCents { get; set; }
+
+    /// <summary>
+    /// Price formatted to dollar amount (e.g., 99.99)
+    /// </summary>
+    [NotMapped]
+    public decimal PriceInDollars => PriceInCents / 100.0m;
     
     /// <summary>
     /// Event start time (UTC)
@@ -44,6 +56,11 @@ public class Event : BaseEntity
     /// Event end time (UTC)
     /// </summary>
     public DateTime EndTimeUtc { get; set; }
+
+    /// <summary>
+    /// Registration deadline (UTC, optional)
+    /// </summary>
+    public DateTime? RegistrationDeadlineUtc { get; set; }
     
     /// <summary>
     /// Time zone ID for the event (e.g., "America/Denver" for Mountain Time)
@@ -60,6 +77,5 @@ public class Event : BaseEntity
     
     // Navigation properties
     public Tenant Tenant { get; set; } = null!;
-    public User? Coach { get; set; }
     public ICollection<EventRegistration> EventRegistrations { get; set; } = new List<EventRegistration>();
 }
