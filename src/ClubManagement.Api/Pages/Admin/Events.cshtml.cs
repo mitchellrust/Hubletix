@@ -4,6 +4,7 @@ using Finbuckle.MultiTenant.Abstractions;
 using ClubManagement.Api.Utils;
 using ClubManagement.Api.Models;
 using ClubManagement.Infrastructure.Services;
+using ClubManagement.Core.Constants;
 
 namespace ClubManagement.Api.Pages.Admin;
 
@@ -111,7 +112,10 @@ public class EventsModel : AdminPageModel
                 Date = localStart,
                 Time = $"{localStart:h:mm tt} ({tzShort})",
                 Location = "Club Location",
-                Registrations = e.EventRegistrations?.Count(r => r.Status == Core.Constants.EventRegistrationStatus.Registered) ?? 0,
+                Registrations = e.EventRegistrations?.Count(r => 
+                        r.Status == EventRegistrationStatus.Registered ||
+                        r.Status == EventRegistrationStatus.Attended
+                    ) ?? 0,
                 EventType = e.EventType.ToString().Humanize(),
                 Capacity = e.Capacity,
                 IsActive = e.IsActive
