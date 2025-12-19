@@ -290,11 +290,47 @@ public class EventDetailModel : AdminPageModel
 
         // Verify event exists
         var eventToDelete = await DbContext.Events
+            .Include(e => e.EventRegistrations)
             .FirstOrDefaultAsync(e => e.Id == id);
 
         if (eventToDelete == null)
         {
             return RedirectToPage("/Admin/Events", new { message = "Event had already been deleted." });
+        }
+
+        // Check for active registrations (Registered or Waitlist status)
+        var activeRegistrations = eventToDelete.EventRegistrations
+            .Where(r => r.Status == EventRegistrationStatus.Registered || r.Status == EventRegistrationStatus.Waitlist)
+            .ToList();
+
+        if (activeRegistrations.Any())
+        {
+            var registeredCount = activeRegistrations.Count(r => r.Status == EventRegistrationStatus.Registered);
+            var waitlistCount = activeRegistrations.Count(r => r.Status == EventRegistrationStatus.Waitlist);
+            
+            var message = "Cannot delete this event because it has ";
+            var parts = new List<string>();
+            
+            if (registeredCount > 0)
+            {
+                parts.Add($"{registeredCount} registered {(registeredCount == 1 ? "attendee" : "attendees")}");
+            }
+            if (waitlistCount > 0)
+            {
+                parts.Add($"{waitlistCount} waitlisted {(waitlistCount == 1 ? "attendee" : "attendees")}");
+            }
+            
+            message += string.Join(" and ", parts) + ". Please cancel all active registrations before deleting this event.";
+            
+            ErrorMessage = message;
+            Event = eventToDelete;
+            PopulateEventTypeOptions();
+            PopulateTimeZoneOptions();
+            
+            // Reload registrations for display
+            await LoadEventRegistrationsAsync(id, null, null, 1, 10, null);
+            
+            return Page();
         }
 
         try
