@@ -9,7 +9,7 @@ using ClubManagement.Infrastructure.Services;
 
 namespace ClubManagement.Api.Pages.Admin;
 
-public class CreateEventModel : TenantPageModel
+public class CreateEventModel : AdminPageModel
 {
     [BindProperty]
     public Event Event { get; set; } = new Event();

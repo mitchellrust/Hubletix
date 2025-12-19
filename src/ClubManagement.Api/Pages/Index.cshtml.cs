@@ -6,7 +6,7 @@ using ClubManagement.Core.Models;
 
 namespace ClubManagement.Api.Pages;
 
-public class IndexModel : TenantPageModel
+public class IndexModel : PublicPageModel
 {
     public HomePageViewModel HomePage { get; set; } = new();
 
@@ -23,78 +23,52 @@ public class IndexModel : TenantPageModel
 
     public async Task OnGetAsync()
     {
-        var primaryColor = TenantConfig?.Theme?.PrimaryColor;
-        var secondaryColor = TenantConfig?.Theme?.SecondaryColor;
-        var logoUrl = TenantConfig?.Theme?.LogoUrl;
-
-        // Build navbar, conditionally adding items based on feature flags
-        var navItems = new List<NavItem>();
-        
-        if (TenantConfig?.Features?.EnableMemberships ?? false)
-        {
-            navItems.Add(new() { Text = "Memberships", Url = "/membership-plans", IsActive = false });
-        }
-        if (TenantConfig?.Features?.EnableEventRegistration ?? false)
-        {
-            navItems.Add(new() { Text = "Events", Url = "/events", IsActive = false });
-        }
-        navItems.Add(new() { Text = "Contact Us", Url = "/contact", IsActive = false });
-
-        HomePage.Navbar = new NavbarViewModel
-        {
-            TenantName = CurrentTenantInfo.Name ?? CurrentTenantInfo.Identifier,
-            LogoUrl = logoUrl,
-            PrimaryColor = primaryColor,
-            NavItems = navItems,
-            ShowLogInButton = TenantConfig?.Features?.EnableUserSignup ?? false
-        };
+        var primaryColor = TenantConfig.Theme?.PrimaryColor;
+        var secondaryColor = TenantConfig.Theme?.SecondaryColor;
 
         // Build hero section
-        if (TenantConfig?.HomePage.Visibility.ShowHero ?? true)
+        if (TenantConfig.HomePage.Visibility.ShowHero)
         {
             HomePage.Hero = new HeroViewModel
             {
-                Heading = TenantConfig?.HomePage.Hero?.Heading,
-                Subheading = TenantConfig?.HomePage.Hero?.Subheading,
-                BackgroundImageUrl = TenantConfig?.HomePage.Hero?.ImageUrl,
-                CtaText = TenantConfig?.HomePage.Hero?.CtaText,
-                CtaUrl =  TenantConfig?.HomePage.Hero?.CtaUrl,
+                Heading = TenantConfig.HomePage.Hero?.Heading,
+                Subheading = TenantConfig.HomePage.Hero?.Subheading,
+                BackgroundImageUrl = TenantConfig.HomePage.Hero?.ImageUrl,
+                CtaText = TenantConfig.HomePage.Hero?.CtaText,
+                CtaUrl =  TenantConfig.HomePage.Hero?.CtaUrl,
                 PrimaryColor = primaryColor,
                 SecondaryColor = secondaryColor
             };
         }
 
         // Build about section
-        if (TenantConfig?.HomePage.Visibility.ShowAbout ?? true)
+        if (TenantConfig.HomePage.Visibility.ShowAbout)
         {
             HomePage.About = new AboutSectionViewModel
             {
-                Heading = TenantConfig?.HomePage.About?.Heading ?? string.Empty,
-                Description = TenantConfig?.HomePage.About?.Description ?? string.Empty,
+                Heading = TenantConfig.HomePage.About?.Heading ?? string.Empty,
+                Description = TenantConfig.HomePage.About?.Description ?? string.Empty,
                 AccentColor = primaryColor,
-                Features = GetFeatureCards(TenantConfig?.HomePage.About?.FeatureCards, primaryColor),
+                Features = GetFeatureCards(TenantConfig.HomePage.About?.FeatureCards, primaryColor),
             };
         }
 
         // Build services section
-        if (TenantConfig?.HomePage.Visibility.ShowServices ?? true)
+        if (TenantConfig.HomePage.Visibility.ShowServices)
         {
             HomePage.Services = new ServicesSectionViewModel
             {
-                Heading = TenantConfig?.HomePage.Services?.Heading ?? string.Empty,
-                Description = TenantConfig?.HomePage.Services?.Description ?? string.Empty,
+                Heading = TenantConfig.HomePage.Services?.Heading ?? string.Empty,
+                Description = TenantConfig.HomePage.Services?.Description ?? string.Empty,
                 AccentColor = secondaryColor,
-                Services = GetServiceCards(TenantConfig?.HomePage?.Services?.ServiceCards, primaryColor)
+                Services = GetServiceCards(TenantConfig.HomePage?.Services?.ServiceCards, primaryColor)
             };
         }
 
         // Section visibility
-        HomePage.ShowHero = TenantConfig?.HomePage?.Visibility.ShowHero ?? true;
-        HomePage.ShowAbout = TenantConfig?.HomePage?.Visibility.ShowAbout ?? true;
-        HomePage.ShowServices = TenantConfig?.HomePage?.Visibility.ShowServices ?? true;
-        
-        // Pass data to layout via ViewData
-        ViewData["Navbar"] = HomePage.Navbar;
+        HomePage.ShowHero = TenantConfig.HomePage?.Visibility.ShowHero ?? true;
+        HomePage.ShowAbout = TenantConfig.HomePage?.Visibility.ShowAbout ?? true;
+        HomePage.ShowServices = TenantConfig.HomePage?.Visibility.ShowServices ?? true;
     }
 
     private List<FeatureCard> GetFeatureCards(List<FeatureCardConfig>? configs, string? primaryColor)

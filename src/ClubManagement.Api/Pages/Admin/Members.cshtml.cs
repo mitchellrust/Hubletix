@@ -5,7 +5,7 @@ using ClubManagement.Infrastructure.Services;
 
 namespace ClubManagement.Api.Pages.Admin;
 
-public class MembersModel : TenantPageModel
+public class MembersModel : AdminPageModel
 {
     public List<MemberDto> Members { get; set; } = new();
     public int PageNum { get; set; }

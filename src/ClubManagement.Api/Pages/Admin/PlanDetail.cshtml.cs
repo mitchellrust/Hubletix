@@ -10,7 +10,7 @@ using ClubManagement.Infrastructure.Services;
 
 namespace ClubManagement.Api.Pages.Admin;
 
-public class PlanDetailModel : TenantPageModel
+public class PlanDetailModel : AdminPageModel
 {
     [BindProperty]
     public MembershipPlan? Plan { get; set; }

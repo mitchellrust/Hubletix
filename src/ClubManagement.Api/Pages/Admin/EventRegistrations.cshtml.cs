@@ -6,7 +6,7 @@ using ClubManagement.Infrastructure.Services;
 
 namespace ClubManagement.Api.Pages.Admin;
 
-public class EventRegistrationsModel : TenantPageModel
+public class EventRegistrationsModel : AdminPageModel
 {
     public List<EventRegistrationDto> Registrations { get; set; } = new();
     public int PageNum { get; set; }

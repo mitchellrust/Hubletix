@@ -6,7 +6,7 @@ using ClubManagement.Infrastructure.Services;
 
 namespace ClubManagement.Api.Pages.Admin;
 
-public class DashboardModel : TenantPageModel
+public class DashboardModel : AdminPageModel
 {
     public List<UpcomingEventDto> UpcomingEvents { get; set; } = new();
     public TenantStatsDto TenantStats { get; set; } = new();

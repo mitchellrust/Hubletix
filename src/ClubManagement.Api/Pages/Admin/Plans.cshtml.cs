@@ -6,7 +6,7 @@ using ClubManagement.Infrastructure.Services;
 
 namespace ClubManagement.Api.Pages.Admin;
 
-public class PlansModel : TenantPageModel
+public class PlansModel : AdminPageModel
 {
     public List<PlanDto> Plans { get; set; } = new();
     public int PageNum { get; set; }

@@ -11,7 +11,7 @@ using ClubManagement.Infrastructure.Services;
 
 namespace ClubManagement.Api.Pages.Admin;
 
-public class EventDetailModel : TenantPageModel
+public class EventDetailModel : AdminPageModel
 {
     // Bind property so that form submission populates this object automatically based on property names
     [BindProperty]
