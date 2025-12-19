@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using ClubManagement.Infrastructure.Persistence;
 using ClubManagement.Infrastructure.Services;
 using Finbuckle.MultiTenant.Abstractions;
-using ClubManagement.Core.Entities;
 using ClubManagement.Api.Utils;
 
 namespace ClubManagement.Api.Pages;
@@ -70,11 +69,11 @@ public class EventsModel : PublicPageModel
         // Apply availability filter
         if (AvailabilityFilter == "available")
         {
-            eventDtos = eventDtos.Where(e => !e.IsSoldOut).ToList();
+            eventDtos = eventDtos.Where(e => !e.IsFull).ToList();
         }
-        else if (AvailabilityFilter == "soldout")
+        else if (AvailabilityFilter == "full")
         {
-            eventDtos = eventDtos.Where(e => e.IsSoldOut).ToList();
+            eventDtos = eventDtos.Where(e => e.IsFull).ToList();
         }
         
         UpcomingEvents = eventDtos;
@@ -100,6 +99,6 @@ public class EventCardDto
     public int? MaxAttendees { get; set; }
     public int CurrentAttendees { get; set; }
     
-    public bool IsSoldOut => MaxAttendees.HasValue && CurrentAttendees >= MaxAttendees.Value;
+    public bool IsFull => MaxAttendees.HasValue && CurrentAttendees >= MaxAttendees.Value;
     public bool IsSameDay => !EndTimeLocal.HasValue || StartTimeLocal.Date == EndTimeLocal.Value.Date;
 }

@@ -63,8 +63,8 @@
                             <a href="@Model.BuildAvailabilityUrl("available")" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.AvailabilityFilter == "available" ? "fw-bold text-primary" : "")">
                                 Available
                             </a>
-                            <a href="@Model.BuildAvailabilityUrl("soldout")" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.AvailabilityFilter == "soldout" ? "fw-bold text-primary" : "")">
-                                Sold Out
+                            <a href="@Model.BuildAvailabilityUrl("full")" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.AvailabilityFilter == "full" ? "fw-bold text-primary" : "")">
+                                Full
                             </a>
                         </div>
                     </div>
@@ -152,9 +152,9 @@
                                             <div class="small text-muted mt-1">
                                                 <i class="bi bi-people me-1"></i>
                                                 @evt.CurrentAttendees / @evt.MaxAttendees attendees
-                                                @if (evt.IsSoldOut)
+                                                @if (evt.IsFull)
                                                 {
-                                                    <span class="badge bg-danger ms-2">Sold Out</span>
+                                                    <span class="badge bg-danger ms-2">Event Full</span>
                                                 }
                                             </div>
                                         }
@@ -164,10 +164,10 @@
                                 <!-- Action Buttons Section -->
                                 <div class="col-auto">
                                     <div class="d-flex flex-column gap-2">
-                                        @if (evt.IsSoldOut)
+                                        @if (evt.IsFull)
                                         {
                                             <button class="btn btn-secondary rounded-pill px-4" disabled>
-                                                Sold Out
+                                                Event Full
                                             </button>
                                         }
                                         else
@@ -256,9 +256,9 @@
                             <label class="form-check-label" for="availabilityAvailable">Available</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="AvailabilityFilter" id="availabilitySoldOut" value="soldout" 
-                                   @(Model.AvailabilityFilter == "soldout" ? "checked" : "")>
-                            <label class="form-check-label" for="availabilitySoldOut">Sold Out</label>
+                            <input class="form-check-input" type="radio" name="AvailabilityFilter" id="availabilityFull" value="full" 
+                                   @(Model.AvailabilityFilter == "full" ? "checked" : "")>
+                            <label class="form-check-label" for="availabilityFull">Full</label>
                         </div>
                     </div>
                 </form>
