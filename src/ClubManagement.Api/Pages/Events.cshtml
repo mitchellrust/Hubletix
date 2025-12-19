@@ -52,16 +52,16 @@
                                                 <div class="text-uppercase small fw-semibold text-muted">@evt.StartTimeLocal.ToString("dd MMM")</div>
                                             }
                                             <div class="h2 fw-bold mb-0" style="@($"color: {evt.AccentColor ?? "var(--bs-primary)"};")">
-                                                @evt.StartTimeLocal.ToString("HH:mm")
+                                                @evt.StartTimeLocal.ToString("h:mm tt")
                                             </div>
                                         }
                                         else
                                         {
                                             <div class="text-uppercase small fw-semibold text-muted">
-                                                @evt.StartTimeLocal.ToString("dd") - @evt.EndTimeLocal?.ToString("dd MMM")
+                                                @evt.StartTimeLocal.ToString("dd MMM") - @evt.EndTimeLocal?.ToString("dd MMM")
                                             </div>
                                             <div class="h2 fw-bold mb-0" style="@($"color: {evt.AccentColor ?? "var(--bs-primary)"};")">
-                                                @evt.StartTimeLocal.ToString("HH:mm")
+                                                @evt.StartTimeLocal.ToString("h:mm tt")
                                             </div>
                                         }
                                     </div>
@@ -73,7 +73,7 @@
                                         <h3 class="h4 fw-bold mb-2">@evt.Name</h3>
                                         @if (!string.IsNullOrEmpty(evt.Description))
                                         {
-                                            <p class="text-muted mb-2">@evt.Description</p>
+                                            <p class="text-muted mb-2 event-card-description">@evt.Description</p>
                                         }
                                         @if (!string.IsNullOrEmpty(evt.Location))
                                         {
@@ -124,3 +124,13 @@
         </div>
     }
 </div>
+
+<style>
+    .event-card-description {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
