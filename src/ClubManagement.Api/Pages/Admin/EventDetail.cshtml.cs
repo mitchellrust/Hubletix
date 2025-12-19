@@ -169,8 +169,9 @@ public class EventDetailModel : AdminPageModel
             return BadRequest();
         }
 
-        // Verify event still exists in DB.
+        // Verify event still exists in DB and load registrations to check for active ones
         var existingEvent = await DbContext.Events
+            .Include(e => e.EventRegistrations)
             .FirstOrDefaultAsync(e => e.Id == Event.Id);
 
         // If event not found, should return better UI than 404.
@@ -240,6 +241,20 @@ public class EventDetailModel : AdminPageModel
         }
         else
         {
+            // Check if price changed and there are active registrations
+            bool priceChanged = existingEvent.PriceInCents != priceInCents;
+            bool hasActiveRegistrations = false;
+            
+            if (priceChanged)
+            {
+                // Check for active registrations (Registered or Waitlist status) that would not
+                // be affected by price change, to notify the admin user.
+                hasActiveRegistrations = existingEvent.EventRegistrations
+                    .Count(r => r.EventId == Event.Id && 
+                           (r.Status == EventRegistrationStatus.Registered || 
+                            r.Status == EventRegistrationStatus.Waitlist)) > 0;
+            }
+            
             // Update allowed fields
             existingEvent.Name = Event.Name;
             existingEvent.Description = Event.Description;
@@ -257,7 +272,15 @@ public class EventDetailModel : AdminPageModel
             {
                 DbContext.Events.Update(existingEvent);
                 await DbContext.SaveChangesAsync();
-                StatusMessage = "Event updated successfully.";
+                
+                if (priceChanged && hasActiveRegistrations)
+                {
+                    StatusMessage = "Event updated successfully. Note: This price change will not affect existing registrations that have already been paid.";
+                }
+                else
+                {
+                    StatusMessage = "Event updated successfully.";
+                }
             }
             catch (Exception ex)
             {
@@ -277,6 +300,16 @@ public class EventDetailModel : AdminPageModel
         LocalEndTime = existingEvent.EndTimeUtc
             .ToTimeZone(existingEvent.TimeZoneId)
             .ToString("yyyy-MM-ddTHH:mm");
+        if (existingEvent.RegistrationDeadlineUtc.HasValue)
+        {
+            LocalRegistrationDeadline = existingEvent.RegistrationDeadlineUtc.Value
+                .ToTimeZone(existingEvent.TimeZoneId)
+                .ToString("yyyy-MM-ddTHH:mm");
+        }
+        PriceInDollars = existingEvent.PriceInDollars;
+        
+        // Reload registrations for display
+        await LoadEventRegistrationsAsync(Event.Id, null, null, 1, 10, null);
         
         return Page();
     }
