@@ -11,6 +11,7 @@ public class EventDto
     public string EventType { get; set; } = string.Empty;
     public int Capacity { get; set; }
     public bool IsActive { get; set; }
+    public bool IsHappening { get; set; }
 }
 
 public class EventsTableViewModel

@@ -118,7 +118,8 @@ public class EventsModel : AdminPageModel
                     ) ?? 0,
                 EventType = e.EventType.ToString().Humanize(),
                 Capacity = e.Capacity,
-                IsActive = e.IsActive
+                IsActive = e.IsActive,
+                IsHappening = nowUtc >= e.StartTimeUtc && nowUtc <= e.EndTimeUtc
             };
         }).ToList();
     }

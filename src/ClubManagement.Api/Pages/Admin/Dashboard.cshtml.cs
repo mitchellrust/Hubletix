@@ -3,6 +3,7 @@ using ClubManagement.Infrastructure.Persistence;
 using Finbuckle.MultiTenant.Abstractions;
 using ClubManagement.Api.Utils;
 using ClubManagement.Infrastructure.Services;
+using ClubManagement.Core.Constants;
 
 namespace ClubManagement.Api.Pages.Admin;
 
@@ -24,18 +25,27 @@ public class DashboardModel : AdminPageModel
 
     public async Task OnGetAsync()
     {
+        var utcNow = DateTime.UtcNow;
+
         // Fetch tenant statistics
         TenantStats.TotalMembers = await DbContext.Users
             .Where(u => u.TenantId == CurrentTenantInfo.Id)
             .CountAsync();
 
         TenantStats.ActiveEvents = await DbContext.Events
-            .Where(e => e.TenantId == CurrentTenantInfo.Id && e.IsActive)
-            .CountAsync();
+            .CountAsync(
+                e => (e.StartTimeUtc >= utcNow || e.EndTimeUtc >= utcNow)
+                    && e.TenantId == CurrentTenantInfo.Id
+                    && e.IsActive
+            );
 
-        // Fetch the next 5 active events from the database
+        // Fetch the next 5 current or upcoming active events from the database
         var events = await DbContext.Events
-            .Where(e => e.StartTimeUtc > DateTime.UtcNow)
+            .Where(
+                e => (e.StartTimeUtc >= utcNow || e.EndTimeUtc >= utcNow)
+                    && e.TenantId == CurrentTenantInfo.Id
+                    && e.IsActive
+            )
             .Include(e => e.EventRegistrations)
             .OrderBy(e => e.StartTimeUtc)
             .Take(5)
@@ -53,9 +63,12 @@ public class DashboardModel : AdminPageModel
                 Name = e.Name,
                 Date = localStart,
                 Time = $"{localStart:h:mm tt} ({tzShort})",
-                Location = "Club", // TODO: Add location field to Event entity
-                Registrations = e.EventRegistrations.Count,
-                IsActive = e.IsActive
+                Location = e.Location,
+                Registrations = e.EventRegistrations.Count(r =>
+                    r.Status == EventRegistrationStatus.Registered ||
+                    r.Status == EventRegistrationStatus.Attended
+                ),
+                IsHappening = utcNow >= e.StartTimeUtc && utcNow <= e.EndTimeUtc
             };
         }).ToList();
     }
@@ -70,9 +83,9 @@ public class UpcomingEventDto
     public string Name { get; set; } = string.Empty;
     public DateTime Date { get; set; }
     public string Time { get; set; } = string.Empty;
-    public string Location { get; set; } = string.Empty;
+    public string? Location { get; set; }
     public int Registrations { get; set; }
-    public bool IsActive { get; set; }
+    public bool IsHappening { get; set; }
 }
 
 public class TenantStatsDto

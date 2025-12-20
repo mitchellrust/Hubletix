@@ -140,6 +140,10 @@
                                             {
                                                 <span class="badge bg-secondary ms-1">Inactive</span>
                                             }
+                                            @if (evt.IsHappening)
+                                            {
+                                                <span class="badge bg-success ms-1">Happening Now</span>
+                                            }
                                         </div>
                                         @if (!string.IsNullOrEmpty(evt.Location))
                                         {

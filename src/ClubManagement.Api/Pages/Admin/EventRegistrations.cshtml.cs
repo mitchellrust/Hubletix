@@ -54,7 +54,8 @@ public class EventRegistrationsModel : AdminPageModel
                 Registration = r,
                 UserName = r.User.FirstName + " " + r.User.LastName,
                 EventName = r.Event.Name,
-                EventStartTime = r.Event.StartTimeUtc
+                EventStartTime = r.Event.StartTimeUtc,
+                EventEndTime = r.Event.EndTimeUtc
             })
             .AsQueryable();
 
@@ -68,7 +69,7 @@ public class EventRegistrationsModel : AdminPageModel
         var nowUtc = DateTime.UtcNow;
         if (TimeFilter == "upcoming")
         {
-            query = query.Where(r => r.EventStartTime >= nowUtc);
+            query = query.Where(e => e.EventStartTime >= nowUtc || e.EventEndTime >= nowUtc);
         }
         else if (TimeFilter == "previous")
         {
