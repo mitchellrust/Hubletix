@@ -191,7 +191,7 @@ public class DatabaseInitializationService
                     Id = Guid.NewGuid().ToString(),
                     TenantId = demoTenant.Id,
                     Name = "Basic Membership",
-                    Description = "Access to gym facilities during staffed hours.",
+                    Description = "Gym access during staffed hours.",
                     PriceInCents = 1000, // $10.00
                     BillingInterval = Core.Constants.BillingIntervals.Monthly,
                     IsPriceDisplayedMonthly = true,
@@ -204,7 +204,7 @@ public class DatabaseInitializationService
                     Id = Guid.NewGuid().ToString(),
                     TenantId = demoTenant.Id,
                     Name = "Premium Membership",
-                    Description = "Includes 24/7 gym access and discounts on events.",
+                    Description = "24/7 gym access.|Member-only events.",
                     PriceInCents = 12000, // $120.00, billed annually, displayed annually
                     BillingInterval = Core.Constants.BillingIntervals.Annually,
                     IsPriceDisplayedMonthly = false,
@@ -217,7 +217,7 @@ public class DatabaseInitializationService
                     Id = Guid.NewGuid().ToString(),
                     TenantId = demoTenant.Id,
                     Name = "Ultra Membership",
-                    Description = "Includes 24/7 gym access and discounts on events, AND MORE.",
+                    Description = "24/7 gym access.|Member-only events.|Free guest passes.",
                     PriceInCents = 15000, // $150.00 billed annually, displayed monthly
                     BillingInterval = Core.Constants.BillingIntervals.Annually,
                     IsPriceDisplayedMonthly = true,

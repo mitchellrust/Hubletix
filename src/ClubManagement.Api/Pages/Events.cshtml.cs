@@ -36,6 +36,12 @@ public class EventsModel : PublicPageModel
 
     public async Task<IActionResult> OnGetAsync()
     {
+        // Verify events are enabled
+        if (!TenantConfig.Features.EnableEventRegistration)
+        {
+            return RedirectToPage("/Index");
+        }
+
         // Get all event types dynamically from EventType constants
         AllEventTypes = typeof(Core.Constants.EventType)
             .GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
@@ -113,6 +119,12 @@ public class EventsModel : PublicPageModel
     
     public async Task<IActionResult> OnGetLoadMoreAsync(int pageNum, string typeFilter = "all", string availabilityFilter = "all")
     {
+        // Verify events are enabled
+        if (!TenantConfig.Features.EnableEventRegistration)
+        {
+            return RedirectToPage("/Index");
+        }
+        
         TypeFilter = typeFilter;
         AvailabilityFilter = availabilityFilter;
         PageNum = pageNum;
