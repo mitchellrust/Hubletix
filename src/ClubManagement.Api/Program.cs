@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ClubManagement.Infrastructure.Persistence;
 using ClubManagement.Infrastructure.Services;
+using ClubManagement.Core.Models;
 using Finbuckle.MultiTenant.Extensions;
 using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
@@ -43,6 +44,13 @@ builder.Services.AddScoped<DatabaseInitializationService>();
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<ICacheService, CacheService>();
 builder.Services.AddScoped<ITenantConfigService, TenantConfigService>();
+
+// Configure Stripe settings
+builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
+
+// Register Stripe services
+builder.Services.AddScoped<IStripeConnectService, StripeConnectService>();
+builder.Services.AddScoped<IStripePlatformService, StripePlatformService>();
 
 // Enable hot reload of razor pages in development
 if (builder.Environment.IsDevelopment())
