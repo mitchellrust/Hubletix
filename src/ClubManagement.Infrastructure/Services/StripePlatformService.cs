@@ -8,17 +8,19 @@ namespace ClubManagement.Infrastructure.Services;
 /// <summary>
 /// Implementation of Stripe platform service for direct platform payments.
 /// Used for collecting payments from tenants to the platform (e.g., subscription fees).
+/// Uses StripeClient for thread-safe, isolated API access.
 /// </summary>
 public class StripePlatformService : IStripePlatformService
 {
+    private readonly StripeClient _stripeClient;
     private readonly StripePlatformSettings _settings;
 
     public StripePlatformService(IOptions<StripeSettings> stripeSettings)
     {
         _settings = stripeSettings.Value.Platform;
         
-        // Configure Stripe API key for platform account
-        StripeConfiguration.ApiKey = _settings.SecretKey;
+        // Create StripeClient with API key (thread-safe, no global config)
+        _stripeClient = new StripeClient(_settings.SecretKey);
     }
 
     public async Task<Session> CreateCheckoutSessionAsync(
@@ -46,7 +48,7 @@ public class StripePlatformService : IStripePlatformService
             Metadata = metadata,
         };
 
-        var service = new SessionService();
+        var service = new SessionService(_stripeClient);
         var session = await service.CreateAsync(options, cancellationToken: cancellationToken);
         
         return session;
@@ -54,7 +56,7 @@ public class StripePlatformService : IStripePlatformService
 
     public async Task<Session> GetCheckoutSessionAsync(string sessionId, CancellationToken cancellationToken = default)
     {
-        var service = new SessionService();
+        var service = new SessionService(_stripeClient);
         return await service.GetAsync(sessionId, cancellationToken: cancellationToken);
     }
 
@@ -71,7 +73,7 @@ public class StripePlatformService : IStripePlatformService
             Metadata = metadata
         };
 
-        var service = new CustomerService();
+        var service = new CustomerService(_stripeClient);
         var customer = await service.CreateAsync(options, cancellationToken: cancellationToken);
         
         return customer.Id;
@@ -96,7 +98,7 @@ public class StripePlatformService : IStripePlatformService
             Metadata = metadata,
         };
 
-        var service = new SubscriptionService();
+        var service = new SubscriptionService(_stripeClient);
         var subscription = await service.CreateAsync(options, cancellationToken: cancellationToken);
         
         return subscription.Id;
@@ -104,7 +106,7 @@ public class StripePlatformService : IStripePlatformService
 
     public async Task CancelSubscriptionAsync(string subscriptionId, CancellationToken cancellationToken = default)
     {
-        var service = new SubscriptionService();
+        var service = new SubscriptionService(_stripeClient);
         await service.CancelAsync(subscriptionId, cancellationToken: cancellationToken);
     }
 
@@ -116,7 +118,7 @@ public class StripePlatformService : IStripePlatformService
             Description = description,
         };
 
-        var service = new ProductService();
+        var service = new ProductService(_stripeClient);
         var product = await service.CreateAsync(options, cancellationToken: cancellationToken);
         
         return product.Id;
@@ -145,7 +147,7 @@ public class StripePlatformService : IStripePlatformService
             };
         }
 
-        var service = new PriceService();
+        var service = new PriceService(_stripeClient);
         var price = await service.CreateAsync(options, cancellationToken: cancellationToken);
         
         return price.Id;

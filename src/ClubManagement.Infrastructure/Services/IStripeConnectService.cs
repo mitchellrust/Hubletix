@@ -1,3 +1,4 @@
+using ClubManagement.Core.Models;
 using Stripe;
 using Stripe.Checkout;
 
@@ -13,10 +14,12 @@ public interface IStripeConnectService
     /// Creates a Stripe Connect account for a tenant.
     /// </summary>
     /// <param name="tenantId">The tenant ID</param>
+    /// <param name="name">Name of the tenant, for the Connect account</param>
     /// <param name="email">Email for the Connect account</param>
+    /// <param name="tenantConfig">The tenant configuration including settings</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>The created Stripe account ID</returns>
-    Task<string> CreateConnectAccountAsync(string tenantId, string email, CancellationToken cancellationToken = default);
+    Task<string> CreateConnectAccountAsync(string tenantId, string name, string email, TenantConfig tenantConfig, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Creates an account link for onboarding a Connect account.
@@ -27,14 +30,6 @@ public interface IStripeConnectService
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>The onboarding URL</returns>
     Task<string> CreateAccountLinkAsync(string stripeAccountId, string refreshUrl, string returnUrl, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Gets the onboarding status of a Connect account.
-    /// </summary>
-    /// <param name="stripeAccountId">The Stripe Connect account ID</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>True if the account is fully onboarded, false otherwise</returns>
-    Task<bool> IsAccountOnboardedAsync(string stripeAccountId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Creates a Stripe Product for a tenant's membership plan.
@@ -69,8 +64,11 @@ public interface IStripeConnectService
     /// </summary>
     /// <param name="stripeAccountId">The tenant's Stripe Connect account ID</param>
     /// <param name="priceId">The Stripe Price ID</param>
+    /// <param name="applicationFeeAmountInCents">The application fee amount in cents to charge the tenant</param>
+    /// <param name="isRecurring">Whether the price is for a recurring subscription</param
     /// <param name="successUrl">URL to redirect after successful payment</param>
     /// <param name="cancelUrl">URL to redirect if payment is cancelled</param>
+    /// <param name="stripeCustomerId">Optional Stripe Customer ID to prefill</param>
     /// <param name="customerEmail">Customer's email address</param>
     /// <param name="metadata">Additional metadata to attach to the session</param>
     /// <param name="cancellationToken">Cancellation token</param>
@@ -78,8 +76,11 @@ public interface IStripeConnectService
     Task<Session> CreateCheckoutSessionAsync(
         string stripeAccountId,
         string priceId,
+        long applicationFeeAmountInCents,
+        bool isRecurring,
         string successUrl,
         string cancelUrl,
+        string? stripeCustomerId,
         string? customerEmail,
         Dictionary<string, string>? metadata,
         CancellationToken cancellationToken = default);
