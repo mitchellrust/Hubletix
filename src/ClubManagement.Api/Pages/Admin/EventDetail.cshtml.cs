@@ -226,7 +226,8 @@ public class EventDetailModel : AdminPageModel
             existingEvent.Name != Event.Name ||
             existingEvent.Description != Event.Description ||
             existingEvent.EventType != Event.EventType ||
-            existingEvent.Location != Event.Location ||
+            existingEvent.LocationDetails != Event.LocationDetails ||
+            // existingEvent.LocationId != Event.LocationId || // TODO: Event Location change is not currently supported
             existingEvent.Capacity != Event.Capacity ||
             existingEvent.PriceInCents != priceInCents ||
             existingEvent.RegistrationDeadlineUtc != registrationDeadlineUtc ||
@@ -259,7 +260,8 @@ public class EventDetailModel : AdminPageModel
             existingEvent.Name = Event.Name;
             existingEvent.Description = Event.Description;
             existingEvent.EventType = Event.EventType;
-            existingEvent.Location = Event.Location;
+            existingEvent.LocationDetails = Event.LocationDetails;
+            // existingEvent.LocationId = Event.LocationId; // TODO: Event Location change is not currently supported
             existingEvent.Capacity = Event.Capacity;
             existingEvent.PriceInCents = priceInCents;
             existingEvent.RegistrationDeadlineUtc = registrationDeadlineUtc;

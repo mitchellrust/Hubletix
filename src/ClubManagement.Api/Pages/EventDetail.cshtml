@@ -86,14 +86,14 @@ else
                                     </div>
                                 </div>
 
-                                @if (!string.IsNullOrEmpty(Model.Event.Location))
+                                @if (!string.IsNullOrEmpty(Model.Event.LocationDetails))
                                 {
                                     <div class="col-md-6">
                                         <div class="d-flex align-items-start">
                                             <i class="bi bi-geo-alt fs-4 me-3" style="color: @(Model.Event.AccentColor ?? "var(--bs-primary)");"></i>
                                             <div>
-                                                <div class="small text-muted">Location</div>
-                                                <div class="fw-semibold">@Model.Event.Location</div>
+                                                <div class="small text-muted">Location Details</div>
+                                                <div class="fw-semibold">@Model.Event.LocationDetails</div>
                                             </div>
                                         </div>
                                     </div>

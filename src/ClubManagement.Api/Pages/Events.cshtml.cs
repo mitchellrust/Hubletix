@@ -91,7 +91,7 @@ public class EventsModel : PublicPageModel
                 Name = e.Name,
                 Description = e.Description,
                 EventType = e.EventType,
-                Location = e.Location,
+                LocationDetails = e.LocationDetails,
                 Price = e.PriceInDollars,
                 AccentColor = TenantConfig.Theme.PrimaryColor,
                 StartTimeLocal = localStart,
@@ -168,7 +168,7 @@ public class EventsModel : PublicPageModel
                 Name = e.Name,
                 Description = e.Description,
                 EventType = e.EventType,
-                Location = e.Location,
+                LocationDetails = e.LocationDetails,
                 Price = e.PriceInDollars,
                 AccentColor = TenantConfig.Theme.PrimaryColor,
                 StartTimeLocal = localStart,
@@ -201,7 +201,7 @@ public class EventCardDto
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
     public string EventType { get; set; } = string.Empty;
-    public string? Location { get; set; }
+    public string? LocationDetails { get; set; }
     public decimal? Price { get; set; }
     public string? AccentColor { get; set; }
     public DateTime StartTimeLocal { get; set; }

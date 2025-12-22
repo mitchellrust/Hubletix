@@ -63,7 +63,7 @@ public class DashboardModel : AdminPageModel
                 Name = e.Name,
                 Date = localStart,
                 Time = $"{localStart:h:mm tt} ({tzShort})",
-                Location = e.Location,
+                LocationDetails = e.LocationDetails,
                 Registrations = e.EventRegistrations.Count(r =>
                     r.Status == EventRegistrationStatus.Registered ||
                     r.Status == EventRegistrationStatus.Attended
@@ -83,7 +83,7 @@ public class UpcomingEventDto
     public string Name { get; set; } = string.Empty;
     public DateTime Date { get; set; }
     public string Time { get; set; } = string.Empty;
-    public string? Location { get; set; }
+    public string? LocationDetails { get; set; }
     public int Registrations { get; set; }
     public bool IsHappening { get; set; }
 }

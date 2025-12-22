@@ -27,9 +27,16 @@ public class Event : BaseEntity
     public string EventType { get; set; } = Constants.EventType.Other;
 
     /// <summary>
-    /// Event location
+    /// Foreign key to location where this event takes place
     /// </summary>
-    public string? Location { get; set; }
+    [Required]
+    public string LocationId { get; set; } = null!;
+
+    /// <summary>
+    /// Optional additional location details (e.g., "Room 101", "Outdoor Field")
+    /// </summary>
+    [MaxLength(200)]
+    public string? LocationDetails { get; set; }
         
     /// <summary>
     /// Maximum capacity for this event
@@ -77,5 +84,6 @@ public class Event : BaseEntity
     
     // Navigation properties
     public Tenant Tenant { get; set; } = null!;
+    public Location Location { get; set; } = null!;
     public ICollection<EventRegistration> EventRegistrations { get; set; } = new List<EventRegistration>();
 }

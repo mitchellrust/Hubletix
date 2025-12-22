@@ -65,10 +65,17 @@ public class MembershipPlan : BaseEntity
     public bool IsActive { get; set; } = true;
     
     /// <summary>
+    /// Foreign key to location where this membership plan is offered
+    /// </summary>
+    [Required]
+    public string LocationId { get; set; } = null!;
+    
+    /// <summary>
     /// Display order (for sorting in UI)
     /// </summary>
     public int DisplayOrder { get; set; } = 0;
     
     // Navigation properties
     public Tenant Tenant { get; set; } = null!;
+    public Location Location { get; set; } = null!;
 }

@@ -60,9 +60,9 @@
                                     </div>
                                     <p class="text-muted small mb-0">
                                         <i class="bi bi-clock"></i> @evt.Time | 
-                                        @if (!string.IsNullOrEmpty(evt.Location))
+                                        @if (!string.IsNullOrEmpty(evt.LocationDetails))
                                         {
-                                            <i class="bi bi-geo-alt"></i> @($"{evt.Location} | ")
+                                            <i class="bi bi-geo-alt"></i> @($"{evt.LocationDetails} | ")
                                         }
                                         <i class="bi bi-people"></i> @evt.Registrations registrations
                                     </p>

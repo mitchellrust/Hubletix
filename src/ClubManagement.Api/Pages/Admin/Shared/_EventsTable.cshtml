@@ -145,9 +145,9 @@
                                                 <span class="badge bg-success ms-1">Happening Now</span>
                                             }
                                         </div>
-                                        @if (!string.IsNullOrEmpty(evt.Location))
+                                        @if (!string.IsNullOrEmpty(evt.LocationDetails))
                                         {
-                                            <div class="text-muted small">@evt.Location</div>
+                                            <div class="text-muted small">@evt.LocationDetails</div>
                                         }
                                     </td>
                                     <td>@evt.EventType</td>

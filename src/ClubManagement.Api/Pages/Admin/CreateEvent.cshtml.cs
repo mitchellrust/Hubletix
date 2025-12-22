@@ -6,6 +6,7 @@ using ClubManagement.Infrastructure.Persistence;
 using Finbuckle.MultiTenant.Abstractions;
 using ClubManagement.Api.Utils;
 using ClubManagement.Infrastructure.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace ClubManagement.Api.Pages.Admin;
 
@@ -126,6 +127,14 @@ public class CreateEventModel : AdminPageModel
         // Set tenant ID
         Event.TenantId = CurrentTenantInfo.Id;
         Event.Id = Guid.NewGuid().ToString();
+
+        //TODO: Change to set location ID based on selection when multi-location is supported
+        // For now, just using the default location for the tenant.
+        var defaultLocationId = await DbContext.Locations
+            .Where(l => l.TenantId == CurrentTenantInfo.Id && l.IsDefault)
+            .Select(l => l.Id)
+            .FirstOrDefaultAsync();
+        Event.LocationId = defaultLocationId ?? throw new Exception("Default location not found for tenant.");
 
         try
         {

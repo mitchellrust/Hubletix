@@ -34,6 +34,7 @@ public class Tenant : BaseEntity
     public string? ConfigJson { get; set; }
     
     // Navigation properties
+    public ICollection<Location> Locations { get; set; } = new List<Location>();
     public ICollection<User> Users { get; set; } = new List<User>();
     public ICollection<MembershipPlan> MembershipPlans { get; set; } = new List<MembershipPlan>();
     public ICollection<Event> Events { get; set; } = new List<Event>();

@@ -6,7 +6,7 @@ public class EventDto
     public string Name { get; set; } = string.Empty;
     public DateTime Date { get; set; }
     public string Time { get; set; } = string.Empty;
-    public string? Location { get; set; }
+    public string? LocationDetails { get; set; }
     public int Registrations { get; set; }
     public string EventType { get; set; } = string.Empty;
     public int Capacity { get; set; }

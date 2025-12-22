@@ -101,6 +101,7 @@ public class PlanDetailModel : AdminPageModel
         bool hasChanges =
             existingPlan.Name != Plan.Name ||
             existingPlan.Description != Plan.Description ||
+            // existingPlan.LocationId != Plan.LocationId || // TODO: Enable when multilocation is supported
             existingPlan.PriceInCents != priceInCents ||
             existingPlan.BillingInterval != Plan.BillingInterval ||
             existingPlan.IsPriceDisplayedMonthly != Plan.IsPriceDisplayedMonthly ||
@@ -116,6 +117,7 @@ public class PlanDetailModel : AdminPageModel
             // Update allowed fields
             existingPlan.Name = Plan.Name;
             existingPlan.Description = Plan.Description;
+            // existingPlan.LocationId = Plan.LocationId; // TODO: Enable when multilocation is supported
             existingPlan.PriceInCents = priceInCents;
             existingPlan.BillingInterval = Plan.BillingInterval;
             existingPlan.IsPriceDisplayedMonthly = Plan.IsPriceDisplayedMonthly;

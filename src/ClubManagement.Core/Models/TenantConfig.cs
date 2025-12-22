@@ -92,6 +92,11 @@ public class FeatureFlags
     /// Enable membership plans
     /// </summary>
     public bool EnableMemberships { get; set; } = false;
+
+    /// <summary>
+    /// Enable multiple location support.
+    /// </summary>
+    public bool EnableMultipleLocations { get; set; } = false;
 }
 
 /// <summary>

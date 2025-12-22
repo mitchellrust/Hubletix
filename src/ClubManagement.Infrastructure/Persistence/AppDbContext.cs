@@ -39,6 +39,7 @@ public class AppDbContext : MultiTenantDbContext
 
     // DbSets
     public DbSet<Tenant> Tenants { get; set; } = null!;
+    public DbSet<Location> Locations { get; set; } = null!;
     public DbSet<User> Users { get; set; } = null!;
     public DbSet<MembershipPlan> MembershipPlans { get; set; } = null!;
     public DbSet<Event> Events { get; set; } = null!;
@@ -59,12 +60,28 @@ public class AppDbContext : MultiTenantDbContext
             .Property(t => t.ConfigJson)
             .HasColumnType("jsonb");
 
+        // Configure Location
+        builder.Entity<Location>()
+            .HasKey(l => l.Id);
+        builder.Entity<Location>()
+            .HasOne(l => l.Tenant)
+            .WithMany(t => t.Locations)
+            .HasForeignKey(l => l.TenantId)
+            .OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<Location>()
+            .HasIndex(l => new { l.TenantId, l.IsDefault });
+
         // Configure User
         builder.Entity<User>()
             .HasOne(u => u.Tenant)
             .WithMany(t => t.Users)
             .HasForeignKey(u => u.TenantId)
             .OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<User>()
+            .HasOne(u => u.Location)
+            .WithMany(l => l.Users)
+            .HasForeignKey(u => u.LocationId)
+            .OnDelete(DeleteBehavior.Restrict);
         builder.Entity<User>()
             .HasIndex(u => u.Email)
             .IsUnique();
@@ -78,6 +95,11 @@ public class AppDbContext : MultiTenantDbContext
             .HasForeignKey(p => p.TenantId)
             .OnDelete(DeleteBehavior.Cascade);
         builder.Entity<MembershipPlan>()
+            .HasOne(p => p.Location)
+            .WithMany(l => l.MembershipPlans)
+            .HasForeignKey(p => p.LocationId)
+            .OnDelete(DeleteBehavior.Restrict);
+        builder.Entity<MembershipPlan>()
             .HasIndex(p => new { p.TenantId, p.StripeProductId });
 
         // Configure Event
@@ -88,6 +110,11 @@ public class AppDbContext : MultiTenantDbContext
             .WithMany(t => t.Events)
             .HasForeignKey(e => e.TenantId)
             .OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<Event>()
+            .HasOne(e => e.Location)
+            .WithMany(l => l.Events)
+            .HasForeignKey(e => e.LocationId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         // Configure EventRegistration
         builder.Entity<EventRegistration>()

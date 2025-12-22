@@ -49,7 +49,7 @@ public class EventDetailModel : PublicPageModel
             MaxAttendees = eventEntity.Capacity,
             CurrentAttendees = registrations,
             Price = eventEntity.PriceInDollars,
-            Location = eventEntity.Location,
+            LocationDetails = eventEntity.LocationDetails,
             RegistrationDeadline = eventEntity.RegistrationDeadlineUtc?.ToTimeZone(eventEntity.TimeZoneId)
         };
 
@@ -63,7 +63,7 @@ public class EventDetailDto
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
     public string EventType { get; set; } = string.Empty;
-    public string? Location { get; set; }
+    public string? LocationDetails { get; set; }
     public string? AccentColor { get; set; }
     public DateTime StartTimeLocal { get; set; }
     public DateTime? EndTimeLocal { get; set; }
