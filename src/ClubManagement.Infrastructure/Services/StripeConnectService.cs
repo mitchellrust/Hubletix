@@ -15,7 +15,6 @@ public class StripeConnectService : IStripeConnectService
     private readonly StripeClient _stripeClient;
     private readonly StripeConnectSettings _settings;
     private const string METADATA_TENANT_ID = "tenant_id";
-    private const string METADATA_PRODUCT_ID = "id";
     private const string RESPONSIBILITIES_STRIPE = "stripe";
     private const string DASHBOARD_FULL = "full";
     private const string ACCOUNT_LINK_USE_CASE_ACCOUNT_ONBOARDING = "account_onboarding";
