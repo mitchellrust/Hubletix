@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 using ClubManagement.Infrastructure.Persistence;
 using Finbuckle.MultiTenant.Abstractions;
 using ClubManagement.Api.Utils;
@@ -9,19 +10,24 @@ namespace ClubManagement.Api.Pages.Admin;
 
 public class DashboardModel : AdminPageModel
 {
+    private readonly ITenantOnboardingService _tenantOnboardingService;
+    
     public List<UpcomingEventDto> UpcomingEvents { get; set; } = new();
     public TenantStatsDto TenantStats { get; set; } = new();
 
     public DashboardModel(
         AppDbContext dbContext,
         ITenantConfigService tenantConfigService,
-        IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor
+        IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
+        ITenantOnboardingService tenantOnboardingService
     ) : base(
         multiTenantContextAccessor,
         tenantConfigService,
         dbContext
     )
-    { }
+    {
+        _tenantOnboardingService = tenantOnboardingService;
+    }
 
     public async Task OnGetAsync()
     {
@@ -71,6 +77,39 @@ public class DashboardModel : AdminPageModel
                 IsHappening = utcNow >= e.StartTimeUtc && utcNow <= e.EndTimeUtc
             };
         }).ToList();
+    }
+
+    public async Task<IActionResult> OnPostSetupStripeAsync()
+    {
+        try
+        {
+            // Generate URLs for redirect
+            var refreshUrl = Url.PageLink("/Admin/Dashboard") ?? "/admin/dashboard";
+            var returnUrl = Url.PageLink("/Admin/Dashboard") ?? "/admin/dashboard";
+            
+            // Use onboarding service to set up Stripe Connect
+            var onboardingUrl = await _tenantOnboardingService.SetupStripeConnectAsync(
+                CurrentTenantInfo.Id,
+                "admin@example.com", // TODO: Use actual admin email
+                refreshUrl,
+                returnUrl
+            );
+
+            // Redirect to Stripe onboarding
+            return Redirect(onboardingUrl);
+        }
+        catch (InvalidOperationException ex)
+        {
+            // Handle business logic errors (duplicate account, tenant not found, etc.)
+            TempData["ErrorMessage"] = ex.Message;
+            return RedirectToPage();
+        }
+        catch (Exception ex)
+        {
+            // Log error and show generic message
+            TempData["ErrorMessage"] = $"Failed to set up Stripe Connect: {ex.Message}";
+            return RedirectToPage();
+        }
     }
 }
 

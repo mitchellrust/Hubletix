@@ -22,17 +22,34 @@ public interface ITenantOnboardingService
         string adminLastName,
         string adminEmail
     );
+
+    /// <summary>
+    /// Sets up Stripe Connect for an existing tenant.
+    /// Creates a Stripe Connect account and generates an onboarding link.
+    /// </summary>
+    /// <param name="tenantId">The tenant ID</param>
+    /// <param name="adminEmail">Admin email for the Connect account</param>
+    /// <param name="refreshUrl">URL to redirect if the onboarding link expires</param>
+    /// <param name="returnUrl">URL to redirect after onboarding completion</param>
+    /// <returns>The Stripe onboarding URL</returns>
+    Task<string> SetupStripeConnectAsync(string tenantId, string adminEmail, string refreshUrl, string returnUrl);
 }
 
 public class TenantOnboardingService : ITenantOnboardingService
 {
     private readonly AppDbContext _dbContext;
+    private readonly IStripeConnectService _stripeConnectService;
+    private readonly ITenantConfigService _tenantConfigService;
 
     public TenantOnboardingService(
         AppDbContext dbContext,
-        IMultiTenantContextAccessor multiTenantContextAccessor)
+        IMultiTenantContextAccessor multiTenantContextAccessor,
+        IStripeConnectService stripeConnectService,
+        ITenantConfigService tenantConfigService)
     {
         _dbContext = dbContext;
+        _stripeConnectService = stripeConnectService;
+        _tenantConfigService = tenantConfigService;
     }
 
     public async Task<Tenant> OnboardTenantAsync(
@@ -90,6 +107,50 @@ public class TenantOnboardingService : ITenantOnboardingService
         }
     }
 
+    public async Task<string> SetupStripeConnectAsync(
+        string tenantId,
+        string adminEmail,
+        string refreshUrl,
+        string returnUrl)
+    {
+        // Get the tenant from the database
+        var tenant = await _tenantConfigService.GetTenantAsync(tenantId);
+        if (tenant == null)
+        {
+            throw new InvalidOperationException($"Tenant with ID '{tenantId}' not found.");
+        }
+
+        // Check if already has a Stripe account
+        if (!string.IsNullOrEmpty(tenant.StripeAccountId))
+        {
+            throw new InvalidOperationException("Tenant already has a Stripe Connect account.");
+        }
+
+        // Parse tenant configuration
+        var tenantConfig = ParseTenantConfig(tenant.ConfigJson);
+
+        // Create Stripe Connect account
+        var accountId = await _stripeConnectService.CreateConnectAccountAsync(
+            tenant.Id,
+            tenant.Name,
+            adminEmail,
+            tenantConfig
+        );
+
+        // Save the account ID to the tenant
+        tenant.StripeAccountId = accountId;
+        await _dbContext.SaveChangesAsync();
+
+        // Create and return onboarding link
+        var onboardingUrl = await _stripeConnectService.CreateAccountLinkAsync(
+            accountId,
+            refreshUrl,
+            returnUrl
+        );
+
+        return onboardingUrl;
+    }
+
     /// <summary>
     /// Get default configuration JSON string for demo tenant.
     /// </summary>
@@ -103,4 +164,27 @@ public class TenantOnboardingService : ITenantOnboardingService
             }
         );
     }
-}
+
+    /// <summary>
+    /// Parse tenant configuration JSON into TenantConfig object.
+    /// Returns default config if JSON is null or invalid.
+    /// </summary>
+    private static TenantConfig ParseTenantConfig(string? configJson)
+    {
+        if (string.IsNullOrWhiteSpace(configJson))
+        {
+            return new TenantConfig();
+        }
+
+        try
+        {
+            return JsonSerializer.Deserialize<TenantConfig>(
+                configJson,
+                new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
+            ) ?? new TenantConfig();
+        }
+        catch
+        {
+            return new TenantConfig();
+        }
+    }}

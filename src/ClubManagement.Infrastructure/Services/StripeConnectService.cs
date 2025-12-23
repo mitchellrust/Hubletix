@@ -51,6 +51,10 @@ public class StripeConnectService : IStripeConnectService
             {
                 { METADATA_TENANT_ID, tenantId }
             },
+            Identity = new AccountCreateIdentityOptions
+            {
+              Country = tenantConfig.Settings.DefaultCountry,
+            },
             Defaults = new AccountCreateDefaultsOptions
             {
                 Currency = tenantConfig.Settings.DefaultCurrency,

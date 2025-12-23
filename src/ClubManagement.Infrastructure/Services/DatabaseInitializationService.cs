@@ -456,7 +456,8 @@ public class DatabaseInitializationService
             Settings = new SettingsConfig
             {
                 TimeZoneId = "America/Denver",
-                DefaultCurrency = "usd"
+                DefaultCurrency = "usd",
+                DefaultCountry = "US",
             },
             Theme = new ThemeConfig
             {

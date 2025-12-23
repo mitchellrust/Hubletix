@@ -40,6 +40,11 @@ public class SettingsConfig
     /// Default currency for payments (e.g., "usd")
     /// </summary>
     public string DefaultCurrency { get; set; } = "usd";
+
+    /// <summary>
+    /// Default country for the tenant (ISO 3166-1 alpha-2 format, e.g., "US")
+    /// </summary>
+    public string DefaultCountry { get; set; } = "US";
 }
 
 /// <summary>
