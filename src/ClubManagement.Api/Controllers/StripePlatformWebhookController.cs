@@ -4,6 +4,9 @@ using Stripe.Checkout;
 using ClubManagement.Infrastructure.Services;
 using Microsoft.Extensions.Options;
 using ClubManagement.Core.Models;
+using ClubManagement.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
+using ClubManagement.Core.Constants;
 
 namespace ClubManagement.Api.Controllers;
 
@@ -17,16 +20,19 @@ public class StripePlatformWebhookController : ControllerBase
 {
     private readonly ITenantOnboardingService _onboardingService;
     private readonly ILogger<StripePlatformWebhookController> _logger;
+    private readonly AppDbContext _dbContext;
     private readonly string _webhookSecret;
 
     public StripePlatformWebhookController(
         ITenantOnboardingService onboardingService,
         ILogger<StripePlatformWebhookController> logger,
-        IOptions<StripeSettings> stripeSettings)
+        IOptions<StripeSettings> stripeSettings,
+        AppDbContext dbContext)
     {
         _onboardingService = onboardingService;
         _logger = logger;
         _webhookSecret = stripeSettings.Value.Platform.WebhookSecret;
+        _dbContext = dbContext;
     }
 
     /// <summary>
@@ -58,23 +64,23 @@ public class StripePlatformWebhookController : ControllerBase
             // Handle different event types
             switch (stripeEvent.Type)
             {
-                case "checkout.session.completed":
+                case EventTypes.CheckoutSessionCompleted:
                     await HandleCheckoutSessionCompleted(stripeEvent);
                     break;
 
-                case "invoice.paid":
+                case EventTypes.InvoicePaid:
                     await HandleInvoicePaid(stripeEvent);
                     break;
 
-                case "invoice.payment_failed":
+                case EventTypes.InvoicePaymentFailed:
                     await HandleInvoicePaymentFailed(stripeEvent);
                     break;
 
-                case "customer.subscription.updated":
+                case EventTypes.CustomerSubscriptionUpdated:
                     await HandleSubscriptionUpdated(stripeEvent);
                     break;
 
-                case "customer.subscription.deleted":
+                case EventTypes.CustomerSubscriptionDeleted:
                     await HandleSubscriptionDeleted(stripeEvent);
                     break;
 
@@ -161,27 +167,44 @@ public class StripePlatformWebhookController : ControllerBase
             return;
         }
 
+        // Verify that a subscription is the parent that generated this invoice
+        if (invoice.Parent == null || invoice.Parent.Type != "subscription_details")
+        {
+            _logger.LogWarning(
+                "Invoice parent is not a subscription. InvoiceId={InvoiceId}, Parent={Parent}",
+                invoice.Id,
+                invoice.Parent?.Type ?? "null"
+            );
+            return;
+        }
+
         _logger.LogInformation(
             "Initial subscription invoice paid: InvoiceId={InvoiceId}, SubscriptionId={SubscriptionId}",
             invoice.Id,
-            invoice.SubscriptionId
+            invoice.Parent.SubscriptionDetails.SubscriptionId
         );
 
         // Get the checkout session from metadata
-        var checkoutSessionId = invoice.Subscription?.Metadata?["checkout_session_id"];
+        var checkoutSessionId = invoice.Parent.SubscriptionDetails.Metadata?["checkout_session_id"];
         if (string.IsNullOrEmpty(checkoutSessionId))
         {
             // Fallback: get customer metadata
             checkoutSessionId = invoice.CustomerEmail; // We'll need to look up by email
             _logger.LogWarning(
-                "Checkout session ID not in subscription metadata. InvoiceId={InvoiceId}",
-                invoice.Id
+                "Checkout session ID not in subscription metadata. InvoiceId={InvoiceId}, SubscriptionId={SubscriptionId}",
+                invoice.Id,
+                invoice.Parent.SubscriptionDetails.SubscriptionId
             );
         }
 
-        if (invoice.Subscription == null)
+        if (invoice.Parent.SubscriptionDetails.Subscription.Items.Data.Count != 1)
         {
-            _logger.LogError("Subscription is null on invoice. InvoiceId={InvoiceId}", invoice.Id);
+            _logger.LogWarning(
+                "Invoice Subscription has [{}] items but expected [1]. InvoiceId={InvoiceId}, SubscriptionId={SubscriptionId}",
+                invoice.Parent.SubscriptionDetails.Subscription.Items.Data.Count,
+                invoice.Id,
+                invoice.Parent.SubscriptionDetails.SubscriptionId
+            );
             return;
         }
 
@@ -190,15 +213,15 @@ public class StripePlatformWebhookController : ControllerBase
         {
             await _onboardingService.ActivateTenantAsync(
                 checkoutSessionId ?? invoice.Id, // Fallback to invoice ID
-                invoice.SubscriptionId,
+                invoice.Parent.SubscriptionDetails.SubscriptionId,
                 invoice.CustomerId,
-                invoice.Subscription.CurrentPeriodStart,
-                invoice.Subscription.CurrentPeriodEnd
+                invoice.Parent.SubscriptionDetails.Subscription.Items.Data[0].CurrentPeriodStart,
+                invoice.Parent.SubscriptionDetails.Subscription.Items.Data[0].CurrentPeriodEnd
             );
 
             _logger.LogInformation(
                 "Tenant activated successfully. SubscriptionId={SubscriptionId}",
-                invoice.SubscriptionId
+                invoice.Parent.SubscriptionDetails.SubscriptionId
             );
         }
         catch (Exception ex)
@@ -206,7 +229,7 @@ public class StripePlatformWebhookController : ControllerBase
             _logger.LogError(
                 ex,
                 "Failed to activate tenant. SubscriptionId={SubscriptionId}",
-                invoice.SubscriptionId
+                invoice.Parent.SubscriptionDetails.SubscriptionId
             );
             throw; // Re-throw to trigger webhook retry
         }
@@ -232,13 +255,39 @@ public class StripePlatformWebhookController : ControllerBase
             invoice.CustomerId
         );
 
+        // Verify that a subscription is the parent for this invoice
+        if (invoice.Parent == null || invoice.Parent.Type != "subscription_details")
+        {
+            _logger.LogWarning(
+                "Invoice parent is not a subscription. InvoiceId={InvoiceId}, Parent={Parent}",
+                invoice.Id,
+                invoice.Parent?.Type ?? "null"
+            );
+            return;
+        }
+
+        // Get the latest payment that was an intent to pay.
+        var latestPayment = invoice.Payments
+            .Where(p => p.Payment.Type == "payment_intent")
+            .OrderByDescending(p => p.Created)
+            .FirstOrDefault();
+            
+        if (latestPayment == null)
+        {
+            _logger.LogWarning(
+                "No payment found for failed invoice. InvoiceId={InvoiceId}",
+                invoice.Id
+            );
+            return;
+        }
+
         // Get checkout session from metadata if available
-        var checkoutSessionId = invoice.Subscription?.Metadata?["checkout_session_id"];
+        var checkoutSessionId = invoice.Parent.SubscriptionDetails.Subscription.Metadata["checkout_session_id"];
         if (!string.IsNullOrEmpty(checkoutSessionId))
         {
             await _onboardingService.HandleBillingFailureAsync(
                 checkoutSessionId,
-                $"Payment failed: {invoice.PaymentIntent?.LastPaymentError?.Message ?? "Unknown error"}"
+                $"Payment failed: {latestPayment.Payment.PaymentIntent.LastPaymentError?.Message ?? "Unknown error"}"
             );
         }
 
@@ -266,6 +315,36 @@ public class StripePlatformWebhookController : ControllerBase
 
         // TODO: Update TenantSubscription status in database
         // This would handle status changes like past_due, canceled, etc.
+
+        var tenantSubscription = await _dbContext.TenantSubscriptions
+            .FirstOrDefaultAsync(ts => ts.StripeSubscriptionId == subscription.Id);
+        if (tenantSubscription == null)
+        {
+            _logger.LogWarning(
+                "Tenant Subscription not found: SubscriptionId={SubscriptionId}",
+                subscription.Id
+            );
+            return;
+        }
+
+        // Handle status update
+        if (subscription.Status != tenantSubscription.Status)
+        {
+            _logger.LogInformation(
+                "Updating Tenant Subscription status: SubscriptionId={SubscriptionId}, OldStatus={OldStatus}, NewStatus={NewStatus}",
+                subscription.Id,
+                tenantSubscription.Status,
+                subscription.Status
+            );
+            tenantSubscription.Status = subscription.Status;
+
+            // If subscription was canceled, set additional values
+            if (tenantSubscription.Status == SubscriptionStatus.Cancelled)
+            {
+                // TOOD: start here to continue dev
+            }
+        }
+        
     }
 
     /// <summary>
