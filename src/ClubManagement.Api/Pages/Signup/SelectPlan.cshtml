@@ -1,0 +1,89 @@
+@page
+@model ClubManagement.Api.Pages.Signup.SelectPlanModel
+@{
+    ViewData["Title"] = "Choose Your Plan";
+}
+
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-extrabold text-gray-900 sm:text-5xl">
+                Choose Your Plan
+            </h1>
+            <p class="mt-4 text-xl text-gray-600">
+                Start your 14-day free trial. No credit card required.
+            </p>
+        </div>
+
+        <!-- Plans Grid -->
+        <div class="grid grid-cols-1 gap-8 lg:grid-cols-3 mb-12">
+            @foreach (var plan in Model.Plans)
+            {
+                <div class="relative bg-white rounded-2xl shadow-xl overflow-hidden transform transition duration-300 hover:scale-105 @(plan.IsPopular ? "ring-4 ring-indigo-600" : "")">
+                    @if (plan.IsPopular)
+                    {
+                        <div class="absolute top-0 right-0 bg-indigo-600 text-white px-4 py-1 text-sm font-semibold rounded-bl-lg">
+                            Most Popular
+                        </div>
+                    }
+                    
+                    <div class="p-8">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2">@plan.Name</h3>
+                        <p class="text-gray-600 mb-6">@plan.Description</p>
+                        
+                        <div class="mb-6">
+                            <span class="text-5xl font-extrabold text-gray-900">$@plan.MonthlyPrice</span>
+                            <span class="text-gray-600">/month</span>
+                            @if (plan.AnnualPrice > 0)
+                            {
+                                <p class="text-sm text-green-600 mt-2">
+                                    Save $@((plan.MonthlyPrice * 12) - plan.AnnualPrice) with annual billing
+                                </p>
+                            }
+                        </div>
+
+                        <ul class="space-y-4 mb-8">
+                            @foreach (var feature in plan.Features)
+                            {
+                                <li class="flex items-start">
+                                    <svg class="h-6 w-6 text-green-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    <span class="text-gray-700">@feature</span>
+                                </li>
+                            }
+                        </ul>
+
+                        <form method="post">
+                            <input type="hidden" name="planId" value="@plan.Id" />
+                            <button type="submit" 
+                                    class="w-full py-3 px-6 rounded-lg font-semibold transition duration-300 @(plan.IsPopular ? "bg-indigo-600 text-white hover:bg-indigo-700" : "bg-gray-200 text-gray-900 hover:bg-gray-300")">
+                                Get Started
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 max-w-3xl mx-auto">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Frequently Asked Questions</h2>
+            <div class="space-y-6">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Can I change plans later?</h3>
+                    <p class="text-gray-600">Yes! You can upgrade or downgrade your plan at any time. Changes take effect immediately.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">What payment methods do you accept?</h3>
+                    <p class="text-gray-600">We accept all major credit cards through Stripe's secure payment processing.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Can I cancel anytime?</h3>
+                    <p class="text-gray-600">Absolutely! Cancel your subscription at any time with no penalties or hidden fees.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

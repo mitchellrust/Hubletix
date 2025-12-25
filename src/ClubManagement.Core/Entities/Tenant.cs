@@ -19,8 +19,14 @@ public class Tenant : BaseEntity
     public string Subdomain { get; set; } = null!;
     
     /// <summary>
-    /// Whether this tenant is active
+    /// Tenant status: PendingActivation, Active, Suspended, Cancelled
     /// </summary>
+    public string Status { get; set; } = Constants.TenantStatus.PendingActivation;
+    
+    /// <summary>
+    /// Whether this tenant is active (deprecated - use Status instead)
+    /// </summary>
+    [Obsolete("Use Status property instead")]
     public bool IsActive { get; set; } = true;
     
     /// <summary>
@@ -39,4 +45,5 @@ public class Tenant : BaseEntity
     public ICollection<MembershipPlan> MembershipPlans { get; set; } = new List<MembershipPlan>();
     public ICollection<Event> Events { get; set; } = new List<Event>();
     public ICollection<Payment> Payments { get; set; } = new List<Payment>();
+    public ICollection<TenantSubscription> Subscriptions { get; set; } = new List<TenantSubscription>();
 }

@@ -45,6 +45,9 @@ public class AppDbContext : MultiTenantDbContext
     public DbSet<Event> Events { get; set; } = null!;
     public DbSet<EventRegistration> EventRegistrations { get; set; } = null!;
     public DbSet<Payment> Payments { get; set; } = null!;
+    public DbSet<PlatformPlan> PlatformPlans { get; set; } = null!;
+    public DbSet<TenantSubscription> TenantSubscriptions { get; set; } = null!;
+    public DbSet<SignupSession> SignupSessions { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -147,6 +150,56 @@ public class AppDbContext : MultiTenantDbContext
         builder.Entity<Payment>()
             .HasIndex(p => p.StripePaymentId)
             .IsUnique();
+
+        // Configure PlatformPlan
+        builder.Entity<PlatformPlan>()
+            .HasKey(p => p.Id);
+        builder.Entity<PlatformPlan>()
+            .HasIndex(p => p.StripeProductId);
+
+        // Configure TenantSubscription
+        builder.Entity<TenantSubscription>()
+            .HasKey(ts => ts.Id);
+        builder.Entity<TenantSubscription>()
+            .HasOne(ts => ts.Tenant)
+            .WithMany(t => t.Subscriptions)
+            .HasForeignKey(ts => ts.TenantId)
+            .OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<TenantSubscription>()
+            .HasOne(ts => ts.PlatformPlan)
+            .WithMany(pp => pp.TenantSubscriptions)
+            .HasForeignKey(ts => ts.PlatformPlanId)
+            .OnDelete(DeleteBehavior.Restrict);
+        builder.Entity<TenantSubscription>()
+            .HasIndex(ts => ts.StripeSubscriptionId)
+            .IsUnique();
+        builder.Entity<TenantSubscription>()
+            .HasIndex(ts => ts.TenantId);
+
+        // Configure SignupSession
+        builder.Entity<SignupSession>()
+            .HasKey(ss => ss.Id);
+        builder.Entity<SignupSession>()
+            .HasOne(ss => ss.PlatformPlan)
+            .WithMany()
+            .HasForeignKey(ss => ss.PlatformPlanId)
+            .OnDelete(DeleteBehavior.Restrict);
+        builder.Entity<SignupSession>()
+            .HasOne(ss => ss.User)
+            .WithMany()
+            .HasForeignKey(ss => ss.UserId)
+            .OnDelete(DeleteBehavior.SetNull)
+            .IsRequired(false);
+        builder.Entity<SignupSession>()
+            .HasOne(ss => ss.Tenant)
+            .WithMany()
+            .HasForeignKey(ss => ss.TenantId)
+            .OnDelete(DeleteBehavior.SetNull)
+            .IsRequired(false);
+        builder.Entity<SignupSession>()
+            .HasIndex(ss => ss.Email);
+        builder.Entity<SignupSession>()
+            .HasIndex(ss => ss.StripeCheckoutSessionId);
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

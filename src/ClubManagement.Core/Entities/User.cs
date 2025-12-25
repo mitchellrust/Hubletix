@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using ClubManagement.Core.Models;
+using ClubManagement.Core.Constants;
 
 namespace ClubManagement.Core.Entities;
 
@@ -25,6 +26,11 @@ public class User : BaseEntity
     public string LastName { get; set; } = null!;
     
     /// <summary>
+    /// User's role: Admin, Coach, Member
+    /// </summary>
+    public string Role { get; set; } = UserRoles.Member;
+    
+    /// <summary>
     /// Whether this user account is active
     /// </summary>
     public bool IsActive { get; set; } = true;
@@ -32,8 +38,7 @@ public class User : BaseEntity
     /// <summary>
     /// Foreign key to location
     /// </summary>
-    [Required]
-    public string LocationId { get; set; } = null!;
+    public string? LocationId { get; set; }
 
     /// <summary>
     /// Foreign key to membership plan (if any)
@@ -42,7 +47,7 @@ public class User : BaseEntity
     
     // Navigation properties
     public Tenant Tenant { get; set; } = null!;
-    public Location Location { get; set; } = null!;
+    public Location? Location { get; set; }
     public ICollection<EventRegistration> EventRegistrations { get; set; } = new List<EventRegistration>();
     public ICollection<Event> CoachingEvents { get; set; } = new List<Event>();
     public ICollection<Payment> Payments { get; set; } = new List<Payment>();

@@ -1,0 +1,132 @@
+@page
+@model ClubManagement.Api.Pages.Signup.SuccessModel
+@{
+    ViewData["Title"] = "Setup Complete!";
+}
+
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-2xl mx-auto">
+        @if (Model.IsActivated)
+        {
+            <!-- Success State -->
+            <div class="bg-white rounded-2xl shadow-xl p-8 text-center">
+                <div class="mb-6">
+                    <div class="mx-auto w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
+                        <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                </div>
+
+                <h1 class="text-4xl font-bold text-gray-900 mb-4">Welcome to ClubManager!</h1>
+                <p class="text-xl text-gray-600 mb-8">
+                    Your account has been successfully activated and is ready to use.
+                </p>
+
+                <div class="bg-indigo-50 rounded-lg p-6 mb-8">
+                    <h2 class="text-lg font-semibold text-indigo-900 mb-4">Your Organization Details</h2>
+                    <div class="space-y-2 text-left">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Organization:</span>
+                            <span class="font-medium text-gray-900">@Model.OrganizationName</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Your URL:</span>
+                            <span class="font-medium text-indigo-600">@Model.TenantUrl</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Plan:</span>
+                            <span class="font-medium text-gray-900">@Model.PlanName</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-8">
+                    <div class="flex">
+                        <svg class="h-5 w-5 text-yellow-400 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                        <div class="text-left">
+                            <h3 class="text-sm font-medium text-yellow-800">Check your email!</h3>
+                            <p class="mt-1 text-sm text-yellow-700">
+                                We've sent a welcome email with important information and next steps to get started.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <a href="/Admin" 
+                       class="block w-full py-3 px-6 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition">
+                        Go to Dashboard
+                    </a>
+                    <a href="@Model.TenantUrl" 
+                       class="block w-full py-3 px-6 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition">
+                        Visit Your Site
+                    </a>
+                </div>
+            </div>
+        }
+        else
+        {
+            <!-- Processing/Pending State -->
+            <div class="bg-white rounded-2xl shadow-xl p-8 text-center">
+                <div class="mb-6">
+                    <div class="mx-auto w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center">
+                        <svg class="w-12 h-12 text-blue-600 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                    </div>
+                </div>
+
+                <h1 class="text-4xl font-bold text-gray-900 mb-4">Processing Your Payment...</h1>
+                <p class="text-xl text-gray-600 mb-8">
+                    Please wait while we confirm your payment and activate your account.
+                </p>
+
+                <div class="bg-blue-50 rounded-lg p-6 mb-8">
+                    <h2 class="text-lg font-semibold text-blue-900 mb-2">What's happening?</h2>
+                    <ul class="text-left text-gray-700 space-y-2">
+                        <li class="flex items-start">
+                            <svg class="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span>Your account has been created</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span>Payment completed successfully</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="h-5 w-5 text-blue-500 mr-2 flex-shrink-0 mt-0.5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                            </svg>
+                            <span>Activating your organization...</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <p class="text-sm text-gray-600">
+                    This usually takes just a few seconds. The page will automatically refresh.
+                </p>
+
+                <script>
+                    // Auto-refresh every 3 seconds to check activation status
+                    setTimeout(function() {
+                        location.reload();
+                    }, 3000);
+                </script>
+            </div>
+        }
+
+        <!-- Help Section -->
+        <div class="mt-8 text-center">
+            <p class="text-gray-600">
+                Need help? 
+                <a href="/Support" class="text-indigo-600 hover:text-indigo-500 font-medium">Contact Support</a>
+            </p>
+        </div>
+    </div>
+</div>
