@@ -8,6 +8,12 @@ namespace ClubManagement.Core.Entities;
 public class SignupSession : BaseEntity
 {
     /// <summary>
+    /// Foreign key to Tenant (the tenant being created)
+    /// Override base property to make it nullable during signup flow
+    /// </summary>
+    public new string? TenantId { get; set; }
+    
+    /// <summary>
     /// Foreign key to PlatformPlan (the plan selected during signup)
     /// </summary>
     public string PlatformPlanId { get; set; } = null!;

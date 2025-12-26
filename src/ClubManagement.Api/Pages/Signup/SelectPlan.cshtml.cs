@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using ClubManagement.Infrastructure.Services;
+using ClubManagement.Infrastructure.Persistence;
+using ClubManagement.Core.Constants;
 
 namespace ClubManagement.Api.Pages.Signup;
 
@@ -8,22 +11,69 @@ public class SelectPlanModel : PageModel
 {
     private readonly ITenantOnboardingService _onboardingService;
     private readonly ILogger<SelectPlanModel> _logger;
+    private readonly AppDbContext _dbContext;
 
     public SelectPlanModel(
         ITenantOnboardingService onboardingService,
-        ILogger<SelectPlanModel> logger)
+        ILogger<SelectPlanModel> logger,
+        AppDbContext dbContext)
     {
         _onboardingService = onboardingService;
         _logger = logger;
+        _dbContext = dbContext;
     }
 
     public List<PlanViewModel> Plans { get; set; } = new();
 
     public async Task OnGetAsync()
     {
-        // TODO: Load from database (PlatformPlan table)
-        // For now, use hardcoded plans
-        Plans = new List<PlanViewModel>
+        // Load plans from database
+        var platformPlans = await _dbContext.PlatformPlans
+            .Where(p => p.IsActive)
+            .OrderBy(p => p.DisplayOrder)
+            .ToListAsync();
+
+        if (platformPlans.Any())
+        {
+            // Map database plans to view models
+            Plans = platformPlans.Select(p => new PlanViewModel
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Description = p.Description ?? string.Empty,
+                MonthlyPrice = p.PriceInDollars,
+                AnnualPrice = CalculateAnnualPrice(p),
+                IsPopular = p.IsFeatured
+            }).ToList();
+        }
+        else
+        {
+            // Fallback to hardcoded plans if database is empty
+            _logger.LogWarning("No platform plans found in database, using fallback plans");
+            Plans = GetFallbackPlans();
+        }
+    }
+
+    private decimal CalculateAnnualPrice(Core.Entities.PlatformPlan plan)
+    {
+        // If plan is already annual, return its price
+        if (plan.BillingInterval == BillingIntervals.Annually)
+        {
+            return plan.PriceInDollars;
+        }
+        
+        // If monthly, calculate annual with 10% discount
+        if (plan.BillingInterval == BillingIntervals.Monthly)
+        {
+            return plan.PriceInDollars * 12 * 0.9m; // 10% discount
+        }
+        
+        return 0;
+    }
+
+    private List<PlanViewModel> GetFallbackPlans()
+    {
+        return new List<PlanViewModel>
         {
             new PlanViewModel
             {
@@ -32,15 +82,6 @@ public class SelectPlanModel : PageModel
                 Description = "Perfect for small gyms and studios getting started",
                 MonthlyPrice = 29,
                 AnnualPrice = 290,
-                Features = new List<string>
-                {
-                    "Up to 100 members",
-                    "1 location",
-                    "Basic membership management",
-                    "Event scheduling",
-                    "Email support",
-                    "Mobile app access"
-                },
                 IsPopular = false
             },
             new PlanViewModel
@@ -50,17 +91,6 @@ public class SelectPlanModel : PageModel
                 Description = "For growing businesses with advanced needs",
                 MonthlyPrice = 79,
                 AnnualPrice = 790,
-                Features = new List<string>
-                {
-                    "Up to 500 members",
-                    "3 locations",
-                    "Advanced membership plans",
-                    "Automated billing",
-                    "Custom branding",
-                    "Priority email support",
-                    "Analytics & reporting",
-                    "Integrations"
-                },
                 IsPopular = true
             },
             new PlanViewModel
@@ -70,17 +100,6 @@ public class SelectPlanModel : PageModel
                 Description = "For large organizations with custom requirements",
                 MonthlyPrice = 199,
                 AnnualPrice = 1990,
-                Features = new List<string>
-                {
-                    "Unlimited members",
-                    "Unlimited locations",
-                    "All Professional features",
-                    "Custom integrations",
-                    "Dedicated account manager",
-                    "24/7 phone support",
-                    "Advanced security",
-                    "SLA guarantee"
-                },
                 IsPopular = false
             }
         };

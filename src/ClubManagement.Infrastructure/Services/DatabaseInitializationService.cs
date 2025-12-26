@@ -4,6 +4,7 @@ using ClubManagement.Infrastructure.Persistence;
 using ClubManagement.Core.Entities;
 using ClubManagement.Core.Models;
 using System.Text.Json;
+using ClubManagement.Core.Constants;
 
 namespace ClubManagement.Infrastructure.Services;
 
@@ -42,6 +43,9 @@ public class DatabaseInitializationService
           await appContext.Database.MigrateAsync();
           _logger.LogInformation("App database migrations applied successfully");
 
+          // Seed platform wide data, i.e. platform plans
+          await SeedPlatformAsync(appContext);
+
           // Seed tenant store data with demo tenant if needed
           ClubTenantInfo? demoTenantInfo = await SeedTenantStoreAsync(
             tenantStoreContext,
@@ -72,6 +76,53 @@ public class DatabaseInitializationService
         {
           _logger.LogError(ex, "An error occurred while initializing the database");
           throw;
+        }
+    }
+
+    private async Task SeedPlatformAsync(
+        AppDbContext context
+    )
+    {
+        var plansExist = await context.PlatformPlans.AnyAsync();
+        if (!plansExist)
+        {
+            _logger.LogInformation("Seeding platform plans...");
+
+            var platformPlans = new List<PlatformPlan>
+            {
+                new PlatformPlan
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Started",
+                    Description = "Basic features for small clubs.",
+                    PriceInCents = 2900, // $ 29.00,
+                    StripeProductId = "prod_Tg5xfPyhCbYVLS", // from https://dashboard.stripe.com/acct_1SgxH8IRfoYJ66ha/test/products/prod_Tg5xfPyhCbYVLS
+                    StripePriceId = "price_1SijlRIRfoYJ66ha1Td4c9jy",
+                },
+                new PlatformPlan
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Growth",
+                    Description = "Advanced features for growing clubs.",
+                    PriceInCents = 11900, // $119.00,
+                    StripeProductId = "prod_Tg5xYp9svkDqTS",
+                    StripePriceId = "price_1SijllIRfoYJ66habWSCw5jR",
+                },
+                new PlatformPlan
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Professional",
+                    Description = "All features for large clubs.",
+                    PriceInCents = 39900, // $399.00
+                    StripeProductId = "prod_Tg5yYmYLqXV2Oy",
+                    StripePriceId = "price_1SijmCIRfoYJ66haBJy0IAX9",
+                }
+            };
+
+            context.PlatformPlans.AddRange(platformPlans);
+            await context.SaveChangesAsync();
+
+            _logger.LogInformation("Platform plans seeded successfully");
         }
     }
 
@@ -137,7 +188,7 @@ public class DatabaseInitializationService
                 TenantId = basicTenantInfo.Id,
                 Name = basicTenantInfo.Name!,
                 Subdomain = basicTenantInfo.Identifier,
-                IsActive = true,
+                Status = TenantStatus.Active,
                 ConfigJson = GetBasicConfig()
             };
 
@@ -171,7 +222,7 @@ public class DatabaseInitializationService
                 TenantId = demoTenantInfo.Id,
                 Name = demoTenantInfo.Name!,
                 Subdomain = demoTenantInfo.Identifier,
-                IsActive = true,
+                Status = TenantStatus.Active,
                 ConfigJson = GetDemoConfig(),
                 Locations = new List<Location>()
                 {
@@ -187,24 +238,6 @@ public class DatabaseInitializationService
                         PhoneNumber = "555-123-4567",
                         Email = "location@demo.com",
                         IsDefault = true,
-                    }
-                }
-            };
-            var basicTenant = new Tenant
-            {
-                Id = demoTenantInfo.Id,
-                TenantId = demoTenantInfo.Id,
-                Name = demoTenantInfo.Name!,
-                Subdomain = demoTenantInfo.Identifier,
-                IsActive = true,
-                ConfigJson = GetDemoConfig(),
-                Locations = new List<Location>()
-                {
-                    new Location
-                    {
-                        Id = Guid.NewGuid().ToString(),
-                        Name = "Default",
-                        IsDefault = true
                     }
                 }
             };

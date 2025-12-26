@@ -153,7 +153,7 @@ public class TenantOnboardingService : ITenantOnboardingService
             State = SignupSessionState.Started,
             ExpiresAt = DateTime.UtcNow.AddHours(24), // 24-hour expiration
             LastActivityAt = DateTime.UtcNow,
-            TenantId = "__platform__" // Special tenant ID for platform-level records
+            TenantId = null // Will be set when tenant is created in Step 3
         };
 
         _dbContext.SignupSessions.Add(session);

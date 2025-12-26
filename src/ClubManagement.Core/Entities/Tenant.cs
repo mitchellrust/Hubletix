@@ -24,12 +24,6 @@ public class Tenant : BaseEntity
     public string Status { get; set; } = Constants.TenantStatus.PendingActivation;
     
     /// <summary>
-    /// Whether this tenant is active (deprecated - use Status instead)
-    /// </summary>
-    [Obsolete("Use Status property instead")]
-    public bool IsActive { get; set; } = true;
-    
-    /// <summary>
     /// Stripe Connect Account ID for this tenant's payment processing
     /// </summary>
     public string? StripeAccountId { get; set; }

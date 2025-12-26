@@ -48,7 +48,7 @@ public class TenantsController : ControllerBase
             tenant!.Id,
             tenant.Name,
             tenant.Subdomain,
-            tenant.IsActive,
+            tenant.Status,
             tenant.CreatedAt,
             tenant.UpdatedAt,
             tenant.ConfigJson
