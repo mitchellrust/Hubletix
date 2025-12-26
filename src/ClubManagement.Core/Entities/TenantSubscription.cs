@@ -42,6 +42,11 @@ public class TenantSubscription : BaseEntity
     /// Date when the subscription was cancelled (if applicable)
     /// </summary>
     public DateTime? CancelledAt { get; set; }
+
+    /// <summary>
+    /// Date when the subscription went past due (if applicable)
+    /// </summary>
+    public DateTime? PastDueAt { get; set; }
     
     /// <summary>
     /// Date when the subscription ends after cancellation

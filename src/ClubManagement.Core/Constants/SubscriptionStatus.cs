@@ -39,12 +39,12 @@ public static class SubscriptionStatus
     public const string IncompleteExpired = "incomplete_expired";
 
     /// <summary>
-    /// .Currently in trial period.
+    /// Currently in trial period.
     /// </summary>
     public const string Trialing = "trialing";
 
     /// <summary>
-    /// .Currently paused.
+    /// Currently paused.
     /// </summary>
     public const string Paused = "paused";
 }

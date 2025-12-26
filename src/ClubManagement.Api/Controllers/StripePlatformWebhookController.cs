@@ -12,6 +12,7 @@ namespace ClubManagement.Api.Controllers;
 
 /// <summary>
 /// Webhook controller for handling Stripe platform payment events.
+/// See <see href="https://docs.stripe.com/api/events/types">Stripe Event Types</see> for details.
 /// This handles billing for tenant subscriptions to the platform.
 /// </summary>
 [ApiController]
@@ -75,8 +76,19 @@ public class StripePlatformWebhookController : ControllerBase
                 case EventTypes.InvoicePaymentFailed:
                     await HandleInvoicePaymentFailed(stripeEvent);
                     break;
+                
+                case EventTypes.CustomerSubscriptionCreated:
+                    // Handled via invoice.paid for activation
+                    _logger.LogInformation(
+                        "Event type [{EventType}] handled by [{EventType}] for customer activation",
+                        stripeEvent.Type,
+                        EventTypes.InvoicePaid
+                    );
+                    break;
 
                 case EventTypes.CustomerSubscriptionUpdated:
+                case EventTypes.CustomerSubscriptionPaused:
+                case EventTypes.CustomerSubscriptionResumed:
                     await HandleSubscriptionUpdated(stripeEvent);
                     break;
 
@@ -197,11 +209,28 @@ public class StripePlatformWebhookController : ControllerBase
             );
         }
 
-        if (invoice.Parent.SubscriptionDetails.Subscription.Items.Data.Count != 1)
+        // Find the particular subscription item that corresponds to a platform plan.
+        // Since this is just to active the tenant, the presense of any valid platform plan
+        // will suffice. In a future state, we might need to be more selective here.
+        var priceIds = invoice.Parent.SubscriptionDetails.Subscription.Items.Data
+            .Select(i => i.Price?.Id)
+            .Where(id => !string.IsNullOrEmpty(id))
+            .ToList();
+
+        var dbPriceSet = new HashSet<string>(
+            await _dbContext.PlatformPlans
+                .Where(p => priceIds.Contains(p.StripePriceId))
+                .Select(p => p.StripePriceId!) // Force unwraping since we have the where contains above
+                .ToListAsync()
+        );
+
+        var subscriptionItem = invoice.Parent.SubscriptionDetails.Subscription.Items.Data
+            .FirstOrDefault(item => item.Price != null && dbPriceSet.Contains(item.Price.Id));
+
+        if (subscriptionItem == null)
         {
             _logger.LogWarning(
-                "Invoice Subscription has [{}] items but expected [1]. InvoiceId={InvoiceId}, SubscriptionId={SubscriptionId}",
-                invoice.Parent.SubscriptionDetails.Subscription.Items.Data.Count,
+                "No subscription item found for platform plan. InvoiceId={InvoiceId}, SubscriptionId={SubscriptionId}",
                 invoice.Id,
                 invoice.Parent.SubscriptionDetails.SubscriptionId
             );
@@ -215,8 +244,8 @@ public class StripePlatformWebhookController : ControllerBase
                 checkoutSessionId ?? invoice.Id, // Fallback to invoice ID
                 invoice.Parent.SubscriptionDetails.SubscriptionId,
                 invoice.CustomerId,
-                invoice.Parent.SubscriptionDetails.Subscription.Items.Data[0].CurrentPeriodStart,
-                invoice.Parent.SubscriptionDetails.Subscription.Items.Data[0].CurrentPeriodEnd
+                subscriptionItem.CurrentPeriodStart,
+                subscriptionItem.CurrentPeriodEnd
             );
 
             _logger.LogInformation(
@@ -285,10 +314,38 @@ public class StripePlatformWebhookController : ControllerBase
         var checkoutSessionId = invoice.Parent.SubscriptionDetails.Subscription.Metadata["checkout_session_id"];
         if (!string.IsNullOrEmpty(checkoutSessionId))
         {
-            await _onboardingService.HandleBillingFailureAsync(
-                checkoutSessionId,
-                $"Payment failed: {latestPayment.Payment.PaymentIntent.LastPaymentError?.Message ?? "Unknown error"}"
-            );
+            try
+            {
+                await _onboardingService.HandleBillingFailureAsync(
+                    checkoutSessionId,
+                    $"Payment failed: {latestPayment.Payment.PaymentIntent.LastPaymentError?.Message ?? "Unknown error"}"
+                );
+                
+                _logger.LogInformation(
+                    "Recorded billing failure: CheckoutSessionId={CheckoutSessionId}",
+                    checkoutSessionId
+                );
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Signup session not found or in wrong state
+                _logger.LogWarning(
+                    ex,
+                    "Could not record billing failure: CheckoutSessionId={CheckoutSessionId}",
+                    checkoutSessionId
+                );
+                // Don't throw - not critical, user will see failure in Stripe
+            }
+            catch (DbUpdateException ex)
+            {
+                // Database error - retry may help
+                _logger.LogError(
+                    ex,
+                    "Database error recording billing failure: CheckoutSessionId={CheckoutSessionId}",
+                    checkoutSessionId
+                );
+                throw; // Trigger retry
+            }
         }
 
         // Tenant remains in PendingActivation - user can retry payment
@@ -313,9 +370,6 @@ public class StripePlatformWebhookController : ControllerBase
             subscription.Status
         );
 
-        // TODO: Update TenantSubscription status in database
-        // This would handle status changes like past_due, canceled, etc.
-
         var tenantSubscription = await _dbContext.TenantSubscriptions
             .FirstOrDefaultAsync(ts => ts.StripeSubscriptionId == subscription.Id);
         if (tenantSubscription == null)
@@ -338,13 +392,53 @@ public class StripePlatformWebhookController : ControllerBase
             );
             tenantSubscription.Status = subscription.Status;
 
-            // If subscription was canceled, set additional values
-            if (tenantSubscription.Status == SubscriptionStatus.Cancelled)
+            // If subscription is past due, set additional values
+            if (subscription.Status == SubscriptionStatus.PastDue)
             {
-                // TOOD: start here to continue dev
+                // Going off of when we created the event in our webhook, not sure
+                // how to pull this from the subscription data itself.
+                tenantSubscription.PastDueAt = stripeEvent.Created;
+            }
+
+            // If subscription was canceled, set additional values
+            if (subscription.Status == SubscriptionStatus.Cancelled)
+            {
+                tenantSubscription.CancelledAt = subscription.CanceledAt ?? stripeEvent.Created;
+                tenantSubscription.EndsAt = tenantSubscription.CurrentPeriodEnd;
+                tenantSubscription.WillRenew = false;
+            }
+
+            try
+            {
+                await _dbContext.SaveChangesAsync();
+                _logger.LogInformation(
+                    "Successfully saved subscription update: SubscriptionId={SubscriptionId}",
+                    subscription.Id
+                );
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                // Another webhook may have updated the same record
+                // This is OK for idempotent operations - log and continue
+                _logger.LogWarning(
+                    ex,
+                    "Concurrency conflict updating subscription (likely duplicate webhook): SubscriptionId={SubscriptionId}",
+                    subscription.Id
+                );
+                // Don't throw - webhook already processed
+            }
+            catch (DbUpdateException ex)
+            {
+                // Database constraint violation or connection issue
+                _logger.LogError(
+                    ex,
+                    "Database error updating subscription: SubscriptionId={SubscriptionId}",
+                    subscription.Id
+                );
+                // Re-throw to trigger Stripe webhook retry
+                throw;
             }
         }
-        
     }
 
     /// <summary>
@@ -365,8 +459,68 @@ public class StripePlatformWebhookController : ControllerBase
             subscription.Id
         );
 
-        // TODO: Suspend tenant in database
-        // Find tenant by subscription ID and set status to Suspended
+        // Find tenant subscription
+        var tenantSubscription = await _dbContext.TenantSubscriptions
+            .Include(ts => ts.Tenant)
+            .FirstOrDefaultAsync(ts => ts.StripeSubscriptionId == subscription.Id);
+            
+        if (tenantSubscription == null)
+        {
+            _logger.LogWarning(
+                "Tenant subscription not found for deleted subscription: SubscriptionId={SubscriptionId}",
+                subscription.Id
+            );
+            return;
+        }
+
+        try
+        {
+            // Update subscription record
+            tenantSubscription.Status = SubscriptionStatus.Cancelled;
+            tenantSubscription.CancelledAt = subscription.CanceledAt ?? stripeEvent.Created;
+            tenantSubscription.EndsAt = tenantSubscription.CurrentPeriodEnd;
+            tenantSubscription.WillRenew = false;
+
+            // Suspend the tenant
+            // TODO: Should we do this here, or when the current period ends?
+            if (tenantSubscription.Tenant != null)
+            {
+                tenantSubscription.Tenant.Status = TenantStatus.Suspended;
+                _logger.LogInformation(
+                    "Suspending tenant: TenantId={TenantId}, SubscriptionId={SubscriptionId}",
+                    tenantSubscription.TenantId,
+                    subscription.Id
+                );
+            }
+
+            await _dbContext.SaveChangesAsync();
+            
+            _logger.LogInformation(
+                "Successfully processed subscription deletion: SubscriptionId={SubscriptionId}",
+                subscription.Id
+            );
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            // Another webhook may have updated the same record
+            _logger.LogWarning(
+                ex,
+                "Concurrency conflict deleting subscription (likely duplicate webhook): SubscriptionId={SubscriptionId}",
+                subscription.Id
+            );
+            // Don't throw - webhook already processed
+        }
+        catch (DbUpdateException ex)
+        {
+            // Database constraint violation or connection issue
+            _logger.LogError(
+                ex,
+                "Database error deleting subscription: SubscriptionId={SubscriptionId}",
+                subscription.Id
+            );
+            // Re-throw to trigger Stripe webhook retry
+            throw;
+        }
     }
 
     /// <summary>
@@ -387,12 +541,39 @@ public class StripePlatformWebhookController : ControllerBase
         var subscriptionService = new SubscriptionService();
         var subscription = await subscriptionService.GetAsync(session.SubscriptionId);
 
+        // Find the particular subscription item that corresponds to a platform plan.
+        // Since this is just to active the tenant, the presense of any valid platform plan
+        // will suffice. In a future state, we might need to be more selective here.
+        var priceIds = subscription.Items.Data
+            .Select(i => i.Price?.Id)
+            .Where(id => !string.IsNullOrEmpty(id))
+            .ToList();
+
+        var dbPriceSet = new HashSet<string>(
+            await _dbContext.PlatformPlans
+                .Where(p => priceIds.Contains(p.StripePriceId))
+                .Select(p => p.StripePriceId!) // Force unwraping since we have the where contains above
+                .ToListAsync()
+        );
+
+        var subscriptionItem = subscription.Items.Data
+            .FirstOrDefault(item => item.Price != null && dbPriceSet.Contains(item.Price.Id));
+
+        if (subscriptionItem == null)
+        {
+            _logger.LogWarning(
+                "No subscription item found for platform plan. SubscriptionId={SubscriptionId}",
+                subscription.Id
+            );
+            return;
+        }
+
         await _onboardingService.ActivateTenantAsync(
             session.Id,
             session.SubscriptionId,
             session.CustomerId,
-            subscription.CurrentPeriodStart,
-            subscription.CurrentPeriodEnd
+            subscriptionItem.CurrentPeriodStart,
+            subscriptionItem.CurrentPeriodEnd
         );
 
         _logger.LogInformation(
