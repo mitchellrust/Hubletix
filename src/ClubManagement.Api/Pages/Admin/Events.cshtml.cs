@@ -50,6 +50,7 @@ public class EventsModel : AdminPageModel
         // Build a deferred query for events
         var query = DbContext.Events
             .Include(e => e.EventRegistrations)
+            .Where(e => e.TenantId == CurrentTenantInfo.Id)
             .AsQueryable();
 
         // Apply status filter

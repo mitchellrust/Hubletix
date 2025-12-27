@@ -93,11 +93,11 @@ public class DatabaseInitializationService
                 new PlatformPlan
                 {
                     Id = Guid.NewGuid().ToString(),
-                    Name = "Started",
+                    Name = "Starter",
                     Description = "Basic features for small clubs.",
                     PriceInCents = 2900, // $ 29.00,
-                    StripeProductId = "prod_Tg5xfPyhCbYVLS", // from https://dashboard.stripe.com/acct_1SgxH8IRfoYJ66ha/test/products/prod_Tg5xfPyhCbYVLS
-                    StripePriceId = "price_1SijlRIRfoYJ66ha1Td4c9jy",
+                    StripeProductId = "prod_Tg7eQ22S6skvJS",
+                    StripePriceId = "price_1SilOxIRfoYJ66hasQ7q0WbW",
                 },
                 new PlatformPlan
                 {
@@ -105,8 +105,8 @@ public class DatabaseInitializationService
                     Name = "Growth",
                     Description = "Advanced features for growing clubs.",
                     PriceInCents = 11900, // $119.00,
-                    StripeProductId = "prod_Tg5xYp9svkDqTS",
-                    StripePriceId = "price_1SijllIRfoYJ66habWSCw5jR",
+                    StripeProductId = "prod_Tg7gmYfIQZpdCv",
+                    StripePriceId = "price_1SilQrIRfoYJ66haHe2GhAfj",
                 },
                 new PlatformPlan
                 {
@@ -114,8 +114,8 @@ public class DatabaseInitializationService
                     Name = "Professional",
                     Description = "All features for large clubs.",
                     PriceInCents = 39900, // $399.00
-                    StripeProductId = "prod_Tg5yYmYLqXV2Oy",
-                    StripePriceId = "price_1SijmCIRfoYJ66haBJy0IAX9",
+                    StripeProductId = "prod_Tg7guM5UpEpbIA",
+                    StripePriceId = "price_1SilRYIRfoYJ66hal0mKXdma",
                 }
             };
 

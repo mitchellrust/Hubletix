@@ -47,6 +47,7 @@ public class MembersModel : AdminPageModel
 
         // Build a deferred query for users
         var query = DbContext.Users
+            .Where(u => u.TenantId == CurrentTenantInfo.Id)
             .Select(u => new
                 {
                     User = u,
@@ -127,7 +128,9 @@ public class MembersModel : AdminPageModel
     private async Task LoadMembershipPlanFacetsAsync()
     {
         // Build base query with status filter applied
-        var userQuery = DbContext.Users.AsQueryable();
+        var userQuery = DbContext.Users
+            .Where(u => u.TenantId == CurrentTenantInfo.Id)
+            .AsQueryable();
         
         if (StatusFilter == "active")
         {
@@ -141,6 +144,7 @@ public class MembersModel : AdminPageModel
         
         // Get all membership plans with filtered member counts
         var planFacets = await DbContext.MembershipPlans
+            .Where(e => e.TenantId == CurrentTenantInfo.Id)
             .OrderBy(p => p.DisplayOrder)
             .ThenBy(p => p.Name)
             .Select(p => new MembershipPlanFacet

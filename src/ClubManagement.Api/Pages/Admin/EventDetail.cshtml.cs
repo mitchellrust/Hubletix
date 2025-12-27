@@ -66,6 +66,7 @@ public class EventDetailModel : AdminPageModel
         }
 
         Event = await DbContext.Events
+            .Where(e => e.TenantId == CurrentTenantInfo.Id)
             .FirstOrDefaultAsync(e => e.Id == id);
 
         // If event not found, should return better UI than 404.
@@ -110,7 +111,9 @@ public class EventDetailModel : AdminPageModel
 
         // Build query for registrations of this specific event
         var query = DbContext.EventRegistrations
-            .Where(r => r.EventId == eventId)
+            .Where(r => r.TenantId == CurrentTenantInfo.Id &&
+                r.EventId == eventId
+            )
             .Include(r => r.User)
             .Select(r => new
             {
@@ -172,7 +175,9 @@ public class EventDetailModel : AdminPageModel
         // Verify event still exists in DB and load registrations to check for active ones
         var existingEvent = await DbContext.Events
             .Include(e => e.EventRegistrations)
-            .FirstOrDefaultAsync(e => e.Id == Event.Id);
+            .FirstOrDefaultAsync(e => e.TenantId == CurrentTenantInfo.Id &&
+                e.Id == Event.Id
+            );
 
         // If event not found, should return better UI than 404.
         if (existingEvent == null)

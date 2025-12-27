@@ -113,8 +113,8 @@ public class SetupOrganizationModel : PageModel
             // Initialize billing (creates Stripe checkout session)
             var checkoutUrl = await _onboardingService.InitializeBillingAsync(
                 SessionId,
-                $"https://{Request.Host}/Signup/Success?sessionId={SessionId}",
-                $"https://{Request.Host}/Signup/CreateAccount?sessionId={SessionId}"
+                $"http://{Request.Host}/Signup/Success?sessionId={SessionId}",
+                $"http://{Request.Host}/Signup/CreateAccount?sessionId={SessionId}"
             );
 
             _logger.LogInformation(

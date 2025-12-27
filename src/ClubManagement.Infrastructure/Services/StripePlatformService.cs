@@ -33,7 +33,7 @@ public class StripePlatformService : IStripePlatformService
     {
         var options = new SessionCreateOptions
         {
-            Mode = "subscription", // or "payment" for one-time
+            Mode = "subscription",
             LineItems = new List<SessionLineItemOptions>
             {
                 new SessionLineItemOptions
@@ -46,10 +46,19 @@ public class StripePlatformService : IStripePlatformService
             CancelUrl = cancelUrl,
             CustomerEmail = customerEmail,
             Metadata = metadata,
+            SubscriptionData = new SessionSubscriptionDataOptions
+            {
+                Metadata = metadata,
+            }
+        };
+
+        var requestOptions = new RequestOptions
+        {
+            IdempotencyKey = Guid.NewGuid().ToString(), // Ensure idempotency with Stripe's built-in retry mechanism
         };
 
         var service = new SessionService(_stripeClient);
-        var session = await service.CreateAsync(options, cancellationToken: cancellationToken);
+        var session = await service.CreateAsync(options, requestOptions, cancellationToken);
         
         return session;
     }
@@ -102,6 +111,12 @@ public class StripePlatformService : IStripePlatformService
         var subscription = await service.CreateAsync(options, cancellationToken: cancellationToken);
         
         return subscription.Id;
+    }
+
+    public async Task<Subscription> GetSubscriptionAsync(string subscriptionId, CancellationToken cancellationToken = default)
+    {
+        var service = new SubscriptionService(_stripeClient);
+        return await service.GetAsync(subscriptionId, cancellationToken: cancellationToken);
     }
 
     public async Task CancelSubscriptionAsync(string subscriptionId, CancellationToken cancellationToken = default)

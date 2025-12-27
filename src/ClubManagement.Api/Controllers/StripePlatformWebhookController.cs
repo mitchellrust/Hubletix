@@ -20,17 +20,20 @@ namespace ClubManagement.Api.Controllers;
 public class StripePlatformWebhookController : ControllerBase
 {
     private readonly ITenantOnboardingService _onboardingService;
+    private readonly IStripePlatformService _stripePlatformService;
     private readonly ILogger<StripePlatformWebhookController> _logger;
     private readonly AppDbContext _dbContext;
     private readonly string _webhookSecret;
 
     public StripePlatformWebhookController(
         ITenantOnboardingService onboardingService,
+        IStripePlatformService stripePlatformService,
         ILogger<StripePlatformWebhookController> logger,
         IOptions<StripeSettings> stripeSettings,
         AppDbContext dbContext)
     {
         _onboardingService = onboardingService;
+        _stripePlatformService = stripePlatformService;
         _logger = logger;
         _webhookSecret = stripeSettings.Value.Platform.WebhookSecret;
         _dbContext = dbContext;
@@ -196,35 +199,61 @@ public class StripePlatformWebhookController : ControllerBase
             invoice.Parent.SubscriptionDetails.SubscriptionId
         );
 
-        // Get the checkout session from metadata
-        var checkoutSessionId = invoice.Parent.SubscriptionDetails.Metadata?["checkout_session_id"];
-        if (string.IsNullOrEmpty(checkoutSessionId))
+        // Get the signup session from metadata
+        var signupSessionId = invoice.Parent.SubscriptionDetails.Metadata?["signup_session_id"];
+        if (string.IsNullOrEmpty(signupSessionId))
         {
-            // Fallback: get customer metadata
-            checkoutSessionId = invoice.CustomerEmail; // We'll need to look up by email
             _logger.LogWarning(
-                "Checkout session ID not in subscription metadata. InvoiceId={InvoiceId}, SubscriptionId={SubscriptionId}",
+                "Signup session ID not in subscription metadata. InvoiceId={InvoiceId}, SubscriptionId={SubscriptionId}",
                 invoice.Id,
                 invoice.Parent.SubscriptionDetails.SubscriptionId
             );
+            return;
         }
 
         // Find the particular subscription item that corresponds to a platform plan.
         // Since this is just to active the tenant, the presense of any valid platform plan
         // will suffice. In a future state, we might need to be more selective here.
-        var priceIds = invoice.Parent.SubscriptionDetails.Subscription.Items.Data
-            .Select(i => i.Price?.Id)
+        Subscription? subscription = null;
+
+        if (invoice.Parent.SubscriptionDetails.Subscription != null)
+        {
+            subscription = invoice.Parent.SubscriptionDetails.Subscription;
+        }
+        else
+        {
+            _logger.LogInformation(
+                "Subscription data not provided in Invoice, fetching from {}. InvoiceId={InvoiceId}, SubscriptionId={SubscriptionId}",
+                nameof(StripePlatformService),
+                invoice.Id,
+                invoice.Parent.SubscriptionDetails.SubscriptionId
+            );
+
+            subscription = await _stripePlatformService.GetSubscriptionAsync(invoice.Parent.SubscriptionDetails.SubscriptionId);
+            if (subscription == null)
+            {
+                _logger.LogWarning(
+                    "Subscription not found. InvoiceId={InvoiceId}, SubscriptionId={SubscriptionId}",
+                    invoice.Id,
+                    invoice.Parent.SubscriptionDetails.SubscriptionId
+                );
+                return;
+            }
+        }
+
+        var priceIds = subscription.Items.Data
+            .Select(i => i.Price?.Id ?? string.Empty)
             .Where(id => !string.IsNullOrEmpty(id))
             .ToList();
 
         var dbPriceSet = new HashSet<string>(
             await _dbContext.PlatformPlans
-                .Where(p => priceIds.Contains(p.StripePriceId))
+                .Where(p => priceIds.Contains(p.StripePriceId ?? string.Empty))
                 .Select(p => p.StripePriceId!) // Force unwraping since we have the where contains above
                 .ToListAsync()
         );
 
-        var subscriptionItem = invoice.Parent.SubscriptionDetails.Subscription.Items.Data
+        var subscriptionItem = subscription.Items.Data
             .FirstOrDefault(item => item.Price != null && dbPriceSet.Contains(item.Price.Id));
 
         if (subscriptionItem == null)
@@ -241,11 +270,11 @@ public class StripePlatformWebhookController : ControllerBase
         try
         {
             await _onboardingService.ActivateTenantAsync(
-                checkoutSessionId ?? invoice.Id, // Fallback to invoice ID
                 invoice.Parent.SubscriptionDetails.SubscriptionId,
                 invoice.CustomerId,
                 subscriptionItem.CurrentPeriodStart,
-                subscriptionItem.CurrentPeriodEnd
+                subscriptionItem.CurrentPeriodEnd,
+                signupSessionId: signupSessionId
             );
 
             _logger.LogInformation(
@@ -569,11 +598,11 @@ public class StripePlatformWebhookController : ControllerBase
         }
 
         await _onboardingService.ActivateTenantAsync(
-            session.Id,
             session.SubscriptionId,
             session.CustomerId,
             subscriptionItem.CurrentPeriodStart,
-            subscriptionItem.CurrentPeriodEnd
+            subscriptionItem.CurrentPeriodEnd,
+            stripeCheckoutSessionId: session.Id
         );
 
         _logger.LogInformation(

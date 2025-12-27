@@ -54,11 +54,12 @@ public interface ITenantOnboardingService
     /// Step 5: Activate tenant after successful payment (called by webhook)
     /// </summary>
     Task ActivateTenantAsync(
-        string stripeCheckoutSessionId,
         string stripeSubscriptionId,
         string stripeCustomerId,
         DateTime currentPeriodStart,
         DateTime currentPeriodEnd,
+        string? stripeCheckoutSessionId = null,
+        string? signupSessionId = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -97,17 +98,23 @@ public interface ITenantOnboardingService
 public class TenantOnboardingService : ITenantOnboardingService
 {
     private readonly AppDbContext _dbContext;
+    private readonly TenantStoreDbContext _tenantStoreDbContext;
     private readonly IStripeConnectService _stripeConnectService;
     private readonly IStripePlatformService _stripePlatformService;
     private readonly ITenantConfigService _tenantConfigService;
+    private const string SIGNUP_SESSION_ID_KEY = "signup_session_id";
+    private const string TENANT_ID_KEY = "tenant_id";
+    private const string PLATFORM_PLAN_ID_KEY = "plan_id";
 
     public TenantOnboardingService(
         AppDbContext dbContext,
+        TenantStoreDbContext tenantStoreDbContext,
         IStripeConnectService stripeConnectService,
         IStripePlatformService stripePlatformService,
         ITenantConfigService tenantConfigService)
     {
         _dbContext = dbContext;
+        _tenantStoreDbContext = tenantStoreDbContext;
         _stripeConnectService = stripeConnectService;
         _stripePlatformService = stripePlatformService;
         _tenantConfigService = tenantConfigService;
@@ -276,6 +283,15 @@ public class TenantOnboardingService : ITenantOnboardingService
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
+        // Now create the tenant in the Tenant Store database as well
+        var tenantStoreEntry = new ClubTenantInfo(
+            tenant.Id,
+            tenant.Subdomain,
+            tenant.Name
+        );
+        _tenantStoreDbContext.TenantInfo.Add(tenantStoreEntry);
+        await _tenantStoreDbContext.SaveChangesAsync(cancellationToken);
+
         return tenant;
     }
 
@@ -303,11 +319,12 @@ public class TenantOnboardingService : ITenantOnboardingService
             session.Email,
             new Dictionary<string, string>
             {
-                { "signup_session_id", session.Id },
-                { "tenant_id", session.TenantId },
-                { "plan_id", session.PlatformPlanId }
+                { SIGNUP_SESSION_ID_KEY, session.Id },
+                { TENANT_ID_KEY, session.TenantId },
+                { PLATFORM_PLAN_ID_KEY, session.PlatformPlanId }
             },
-            cancellationToken);
+            cancellationToken
+        );
 
         // Update session
         session.StripeCheckoutSessionId = checkoutSession.Id;
@@ -324,21 +341,33 @@ public class TenantOnboardingService : ITenantOnboardingService
     /// This is the ONLY way a tenant becomes Active - via confirmed payment webhook
     /// </summary>
     public async Task ActivateTenantAsync(
-        string stripeCheckoutSessionId,
         string stripeSubscriptionId,
         string stripeCustomerId,
         DateTime currentPeriodStart,
         DateTime currentPeriodEnd,
+        string? stripeCheckoutSessionId = null,
+        string? signupSessionId = null,
         CancellationToken cancellationToken = default)
     {
-        var session = await _dbContext.SignupSessions
+        SignupSession? session = null;
+
+        var sessionQuery = _dbContext.SignupSessions
             .Include(s => s.Tenant)
             .Include(s => s.PlatformPlan)
-            .FirstOrDefaultAsync(s => s.StripeCheckoutSessionId == stripeCheckoutSessionId, cancellationToken);
+            .AsQueryable();
+
+        if (!string.IsNullOrEmpty(signupSessionId))
+        {
+            session = await sessionQuery.FirstOrDefaultAsync(s => s.Id == signupSessionId, cancellationToken);
+        }
+        else if (!string.IsNullOrEmpty(stripeCheckoutSessionId))
+        {
+            session = await sessionQuery.FirstOrDefaultAsync(s => s.StripeCheckoutSessionId == stripeCheckoutSessionId, cancellationToken);
+        }
 
         if (session == null)
         {
-            throw new InvalidOperationException($"Signup session with Stripe session '{stripeCheckoutSessionId}' not found.");
+            throw new InvalidOperationException($"Signup session with Id '{signupSessionId}' or Stripe session '{stripeCheckoutSessionId}' not found.");
         }
 
         if (session.TenantId == null)

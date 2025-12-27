@@ -10,6 +10,12 @@ namespace ClubManagement.Core.Entities;
 public class User : BaseEntity
 {    
     /// <summary>
+    /// Foreign key to Tenant (the tenant being created)
+    /// Override base property to make it nullable during signup flow
+    /// </summary>
+    public new string? TenantId { get; set; }
+
+    /// <summary>
     /// User's email address
     /// </summary>
     [Required]

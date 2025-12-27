@@ -48,7 +48,7 @@ public class SuccessModel : PageModel
             if (IsActivated && session.Tenant != null)
             {
                 OrganizationName = session.Tenant.Name;
-                TenantUrl = $"https://{session.Tenant.Subdomain}.clubmanager.com";
+                TenantUrl = $"http://{session.Tenant.Subdomain}.localhost";
                 PlanName = session.PlatformPlanId.ToUpper(); // TODO: Get from database
             }
 

@@ -1,3 +1,4 @@
+using Stripe;
 using Stripe.Checkout;
 
 namespace ClubManagement.Infrastructure.Services;
@@ -61,6 +62,14 @@ public interface IStripePlatformService
         string priceId,
         Dictionary<string, string>? metadata,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Retrieves a Subscription from the platform account.
+    /// </summary>
+    /// <param name="subscriptionId">The Subscription ID</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>The Subscription</returns>
+    Task<Subscription> GetSubscriptionAsync(string subscriptionId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Cancels a subscription on the platform account.
