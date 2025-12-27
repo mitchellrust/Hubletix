@@ -7,6 +7,10 @@ using ClubManagement.Core.Constants;
 
 namespace ClubManagement.Api.Pages.Signup;
 
+/// <summary>
+/// TODO: This page and all the platform signup pages need some review and probably rewrite, didn't check copilot here.
+/// </summary>
+
 public class SelectPlanModel : PageModel
 {
     private readonly ITenantOnboardingService _onboardingService;

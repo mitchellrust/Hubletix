@@ -22,9 +22,11 @@ public class EventDetailModel : PublicPageModel
     {
         var eventEntity = await DbContext.Events
             .Include(e => e.EventRegistrations)
-            .FirstOrDefaultAsync(e => e.Id == id 
-                                   && e.TenantId == CurrentTenantInfo.Id 
-                                   && e.IsActive);
+            .FirstOrDefaultAsync(
+                e => e.Id == id &&
+                     e.TenantId == CurrentTenantInfo.Id &&
+                     e.IsActive
+            );
 
         if (eventEntity == null)
         {

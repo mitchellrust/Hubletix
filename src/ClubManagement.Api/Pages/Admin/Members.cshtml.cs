@@ -52,7 +52,10 @@ public class MembersModel : AdminPageModel
                 {
                     User = u,
                     MembershipPlanName = DbContext.MembershipPlans
-                        .Where(p => p.Id == u.MembershipPlanId)
+                        .Where(
+                            p => p.TenantId == CurrentTenantInfo.Id &&
+                                 p.Id == u.MembershipPlanId
+                        )
                         .Select(p => p.Name)
                         .FirstOrDefault()
                 }

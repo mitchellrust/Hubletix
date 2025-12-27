@@ -229,6 +229,7 @@ public class DatabaseInitializationService
                     new Location
                     {
                         Id = Guid.NewGuid().ToString(),
+                        TenantId = demoTenantInfo.Id,
                         Name = "Main Gym",
                         Address = "456 Club St.",
                         City = "Denver",
@@ -252,7 +253,7 @@ public class DatabaseInitializationService
                     Name = "Basic Membership",
                     Description = "Gym access during staffed hours.",
                     PriceInCents = 1000, // $10.00
-                    BillingInterval = Core.Constants.BillingIntervals.Monthly,
+                    BillingInterval = BillingIntervals.Monthly,
                     IsPriceDisplayedMonthly = true,
                     IsActive = true,
                     DisplayOrder = 0,
@@ -266,7 +267,7 @@ public class DatabaseInitializationService
                     Name = "Premium Membership",
                     Description = "24/7 gym access.|Member-only events.",
                     PriceInCents = 12000, // $120.00, billed annually, displayed annually
-                    BillingInterval = Core.Constants.BillingIntervals.Annually,
+                    BillingInterval = BillingIntervals.Annually,
                     IsPriceDisplayedMonthly = false,
                     IsActive = true,
                     DisplayOrder = 1,
@@ -280,7 +281,7 @@ public class DatabaseInitializationService
                     Name = "Ultra Membership",
                     Description = "24/7 gym access.|Member-only events.|Free guest passes.",
                     PriceInCents = 15000, // $150.00 billed annually, displayed monthly
-                    BillingInterval = Core.Constants.BillingIntervals.Annually,
+                    BillingInterval = BillingIntervals.Annually,
                     IsPriceDisplayedMonthly = true,
                     IsActive = true,
                     DisplayOrder = 2,
@@ -294,7 +295,7 @@ public class DatabaseInitializationService
                     Name = "One Time Pass",
                     Description = "A one time pass to the gym.",
                     PriceInCents = 700, // $7.00
-                    BillingInterval = Core.Constants.BillingIntervals.OneTime,
+                    BillingInterval = BillingIntervals.OneTime,
                     IsPriceDisplayedMonthly = false,
                     IsActive = true,
                     DisplayOrder = 3,
@@ -326,7 +327,7 @@ public class DatabaseInitializationService
                     TenantId = demoTenant.Id,
                     LocationId = demoTenant.Locations.First().Id,
                     Name = "Free Event No Desc/Loc No Reg",
-                    EventType = Core.Constants.EventType.Other,
+                    EventType = EventType.Other,
                     Capacity = 10,
                     IsActive = true,
                     PriceInCents = 0,
@@ -342,7 +343,7 @@ public class DatabaseInitializationService
                     LocationId = demoTenant.Locations.First().Id,
                     Name = "Multi-Day Tournament Some Reg",
                     Description = "Join us for our annual holiday volleyball tournament! Open to all skill levels.",
-                    EventType = Core.Constants.EventType.Tournament,
+                    EventType = EventType.Tournament,
                     PriceInCents = 2500, // $25.00
                     LocationDetails = "TVAC Gym",
                     Capacity = 5,
@@ -358,27 +359,30 @@ public class DatabaseInitializationService
                         new EventRegistration
                         {
                             Id = Guid.NewGuid().ToString(),
+                            TenantId = demoTenantInfo.Id,
                             EventId = "12345678-aaaa-bbbb-cccc-1234567890ab",
                             UserId = demoUsers[0].Id,
-                            Status = Core.Constants.EventRegistrationStatus.Registered,
+                            Status = EventRegistrationStatus.Registered,
                             SignedUpAt = todayDateInTz.AddDays(-1).AddHours(-2).ToUniversalTime(),
                             CreatedBy = "System"
                         },
                         new EventRegistration
                         {
                             Id = Guid.NewGuid().ToString(),
+                            TenantId = demoTenantInfo.Id,
                             EventId = "12345678-aaaa-bbbb-cccc-1234567890ab",
                             UserId = demoUsers[2].Id,
-                            Status = Core.Constants.EventRegistrationStatus.Registered,
+                            Status = EventRegistrationStatus.Registered,
                             SignedUpAt = todayDateInTz.AddHours(-5).ToUniversalTime(),
                             CreatedBy = "System"
                         },
                         new EventRegistration
                         {
                             Id = Guid.NewGuid().ToString(),
+                            TenantId = demoTenantInfo.Id,
                             EventId = "12345678-aaaa-bbbb-cccc-1234567890ab",
                             UserId = demoUsers[3].Id,
-                            Status = Core.Constants.EventRegistrationStatus.Cancelled,
+                            Status = EventRegistrationStatus.Cancelled,
                             CancellationReason = "Can't make it",
                             SignedUpAt = todayDateInTz.AddHours(-5).ToUniversalTime(),
                             CreatedBy = "System"
@@ -392,7 +396,7 @@ public class DatabaseInitializationService
                     LocationId = demoTenant.Locations.First().Id,
                     Name = "Event Full Capacity",
                     Description = "A fun event for parents and their kids to play volleyball together.",
-                    EventType = Core.Constants.EventType.Social,
+                    EventType = EventType.Social,
                     LocationDetails = "123 Piper Lane, Meridian, ID 83646",
                     Capacity = 1, // Small capacity to demonstrate full event
                     IsActive = true,
@@ -405,9 +409,10 @@ public class DatabaseInitializationService
                         new EventRegistration
                         {
                             Id = Guid.NewGuid().ToString(),
+                            TenantId = demoTenantInfo.Id,
                             EventId = "87654321-bbbb-cccc-dddd-0987654321ba",
                             UserId = demoUsers[0].Id,
-                            Status = Core.Constants.EventRegistrationStatus.Registered,
+                            Status = EventRegistrationStatus.Registered,
                             SignedUpAt = todayDateInTz.AddHours(-1).ToUniversalTime(),
                             CreatedBy = "System"
                         }
@@ -420,7 +425,7 @@ public class DatabaseInitializationService
                     LocationId = demoTenant.Locations.First().Id,
                     Name = "Inactive Event",
                     Description = "An event that is inactive.",
-                    EventType = Core.Constants.EventType.Social,
+                    EventType = EventType.Social,
                     Capacity = 5,
                     LocationDetails = "Demo Location",
                     PriceInCents = 1499, // $14.99
@@ -438,7 +443,7 @@ public class DatabaseInitializationService
                     LocationId = demoTenant.Locations.First().Id,
                     Name = "Past Event",
                     Description = "An event that already occurred.",
-                    EventType = Core.Constants.EventType.Workshop,
+                    EventType = EventType.Workshop,
                     Capacity = 5,
                     IsActive = true,
                     StartTimeUtc = todayDateInTz.AddDays(-3).AddHours(12).ToUniversalTime(),
