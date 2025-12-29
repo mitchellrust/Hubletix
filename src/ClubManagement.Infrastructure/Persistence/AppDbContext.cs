@@ -52,7 +52,6 @@ public class AppDbContext : IdentityDbContext<User>
     // DbSets
     public DbSet<Tenant> Tenants { get; set; } = null!;
     public DbSet<Location> Locations { get; set; } = null!;
-    public DbSet<User> Users { get; set; } = null!;
     public DbSet<MembershipPlan> MembershipPlans { get; set; } = null!;
     public DbSet<Event> Events { get; set; } = null!;
     public DbSet<EventRegistration> EventRegistrations { get; set; } = null!;
@@ -67,6 +66,9 @@ public class AppDbContext : IdentityDbContext<User>
     {
         base.OnModelCreating(builder); // Important: Call base first for Identity tables
 
+        // Get current tenant ID for query filters
+        var tenantId = _multiTenantContextAccessor?.MultiTenantContext?.TenantInfo?.Id;
+
         // Configure Tenant
         builder.Entity<Tenant>()
             .HasKey(t => t.Id);
@@ -77,7 +79,7 @@ public class AppDbContext : IdentityDbContext<User>
             .Property(t => t.ConfigJson)
             .HasColumnType("jsonb");
 
-        // Configure Location
+        // Configure Location with multi-tenant query filter
         builder.Entity<Location>()
             .HasKey(l => l.Id);
         builder.Entity<Location>()
@@ -87,13 +89,16 @@ public class AppDbContext : IdentityDbContext<User>
             .OnDelete(DeleteBehavior.Cascade);
         builder.Entity<Location>()
             .HasIndex(l => new { l.TenantId, l.IsDefault });
+        builder.Entity<Location>()
+            .HasQueryFilter(l => l.TenantId == tenantId);
 
-        // Configure User
+        // Configure User with multi-tenant query filter
         builder.Entity<User>()
             .HasOne(u => u.Tenant)
             .WithMany(t => t.Users)
             .HasForeignKey(u => u.TenantId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Cascade)
+            .IsRequired(false); // Allow null for platform users
         builder.Entity<User>()
             .HasOne(u => u.Location)
             .WithMany(l => l.Users)
@@ -102,8 +107,10 @@ public class AppDbContext : IdentityDbContext<User>
         builder.Entity<User>()
             .HasIndex(u => u.Email)
             .IsUnique();
+        builder.Entity<User>()
+            .HasQueryFilter(u => u.TenantId == null || u.TenantId == tenantId);
 
-        // Configure MembershipPlan
+        // Configure MembershipPlan with multi-tenant query filter
         builder.Entity<MembershipPlan>()
             .HasKey(p => p.Id);
         builder.Entity<MembershipPlan>()
@@ -118,8 +125,10 @@ public class AppDbContext : IdentityDbContext<User>
             .OnDelete(DeleteBehavior.Restrict);
         builder.Entity<MembershipPlan>()
             .HasIndex(p => new { p.TenantId, p.StripeProductId });
+        builder.Entity<MembershipPlan>()
+            .HasQueryFilter(p => p.TenantId == tenantId);
 
-        // Configure Event
+        // Configure Event with multi-tenant query filter
         builder.Entity<Event>()
             .HasKey(e => e.Id);
         builder.Entity<Event>()
@@ -132,8 +141,10 @@ public class AppDbContext : IdentityDbContext<User>
             .WithMany(l => l.Events)
             .HasForeignKey(e => e.LocationId)
             .OnDelete(DeleteBehavior.Restrict);
+        builder.Entity<Event>()
+            .HasQueryFilter(e => e.TenantId == tenantId);
 
-        // Configure EventRegistration
+        // Configure EventRegistration with multi-tenant query filter (via Event)
         builder.Entity<EventRegistration>()
             .HasKey(s => s.Id);
         builder.Entity<EventRegistration>()
@@ -146,8 +157,9 @@ public class AppDbContext : IdentityDbContext<User>
             .WithMany(u => u.EventRegistrations)
             .HasForeignKey(s => s.UserId)
             .OnDelete(DeleteBehavior.Cascade);
+        // EventRegistration filtered through Event relationship
 
-        // Configure Payment
+        // Configure Payment with multi-tenant query filter
         builder.Entity<Payment>()
             .HasKey(p => p.Id);
         builder.Entity<Payment>()
@@ -164,6 +176,8 @@ public class AppDbContext : IdentityDbContext<User>
         builder.Entity<Payment>()
             .HasIndex(p => p.StripePaymentId)
             .IsUnique();
+        builder.Entity<Payment>()
+            .HasQueryFilter(p => p.TenantId == tenantId);
 
         // Configure PlatformPlan
         builder.Entity<PlatformPlan>()
@@ -262,5 +276,24 @@ public class AppDbContext : IdentityDbContext<User>
         }
 
         return base.SaveChangesAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Gets the current tenant ID from the multi-tenant context.
+    /// Returns null if no tenant context is available.
+    /// </summary>
+    public string? GetCurrentTenantId()
+    {
+        return _multiTenantContextAccessor?.MultiTenantContext?.TenantInfo?.Id;
+    }
+
+    /// <summary>
+    /// Bypasses tenant query filters for queries where you need cross-tenant access.
+    /// Use with caution - typically only for platform admin operations.
+    /// Example: context.Users.IgnoreQueryFilters().Where(...)
+    /// </summary>
+    public IQueryable<T> WithoutTenantFilter<T>() where T : class
+    {
+        return Set<T>().IgnoreQueryFilters();
     }
 }
