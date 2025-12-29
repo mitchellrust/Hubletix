@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using ClubManagement.Infrastructure.Persistence;
 using ClubManagement.Infrastructure.Services;
 using ClubManagement.Core.Models;
+using ClubManagement.Api.Validators;
 using Finbuckle.MultiTenant.Extensions;
 using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
@@ -36,6 +37,76 @@ else
 
 // Register onboarding service
 builder.Services.AddScoped<ITenantOnboardingService, TenantOnboardingService>();
+
+// Register authentication services
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
+
+// Configure Identity
+builder.Services.AddIdentity<ClubManagement.Core.Entities.User, Microsoft.AspNetCore.Identity.IdentityRole>(options =>
+{
+    // Password settings
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequiredLength = 8;
+    
+    // Lockout settings
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.AllowedForNewUsers = true;
+    
+    // User settings
+    options.User.RequireUniqueEmail = true;
+    options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+    options.SignIn.RequireConfirmedEmail = false; // Set to true when email confirmation is implemented
+})
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddUserValidator<RequireEmailValidator>();
+
+// Configure JWT settings
+builder.Services.Configure<ClubManagement.Core.Models.JwtSettings>(builder.Configuration.GetSection("Jwt"));
+
+// JWT Authentication
+var jwtSettings = builder.Configuration.GetSection("Jwt").Get<ClubManagement.Core.Models.JwtSettings>();
+var key = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
+    System.Text.Encoding.UTF8.GetBytes(jwtSettings!.Secret));
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
+    options.SaveToken = true;
+    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings.Issuer,
+        ValidAudience = jwtSettings.Audience,
+        IssuerSigningKey = key,
+        ClockSkew = TimeSpan.FromSeconds(30)
+    };
+});
+
+// Authorization policies
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("PlatformAdmin", policy =>
+        policy.RequireClaim("platform_role", "PlatformAdmin"));
+    
+    options.AddPolicy("TenantAdmin", policy =>
+        policy.RequireClaim("tenant_role", "Admin")
+              .RequireClaim("tenant_id"));
+    
+    options.AddPolicy("TenantMember", policy =>
+        policy.RequireClaim("tenant_id"));
+});
 
 // Register database initialization service
 builder.Services.AddScoped<DatabaseInitializationService>();
@@ -123,8 +194,8 @@ app.UseStaticFiles();
 app.UseMultiTenant();
 
 app.UseRouting();
-// app.UseAuthentication();
-// app.UseAuthorization();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapRazorPages();
 app.MapControllers();

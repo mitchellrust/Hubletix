@@ -109,15 +109,6 @@
                             </a>
                         </th>
                         <th>
-                            <a asp-page="/Admin/Members" asp-route-sort="created" asp-route-dir="@(Model.SortField == "created" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" asp-route-plan="@Model.MembershipPlanFilter" class="text-decoration-none">
-                                Joined
-                                @if (Model.SortField == "created")
-                                {
-                                    <i class="bi bi-arrow-@(Model.SortDirection == "asc" ? "down" : "up")"></i>
-                                }
-                            </a>
-                        </th>
-                        <th>
                             <a asp-page="/Admin/Members" asp-route-sort="membershipplan" asp-route-dir="@(Model.SortField == "membershipplan" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" asp-route-plan="@Model.MembershipPlanFilter" class="text-decoration-none">
                                 Membership Plan
                                 @if (Model.SortField == "membershipplan")
@@ -146,9 +137,6 @@
                                 </td>
                                 <td>
                                     <a href="mailto:@member.Email" class="text-decoration-none">@member.Email</a>
-                                </td>
-                                <td>
-                                    <span class="text-muted">@member.JoinedDate.ToString("MMM d, yyyy")</span>
                                 </td>
                                 <td>
                                     @if (member.MembershipPlanId != null)
