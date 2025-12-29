@@ -160,39 +160,41 @@ public class AccountService : IAccountService
                 return (false, "Invalid email or password.", null);
             }
 
-        if (!user.IsActive)
-        {
-            _logger.LogWarning("Login failed: user {UserId} is inactive", user.Id);
-            return (false, "Your account has been deactivated. Please contact support.", null);
-        }
-
-        // Check if user has access to the specified tenant
-        if (!string.IsNullOrEmpty(tenantId))
-        {
-            var hasTenantAccess = await _db.Set<TenantUserRole>()
-                .AnyAsync(tr => tr.UserId == user.Id && tr.TenantId == tenantId, ct);
-
-            if (!hasTenantAccess && user.TenantId != tenantId)
+            if (!user.IsActive)
             {
-                _logger.LogWarning("Login failed: user {UserId} does not have access to tenant {TenantId}",
-                    user.Id, tenantId);
-                return (false, "You do not have access to this organization.", null);
-            }
-        }
-
-        var result = await _signInManager.CheckPasswordSignInAsync(user, password, lockoutOnFailure: true);
-
-        if (!result.Succeeded)
-        {
-            if (result.IsLockedOut)
-            {
-                _logger.LogWarning("Login failed: user {UserId} is locked out", user.Id);
-                return (false, "Your account is locked due to too many failed login attempts. Please try again later.", null);
+                _logger.LogWarning("Login failed: user {UserId} is inactive", user.Id);
+                return (false, "Your account has been deactivated. Please contact support.", null);
             }
 
-            _logger.LogWarning("Login failed: invalid password for user {Email}", email);
-            return (false, "Invalid email or password.", null);
-        }            _logger.LogInformation("User {UserId} logged in successfully", user.Id);
+            // Check if user has access to the specified tenant
+            if (!string.IsNullOrEmpty(tenantId))
+            {
+                var hasTenantAccess = await _db.Set<TenantUserRole>()
+                    .AnyAsync(tr => tr.UserId == user.Id && tr.TenantId == tenantId, ct);
+
+                if (!hasTenantAccess && user.TenantId != tenantId)
+                {
+                    _logger.LogWarning("Login failed: user {UserId} does not have access to tenant {TenantId}",
+                        user.Id, tenantId);
+                    return (false, "You do not have access to this organization.", null);
+                }
+            }
+
+            var result = await _signInManager.CheckPasswordSignInAsync(user, password, lockoutOnFailure: true);
+
+            if (!result.Succeeded)
+            {
+                if (result.IsLockedOut)
+                {
+                    _logger.LogWarning("Login failed: user {UserId} is locked out", user.Id);
+                    return (false, "Your account is locked due to too many failed login attempts. Please try again later.", null);
+                }
+
+                _logger.LogWarning("Login failed: invalid password for user {Email}", email);
+                return (false, "Invalid email or password.", null);
+            }
+            
+            _logger.LogInformation("User {UserId} logged in successfully", user.Id);
             return (true, null, user);
         }
         catch (Exception ex)
