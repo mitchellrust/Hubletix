@@ -56,7 +56,6 @@ public class TokenService : ITokenService
             new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
             new Claim(JwtRegisteredClaimNames.Name, $"{user.FirstName} {user.LastName}"),
             new Claim("first_name", user.FirstName ?? string.Empty),
-            new Claim("last_name", user.LastName ?? string.Empty),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
