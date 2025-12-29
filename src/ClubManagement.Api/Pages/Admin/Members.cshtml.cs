@@ -92,9 +92,6 @@ public class MembersModel : AdminPageModel
             "email" => SortDirection == _sortDirectionAsc
                 ? query.OrderBy(u => u.User.Email)
                 : query.OrderByDescending(u => u.User.Email),
-            "created" => SortDirection == _sortDirectionAsc
-                ? query.OrderBy(u => u.User.CreatedAt)
-                : query.OrderByDescending(u => u.User.CreatedAt),
             "membershipplan" => SortDirection == _sortDirectionAsc
                 ? query.OrderBy(u => u.MembershipPlanName)
                 : query.OrderByDescending(u => u.MembershipPlanName),
@@ -120,10 +117,9 @@ public class MembersModel : AdminPageModel
             FirstName = u.User.FirstName,
             LastName = u.User.LastName,
             FullName = $"{u.User.FirstName} {u.User.LastName}",
-            Email = u.User.Email,
+            Email = u.User.Email!,
             IsActive = u.User.IsActive,
             MembershipPlanId = u.User.MembershipPlanId,
-            JoinedDate = u.User.CreatedAt,
             MembershipPlanName = u.MembershipPlanName
         }).ToList();
     }
@@ -193,6 +189,5 @@ public class MemberDto
     public string Email { get; set; } = string.Empty;
     public bool IsActive { get; set; }
     public string? MembershipPlanId { get; set; }
-    public DateTime JoinedDate { get; set; }
     public string? MembershipPlanName { get; set; }
 }

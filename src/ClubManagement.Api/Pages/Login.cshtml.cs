@@ -2,11 +2,16 @@ using ClubManagement.Infrastructure.Persistence;
 using ClubManagement.Infrastructure.Services;
 using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace ClubManagement.Api.Pages;
 
 public class LoginModel : PublicPageModel
 {
+    private readonly IAccountService _accountService;
+    private readonly ITokenService _tokenService;
+    private readonly ILogger<LoginModel> _logger;
+
     [BindProperty]
     public string? Email { get; set; }
     
@@ -34,9 +39,16 @@ public class LoginModel : PublicPageModel
     public LoginModel(
         IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
         ITenantConfigService tenantConfigService,
-        AppDbContext dbContext
+        AppDbContext dbContext,
+        IAccountService accountService,
+        ITokenService tokenService,
+        ILogger<LoginModel> logger
     ) : base(multiTenantContextAccessor, tenantConfigService, dbContext)
-    { }
+    {
+        _accountService = accountService;
+        _tokenService = tokenService;
+        _logger = logger;
+    }
 
     public async Task<IActionResult> OnGetAsync()
     {
@@ -55,34 +67,65 @@ public class LoginModel : PublicPageModel
     /// </summary>
     public async Task<IActionResult> OnPostLoginAsync()
     {
-        if (!ModelState.IsValid)
+        if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
         {
-            ErrorMessage = "Please fill in all required fields.";
+            ErrorMessage = "Please enter both email and password.";
             return Page();
         }
 
-        // TODO: Implement login functionality with ASP.NET Core Identity
-        // This will include:
-        // 1. Validate user credentials against the database
-        // 2. Check if user belongs to the current tenant
-        // 3. Create authentication cookie/JWT token
-        // 4. Redirect to member dashboard or return URL
-        
-        ErrorMessage = "TODO: Login functionality not yet implemented. Identity and authentication system needs to be configured.";
-        return Page();
-        
-        // Future implementation will look something like:
-        // var result = await _signInManager.PasswordSignInAsync(Email, Password, RememberMe, lockoutOnFailure: false);
-        // if (result.Succeeded)
-        // {
-        //     SuccessMessage = "Login successful!";
-        //     return RedirectToPage("/Member/Dashboard");
-        // }
-        // else
-        // {
-        //     ErrorMessage = "Invalid email or password.";
-        //     return Page();
-        // }
+        try
+        {
+            // Attempt login with tenant context
+            var (success, error, user) = await _accountService.LoginAsync(
+                Email,
+                Password,
+                CurrentTenantInfo?.Id
+            );
+
+            if (!success || user == null)
+            {
+                ErrorMessage = error ?? "Login failed. Please try again.";
+                return Page();
+            }
+
+            // Create JWT tokens
+            var (accessToken, refreshToken) = await _tokenService.CreateTokensAsync(
+                user,
+                CurrentTenantInfo?.Id
+            );
+
+            // Store tokens in HTTP-only cookies for web sessions
+            Response.Cookies.Append("access_token", accessToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTimeOffset.UtcNow.AddMinutes(15)
+            });
+
+            Response.Cookies.Append("refresh_token", refreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTimeOffset.UtcNow.AddDays(30)
+            });
+
+            _logger.LogInformation("User {Email} logged in successfully to tenant {TenantId}",
+                Email, CurrentTenantInfo?.Id);
+
+            SuccessMessage = "Login successful! Welcome back.";
+            
+            // Redirect to member dashboard or admin dashboard based on role
+            // TODO: Implement role-based redirect
+            return RedirectToPage("/Index");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during login for {Email}", Email);
+            ErrorMessage = "An error occurred during login. Please try again.";
+            return Page();
+        }
     }
 
     /// <summary>
@@ -90,7 +133,8 @@ public class LoginModel : PublicPageModel
     /// </summary>
     public async Task<IActionResult> OnPostSignupAsync()
     {
-        if (!ModelState.IsValid)
+        if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password) ||
+            string.IsNullOrWhiteSpace(FirstName) || string.IsNullOrWhiteSpace(LastName))
         {
             ErrorMessage = "Please fill in all required fields.";
             return Page();
@@ -103,39 +147,60 @@ public class LoginModel : PublicPageModel
             return Page();
         }
 
-        // TODO: Implement signup functionality with ASP.NET Core Identity
-        // This will include:
-        // 1. Create new user account in the database
-        // 2. Associate user with current tenant
-        // 3. Send email verification (optional)
-        // 4. Automatically sign in the user or redirect to login
-        // 5. Create initial member profile
-        
-        ErrorMessage = "TODO: Signup functionality not yet implemented. Identity and authentication system needs to be configured.";
-        return Page();
-        
-        // Future implementation will look something like:
-        // var user = new User
-        // {
-        //     UserName = Email,
-        //     Email = Email,
-        //     FirstName = FirstName,
-        //     LastName = LastName,
-        //     TenantId = CurrentTenantInfo.Id,
-        //     EmailConfirmed = false // Set to true if not requiring email confirmation
-        // };
-        //
-        // var result = await _userManager.CreateAsync(user, Password);
-        // if (result.Succeeded)
-        // {
-        //     await _signInManager.SignInAsync(user, isPersistent: false);
-        //     SuccessMessage = "Account created successfully!";
-        //     return RedirectToPage("/Member/Dashboard");
-        // }
-        // else
-        // {
-        //     ErrorMessage = string.Join(", ", result.Errors.Select(e => e.Description));
-        //     return Page();
-        // }
+        try
+        {
+            // Register new user with tenant context
+            var (success, error, user) = await _accountService.RegisterAsync(
+                Email,
+                Password,
+                FirstName,
+                LastName,
+                CurrentTenantInfo?.Id,
+                ClubManagement.Core.Constants.UserRoles.Member
+            );
+
+            if (!success || user == null)
+            {
+                ErrorMessage = error ?? "Registration failed. Please try again.";
+                return Page();
+            }
+
+            // Create JWT tokens
+            var (accessToken, refreshToken) = await _tokenService.CreateTokensAsync(
+                user,
+                CurrentTenantInfo?.Id
+            );
+
+            // Store tokens in HTTP-only cookies
+            Response.Cookies.Append("access_token", accessToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTimeOffset.UtcNow.AddMinutes(15)
+            });
+
+            Response.Cookies.Append("refresh_token", refreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTimeOffset.UtcNow.AddDays(30)
+            });
+
+            _logger.LogInformation("User {Email} registered successfully for tenant {TenantId}",
+                Email, CurrentTenantInfo?.Id);
+
+            SuccessMessage = $"Welcome, {FirstName}! Your account has been created.";
+            
+            // Redirect to member dashboard
+            return RedirectToPage("/Index");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during signup for {Email}", Email);
+            ErrorMessage = "An error occurred during registration. Please try again.";
+            return Page();
+        }
     }
 }

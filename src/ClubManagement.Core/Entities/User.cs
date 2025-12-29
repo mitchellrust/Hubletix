@@ -1,25 +1,22 @@
-using System.ComponentModel.DataAnnotations;
-using ClubManagement.Core.Models;
+using Microsoft.AspNetCore.Identity;
 using ClubManagement.Core.Constants;
 
 namespace ClubManagement.Core.Entities;
 
 /// <summary>
-/// User with tenant and role information.
+/// User with tenant and role information, extends IdentityUser for authentication.
 /// </summary>
-public class User : BaseEntity
+public class User : IdentityUser
 {    
     /// <summary>
-    /// Foreign key to Tenant (the tenant being created)
-    /// Override base property to make it nullable during signup flow
+    /// Foreign key to Tenant
     /// </summary>
-    public new string? TenantId { get; set; }
+    public string? TenantId { get; set; }
 
     /// <summary>
-    /// User's email address
+    /// Unique identifier for the entity (alias for Id from IdentityUser)
     /// </summary>
-    [Required]
-    public string Email { get; set; } = null!;
+    public string EntityId => Id;
 
     /// <summary>
     /// User's first name

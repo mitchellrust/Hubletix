@@ -2,40 +2,52 @@ using Microsoft.EntityFrameworkCore;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Finbuckle.MultiTenant.Abstractions;
 using ClubManagement.Core.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace ClubManagement.Infrastructure.Persistence;
 
 /// <summary>
-/// Application DbContext with multi-tenant support via Finbuckle.MultiTenant.
+/// Application DbContext with multi-tenant support via Finbuckle.MultiTenant and Identity support.
 /// Uses global query filters to enforce data isolation per tenant.
 /// </summary>
-public class AppDbContext : MultiTenantDbContext
+public class AppDbContext : IdentityDbContext<User>
 {
+    private readonly IMultiTenantContextAccessor? _multiTenantContextAccessor;
+
     // Used for dependency injection
     public AppDbContext(
         IMultiTenantContextAccessor multiTenantContextAccessor
-    ) : base(multiTenantContextAccessor)
-    { }
+    ) : base()
+    {
+        _multiTenantContextAccessor = multiTenantContextAccessor;
+    }
 
     // Used for dependency injection
     public AppDbContext(
         IMultiTenantContextAccessor multiTenantContextAccessor,
         DbContextOptions<AppDbContext> options
-    ) : base(multiTenantContextAccessor, options)
-    { }
+    ) : base(options)
+    {
+        _multiTenantContextAccessor = multiTenantContextAccessor;
+    }
 
     // Useful for testing, no DI
     public AppDbContext(
         ClubTenantInfo tenantInfo
-    ) : base((IMultiTenantContextAccessor)tenantInfo)
-    { }
+    ) : base()
+    {
+        _multiTenantContextAccessor = (IMultiTenantContextAccessor)tenantInfo;
+    }
 
     // Useful for testing, no DI
     public AppDbContext(
         ClubTenantInfo tenantInfo,
         DbContextOptions<AppDbContext> options
-    ) : base((IMultiTenantContextAccessor)tenantInfo, options)
-    { }
+    ) : base(options)
+    {
+        _multiTenantContextAccessor = (IMultiTenantContextAccessor)tenantInfo;
+    }
 
     // DbSets
     public DbSet<Tenant> Tenants { get; set; } = null!;
@@ -48,10 +60,12 @@ public class AppDbContext : MultiTenantDbContext
     public DbSet<PlatformPlan> PlatformPlans { get; set; } = null!;
     public DbSet<TenantSubscription> TenantSubscriptions { get; set; } = null!;
     public DbSet<SignupSession> SignupSessions { get; set; } = null!;
+    public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
+    public DbSet<TenantUserRole> TenantUserRoles { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        base.OnModelCreating(builder);
+        base.OnModelCreating(builder); // Important: Call base first for Identity tables
 
         // Configure Tenant
         builder.Entity<Tenant>()
@@ -200,6 +214,37 @@ public class AppDbContext : MultiTenantDbContext
             .HasIndex(ss => ss.Email);
         builder.Entity<SignupSession>()
             .HasIndex(ss => ss.StripeCheckoutSessionId);
+
+        // Configure RefreshToken
+        builder.Entity<RefreshToken>()
+            .HasKey(rt => rt.Id);
+        builder.Entity<RefreshToken>()
+            .HasOne(rt => rt.User)
+            .WithMany()
+            .HasForeignKey(rt => rt.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<RefreshToken>()
+            .HasIndex(rt => rt.TokenHash)
+            .IsUnique();
+        builder.Entity<RefreshToken>()
+            .HasIndex(rt => rt.UserId);
+
+        // Configure TenantUserRole
+        builder.Entity<TenantUserRole>()
+            .HasKey(tur => tur.Id);
+        builder.Entity<TenantUserRole>()
+            .HasOne(tur => tur.Tenant)
+            .WithMany()
+            .HasForeignKey(tur => tur.TenantId)
+            .OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<TenantUserRole>()
+            .HasOne(tur => tur.User)
+            .WithMany()
+            .HasForeignKey(tur => tur.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<TenantUserRole>()
+            .HasIndex(tur => new { tur.TenantId, tur.UserId })
+            .IsUnique();
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
