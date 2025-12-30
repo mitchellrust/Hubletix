@@ -47,7 +47,6 @@ public class EventRegistrationsModel : AdminPageModel
 
         // Build query
         var query = DbContext.EventRegistrations
-            .Where(e => e.TenantId == CurrentTenantInfo.Id)
             .Include(r => r.User)
             .Include(r => r.Event)
             .Select(r => new
@@ -57,8 +56,7 @@ public class EventRegistrationsModel : AdminPageModel
                 EventName = r.Event.Name,
                 EventStartTime = r.Event.StartTimeUtc,
                 EventEndTime = r.Event.EndTimeUtc
-            })
-            .AsQueryable();
+            });
 
         // Apply status filter
         if (StatusFilter != "all")
@@ -126,9 +124,8 @@ public class EventRegistrationsModel : AdminPageModel
     {
         // Build base query with status filter applied
         var registrationQuery = DbContext.EventRegistrations
-            .Where(e => e.TenantId == CurrentTenantInfo.Id)
             .AsQueryable();
-        
+                    
         if (statusFilter != "all")
         {
             registrationQuery = registrationQuery.Where(r => r.Status.ToLower() == statusFilter);
@@ -136,8 +133,7 @@ public class EventRegistrationsModel : AdminPageModel
         
         // Build event query with time filter
         var eventQuery = DbContext.Events
-            .Where(e => e.TenantId == CurrentTenantInfo.Id)
-            .AsQueryable();
+            .Where(e => e.TenantId == CurrentTenantInfo.Id);
         
         if (timeFilter == "upcoming")
         {

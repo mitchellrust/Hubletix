@@ -45,7 +45,6 @@ public class PlansModel : AdminPageModel
 
         // Build a deferred query for membership plans
         var query = DbContext.MembershipPlans
-            .Where(p => p.TenantId == CurrentTenantInfo.Id)
             .AsQueryable();
 
         // Apply status filter

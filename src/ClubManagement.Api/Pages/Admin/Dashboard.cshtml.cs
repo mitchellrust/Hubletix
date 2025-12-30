@@ -41,7 +41,6 @@ public class DashboardModel : AdminPageModel
         TenantStats.ActiveEvents = await DbContext.Events
             .CountAsync(
                 e => (e.StartTimeUtc >= utcNow || e.EndTimeUtc >= utcNow)
-                    && e.TenantId == CurrentTenantInfo.Id
                     && e.IsActive
             );
 
@@ -49,7 +48,6 @@ public class DashboardModel : AdminPageModel
         var events = await DbContext.Events
             .Where(
                 e => (e.StartTimeUtc >= utcNow || e.EndTimeUtc >= utcNow)
-                    && e.TenantId == CurrentTenantInfo.Id
                     && e.IsActive
             )
             .Include(e => e.EventRegistrations)

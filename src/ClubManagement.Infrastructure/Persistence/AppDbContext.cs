@@ -66,9 +66,6 @@ public class AppDbContext : IdentityDbContext<User>
     {
         base.OnModelCreating(builder); // Important: Call base first for Identity tables
 
-        // Get current tenant ID for query filters
-        var tenantId = _multiTenantContextAccessor?.MultiTenantContext?.TenantInfo?.Id;
-
         // Configure Tenant
         builder.Entity<Tenant>()
             .HasKey(t => t.Id);
@@ -90,7 +87,7 @@ public class AppDbContext : IdentityDbContext<User>
         builder.Entity<Location>()
             .HasIndex(l => new { l.TenantId, l.IsDefault });
         builder.Entity<Location>()
-            .HasQueryFilter(l => l.TenantId == tenantId);
+            .HasQueryFilter(l => _multiTenantContextAccessor!.MultiTenantContext!.TenantInfo!.Id == l.TenantId);
 
         // Configure User with multi-tenant query filter
         builder.Entity<User>()
@@ -108,7 +105,7 @@ public class AppDbContext : IdentityDbContext<User>
             .HasIndex(u => u.Email)
             .IsUnique();
         builder.Entity<User>()
-            .HasQueryFilter(u => u.TenantId == null || u.TenantId == tenantId);
+            .HasQueryFilter(u => u.TenantId == null || _multiTenantContextAccessor!.MultiTenantContext!.TenantInfo!.Id == u.TenantId);
 
         // Configure MembershipPlan with multi-tenant query filter
         builder.Entity<MembershipPlan>()
@@ -126,7 +123,7 @@ public class AppDbContext : IdentityDbContext<User>
         builder.Entity<MembershipPlan>()
             .HasIndex(p => new { p.TenantId, p.StripeProductId });
         builder.Entity<MembershipPlan>()
-            .HasQueryFilter(p => p.TenantId == tenantId);
+            .HasQueryFilter(p => _multiTenantContextAccessor!.MultiTenantContext!.TenantInfo!.Id == p.TenantId);
 
         // Configure Event with multi-tenant query filter
         builder.Entity<Event>()
@@ -142,7 +139,7 @@ public class AppDbContext : IdentityDbContext<User>
             .HasForeignKey(e => e.LocationId)
             .OnDelete(DeleteBehavior.Restrict);
         builder.Entity<Event>()
-            .HasQueryFilter(e => e.TenantId == tenantId);
+            .HasQueryFilter(e => _multiTenantContextAccessor!.MultiTenantContext!.TenantInfo!.Id == e.TenantId);
 
         // Configure EventRegistration with multi-tenant query filter (via Event)
         builder.Entity<EventRegistration>()
@@ -177,7 +174,7 @@ public class AppDbContext : IdentityDbContext<User>
             .HasIndex(p => p.StripePaymentId)
             .IsUnique();
         builder.Entity<Payment>()
-            .HasQueryFilter(p => p.TenantId == tenantId);
+            .HasQueryFilter(p => _multiTenantContextAccessor!.MultiTenantContext!.TenantInfo!.Id == p.TenantId);
 
         // Configure PlatformPlan
         builder.Entity<PlatformPlan>()

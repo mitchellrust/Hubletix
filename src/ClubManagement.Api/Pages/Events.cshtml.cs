@@ -55,11 +55,9 @@ public class EventsModel : PublicPageModel
         var query = DbContext.Events
             .Include(e => e.EventRegistrations)
             .Where(
-                e => e.TenantId == CurrentTenantInfo.Id &&
-                     e.IsActive &&
+                e => e.IsActive &&
                      e.StartTimeUtc > DateTime.UtcNow
-            )
-            .AsQueryable();
+            );
 
         // Apply event type filter
         if (TypeFilter != "all")
@@ -136,11 +134,9 @@ public class EventsModel : PublicPageModel
         var query = DbContext.Events
             .Include(e => e.EventRegistrations)
             .Where(
-                e => e.TenantId == CurrentTenantInfo.Id &&
-                     e.IsActive &&
+                e => e.IsActive &&
                      e.StartTimeUtc > DateTime.UtcNow
-            )
-            .AsQueryable();
+            );
         
         // Apply event type filter
         if (TypeFilter != "all")
