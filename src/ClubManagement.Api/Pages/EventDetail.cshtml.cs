@@ -24,7 +24,6 @@ public class EventDetailModel : PublicPageModel
             .Include(e => e.EventRegistrations)
             .FirstOrDefaultAsync(
                 e => e.Id == id &&
-                     e.TenantId == CurrentTenantInfo.Id &&
                      e.IsActive
             );
 

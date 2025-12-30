@@ -131,7 +131,7 @@ public class CreateEventModel : AdminPageModel
         //TODO: Change to set location ID based on selection when multi-location is supported
         // For now, just using the default location for the tenant.
         var defaultLocationId = await DbContext.Locations
-            .Where(l => l.TenantId == CurrentTenantInfo.Id && l.IsDefault)
+            .Where(l => l.IsDefault)
             .Select(l => l.Id)
             .FirstOrDefaultAsync();
         Event.LocationId = defaultLocationId ?? throw new Exception("Default location not found for tenant.");

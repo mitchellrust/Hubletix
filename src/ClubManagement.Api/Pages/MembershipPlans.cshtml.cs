@@ -29,7 +29,7 @@ public class MembershipPlansModel : PublicPageModel
 
         // Fetch all active membership plans for this tenant
         var plans = await DbContext.MembershipPlans
-            .Where(p => p.TenantId == CurrentTenantInfo.Id && p.IsActive)
+            .Where(p => p.IsActive)
             .OrderBy(p => p.DisplayOrder)
             .ThenBy(p => p.PriceInCents)
             .ToListAsync();

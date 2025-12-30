@@ -53,14 +53,12 @@ public class MembersModel : AdminPageModel
                     User = u,
                     MembershipPlanName = DbContext.MembershipPlans
                         .Where(
-                            p => p.TenantId == CurrentTenantInfo.Id &&
-                                 p.Id == u.MembershipPlanId
+                            p => p.Id == u.MembershipPlanId
                         )
                         .Select(p => p.Name)
                         .FirstOrDefault()
                 }
-            )
-            .AsQueryable();
+            );
 
         // Apply status filter
         query = StatusFilter switch
@@ -128,8 +126,7 @@ public class MembersModel : AdminPageModel
     {
         // Build base query with status filter applied
         var userQuery = DbContext.Users
-            .Where(u => u.TenantId == CurrentTenantInfo.Id)
-            .AsQueryable();
+            .Where(u => u.TenantId == CurrentTenantInfo.Id);
         
         if (StatusFilter == "active")
         {
@@ -143,7 +140,6 @@ public class MembersModel : AdminPageModel
         
         // Get all membership plans with filtered member counts
         var planFacets = await DbContext.MembershipPlans
-            .Where(e => e.TenantId == CurrentTenantInfo.Id)
             .OrderBy(p => p.DisplayOrder)
             .ThenBy(p => p.Name)
             .Select(p => new MembershipPlanFacet

@@ -43,8 +43,7 @@ public class PlanDetailModel : AdminPageModel
 
         Plan = await DbContext.MembershipPlans
             .FirstOrDefaultAsync(
-                p => p.TenantId == CurrentTenantInfo.Id &&
-                     p.Id == id
+                p => p.Id == id
             );
 
         // If plan not found, should return better UI than 404.
@@ -69,8 +68,7 @@ public class PlanDetailModel : AdminPageModel
         // Verify plan still exists in DB
         var existingPlan = await DbContext.MembershipPlans
             .FirstOrDefaultAsync(
-                p => p.TenantId == CurrentTenantInfo.Id &&
-                     p.Id == Plan.Id
+                p => p.Id == Plan.Id
             );
 
         // If event not found, should return better UI than 404.
@@ -160,8 +158,7 @@ public class PlanDetailModel : AdminPageModel
         // Verify plan exists
         var planToDelete = await DbContext.MembershipPlans
             .FirstOrDefaultAsync(
-                p => p.TenantId == CurrentTenantInfo.Id &&
-                     p.Id == id
+                p => p.Id == id
             );
 
         // If plan was not found, must have already been deleted.

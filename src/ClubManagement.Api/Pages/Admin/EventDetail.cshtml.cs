@@ -66,7 +66,6 @@ public class EventDetailModel : AdminPageModel
         }
 
         Event = await DbContext.Events
-            .Where(e => e.TenantId == CurrentTenantInfo.Id)
             .FirstOrDefaultAsync(e => e.Id == id);
 
         // If event not found, should return better UI than 404.
@@ -112,16 +111,14 @@ public class EventDetailModel : AdminPageModel
         // Build query for registrations of this specific event
         var query = DbContext.EventRegistrations
             .Where(
-                r => r.TenantId == CurrentTenantInfo.Id &&
-                     r.EventId == eventId
+                r => r.EventId == eventId
             )
             .Include(r => r.User)
             .Select(r => new
             {
                 Registration = r,
                 UserName = r.User.FirstName + " " + r.User.LastName
-            })
-            .AsQueryable();
+            });
 
         // Apply status filter
         if (RegistrationStatusFilter != "all")
@@ -177,8 +174,7 @@ public class EventDetailModel : AdminPageModel
         var existingEvent = await DbContext.Events
             .Include(e => e.EventRegistrations)
             .FirstOrDefaultAsync(
-                e => e.TenantId == CurrentTenantInfo.Id &&
-                    e.Id == Event.Id
+                e => e.Id == Event.Id
             );
 
         // If event not found, should return better UI than 404.
@@ -334,8 +330,7 @@ public class EventDetailModel : AdminPageModel
         var eventToDelete = await DbContext.Events
             .Include(e => e.EventRegistrations)
             .FirstOrDefaultAsync(
-                e => e.TenantId == CurrentTenantInfo.Id &&
-                     e.Id == id
+                e => e.Id == id
             );
 
         if (eventToDelete == null)
