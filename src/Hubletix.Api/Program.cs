@@ -29,7 +29,7 @@ builder.Services.AddMultiTenant<ClubTenantInfo>()
 builder.Services.AddScoped<ITenantOnboardingService, TenantOnboardingService>();
 
 // Register authentication services
-builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IClaimsPrincipalFactory, ClaimsPrincipalFactory>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 
 // Configure Identity
@@ -55,34 +55,21 @@ builder.Services.AddIdentity<Hubletix.Core.Entities.User, Microsoft.AspNetCore.I
     .AddEntityFrameworkStores<AppDbContext>()
     .AddUserValidator<RequireEmailValidator>();
 
-// Configure JWT settings
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
-
-// JWT Authentication
-var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
-var key = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
-    System.Text.Encoding.UTF8.GetBytes(jwtSettings!.Secret)
-);
-
-builder.Services.AddAuthentication(options =>
+// Cookie Authentication
+builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
     {
-        options.DefaultAuthenticateScheme = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
-    {
-        options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
-        options.SaveToken = true;
-        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtSettings.Issuer,
-            ValidAudience = jwtSettings.Audience,
-            IssuerSigningKey = key,
-            ClockSkew = TimeSpan.FromSeconds(30)
-        };
+        options.Cookie.Name = "Hubletix.Auth";
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = builder.Environment.IsDevelopment() 
+            ? CookieSecurePolicy.SameAsRequest 
+            : CookieSecurePolicy.Always;
+        options.Cookie.SameSite = SameSiteMode.Strict;
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(15);
+        options.SlidingExpiration = true;
+        options.LoginPath = "/Login";
+        options.LogoutPath = "/Platform/Logout";
+        options.AccessDeniedPath = "/AccessDenied";
     });
 
 // Authorization policies
@@ -118,12 +105,12 @@ builder.Services.AddScoped<IStripePlatformService, StripePlatformService>();
 if (builder.Environment.IsDevelopment())
 {
     builder.Services
-        .AddRazorPages()
-        .AddRazorRuntimeCompilation()
-        .AddRazorPagesOptions(options =>
+        .AddRazorPages(options =>
         {
             options.RootDirectory = "/Pages";
+            options.Conventions.ConfigureFilter(new Microsoft.AspNetCore.Mvc.AutoValidateAntiforgeryTokenAttribute());
         })
+        .AddRazorRuntimeCompilation()
         .AddRazorOptions(options =>
         {
             options.PageViewLocationFormats.Add("/Pages/Admin/Shared/{0}.cshtml");
@@ -131,10 +118,10 @@ if (builder.Environment.IsDevelopment())
 }
 else
 {
-    builder.Services.AddRazorPages()
-        .AddRazorPagesOptions(options =>
+    builder.Services.AddRazorPages(options =>
         {
             options.RootDirectory = "/Pages";
+            options.Conventions.ConfigureFilter(new Microsoft.AspNetCore.Mvc.AutoValidateAntiforgeryTokenAttribute());
         })
         .AddRazorOptions(options =>
         {

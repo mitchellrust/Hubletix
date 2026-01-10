@@ -2,15 +2,16 @@ using Finbuckle.MultiTenant.Abstractions;
 using Hubletix.Api.Models;
 using Hubletix.Infrastructure.Persistence;
 using Hubletix.Infrastructure.Services;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace Hubletix.Api.Pages.Platform;
 
 public class LoginModel : PlatformPageModel
 {
     private readonly IAccountService _accountService;
-    private readonly ITokenService _tokenService;
+    private readonly IClaimsPrincipalFactory _authService;
     private readonly ILogger<LoginModel> _logger;
 
     [BindProperty]
@@ -31,12 +32,12 @@ public class LoginModel : PlatformPageModel
     public LoginModel(
         IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
         IAccountService accountService,
-        ITokenService tokenService,
+        IClaimsPrincipalFactory authService,
         ILogger<LoginModel> logger)
         : base(multiTenantContextAccessor)
     {
         _accountService = accountService;
-        _tokenService = tokenService;
+        _authService = authService;
         _logger = logger;
     }
 
@@ -77,33 +78,24 @@ public class LoginModel : PlatformPageModel
                 return Page();
             }
 
-            // Create JWT tokens without tenant context
-            var (accessToken, refreshToken) = await _tokenService.CreateTokensAsync(
+            // Create claims principal and sign in
+            var principal = await _authService.CreateClaimsPrincipalAsync(
                 identityUser,
                 platformUser.Id,
-                tenantId: null  // Platform-level token, no tenant
+                tenantId: null  // Platform-level auth, no tenant
             );
 
-            // Store tokens in HTTP-only cookies for web sessions
-            var cookieExpiry = RememberMe 
-                ? DateTimeOffset.UtcNow.AddDays(30) 
-                : DateTimeOffset.UtcNow.AddHours(8);
-
-            Response.Cookies.Append("access_token", accessToken, new CookieOptions
+            var authProperties = new AuthenticationProperties
             {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTimeOffset.UtcNow.AddMinutes(15)
-            });
+                IsPersistent = RememberMe,
+                ExpiresUtc = RememberMe ? DateTimeOffset.UtcNow.AddDays(30) : DateTimeOffset.UtcNow.AddMinutes(15)
+            };
 
-            Response.Cookies.Append("refresh_token", refreshToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = cookieExpiry
-            });
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                principal,
+                authProperties
+            );
 
             _logger.LogInformation("User {Email} logged in successfully at platform level", Email);
 
