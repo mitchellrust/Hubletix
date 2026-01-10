@@ -4,9 +4,10 @@ using Hubletix.Core.Entities;
 using Hubletix.Core.Enums;
 using Hubletix.Infrastructure.Persistence;
 using Hubletix.Infrastructure.Services;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace Hubletix.Api.Pages.Platform;
 
@@ -76,9 +77,8 @@ public class TenantSelectorModel : PlatformPageModel
 
     public async Task<IActionResult> OnPostLogoutAsync()
     {
-        // Clear authentication cookies
-        Response.Cookies.Delete("access_token");
-        Response.Cookies.Delete("refresh_token");
+        // Sign out using cookie authentication
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
         _logger.LogInformation("User {UserId} logged out from platform", PlatformUserId);
 
