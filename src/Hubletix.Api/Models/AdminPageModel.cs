@@ -5,6 +5,7 @@ using Hubletix.Core.Models;
 using Hubletix.Infrastructure.Services;
 using Hubletix.Api.Utils;
 using Hubletix.Api.Models;
+using Hubletix.Api.Services;
 
 namespace Hubletix.Api.Pages;
 
@@ -17,19 +18,42 @@ public class AdminPageModel : PageModel
     private IMultiTenantContextAccessor<ClubTenantInfo> _multiTenantContextAccessor { get; }
     protected AppDbContext DbContext { get; }
     protected ITenantConfigService TenantConfigService { get; }
+    protected IUserContextService UserContext { get; }
     protected TenantConfig TenantConfig { get; set; } = new TenantConfig();
     public ClubTenantInfo CurrentTenantInfo => _multiTenantContextAccessor.MultiTenantContext?.TenantInfo
       ?? throw new InvalidOperationException("Tenant information is not available in the current context.");
 
+    /// <summary>
+    /// Gets the current authenticated user's platform user ID.
+    /// </summary>
+    public string? CurrentUserId => UserContext.PlatformUserId;
+
+    /// <summary>
+    /// Gets the current user's role within the current tenant.
+    /// </summary>
+    public string? TenantRole => UserContext.TenantRole;
+
+    /// <summary>
+    /// Gets whether the current user is the tenant owner.
+    /// </summary>
+    public bool IsOwner => UserContext.IsOwner;
+
+    /// <summary>
+    /// Gets whether the current user is a tenant admin.
+    /// </summary>
+    public bool IsAdmin => TenantRole == "Admin";
+
     public AdminPageModel(
       IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
       ITenantConfigService tenantConfigService,
-      AppDbContext dbContext
+      AppDbContext dbContext,
+      IUserContextService userContext
     )
     {
         _multiTenantContextAccessor = multiTenantContextAccessor;
         TenantConfigService = tenantConfigService;
         DbContext = dbContext;
+        UserContext = userContext;
     }
 
     public override async Task OnPageHandlerExecutionAsync(

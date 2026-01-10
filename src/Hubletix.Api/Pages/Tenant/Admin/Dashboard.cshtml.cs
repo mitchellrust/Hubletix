@@ -5,6 +5,7 @@ using Finbuckle.MultiTenant.Abstractions;
 using Hubletix.Api.Utils;
 using Hubletix.Infrastructure.Services;
 using Hubletix.Core.Constants;
+using Hubletix.Api.Services;
 
 namespace Hubletix.Api.Pages.Tenant.Admin;
 
@@ -19,11 +20,13 @@ public class DashboardModel : AdminPageModel
         AppDbContext dbContext,
         ITenantConfigService tenantConfigService,
         IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
-        ITenantOnboardingService tenantOnboardingService
+        ITenantOnboardingService tenantOnboardingService,
+        IUserContextService userContext
     ) : base(
         multiTenantContextAccessor,
         tenantConfigService,
-        dbContext
+        dbContext,
+        userContext
     )
     {
         _tenantOnboardingService = tenantOnboardingService;

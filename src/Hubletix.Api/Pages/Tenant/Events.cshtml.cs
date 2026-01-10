@@ -5,6 +5,7 @@ using Hubletix.Infrastructure.Services;
 using Finbuckle.MultiTenant.Abstractions;
 using Hubletix.Api.Utils;
 using System.Reflection;
+using Hubletix.Api.Services;
 
 namespace Hubletix.Api.Pages.Tenant;
 
@@ -30,8 +31,9 @@ public class EventsModel : PublicPageModel
     public EventsModel(
         IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
         ITenantConfigService tenantConfigService,
-        AppDbContext dbContext
-    ) : base(multiTenantContextAccessor, tenantConfigService, dbContext)
+        AppDbContext dbContext,
+        IUserContextService userContext
+    ) : base(multiTenantContextAccessor, tenantConfigService, dbContext, userContext)
     {}
 
     public async Task<IActionResult> OnGetAsync()

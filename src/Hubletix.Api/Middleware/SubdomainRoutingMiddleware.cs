@@ -24,7 +24,9 @@ public class SubdomainRoutingMiddleware
         "/", // For tenant-specific home page
         "/events",
         "/membershipplans",
-        "/admin"
+        "/admin",
+        "/noaccess",
+        "/index"
     };
 
     // Routes that are part of the Platform folder structure (publicly accessible)
@@ -32,6 +34,8 @@ public class SubdomainRoutingMiddleware
     {
         "/", // For platform home page
         "/login",
+        "/logout",
+        "/unauthorized",
         "/signup",
         "/index"
     };

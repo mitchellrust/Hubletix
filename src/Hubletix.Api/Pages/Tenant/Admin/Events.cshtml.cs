@@ -5,6 +5,7 @@ using Hubletix.Api.Utils;
 using Hubletix.Api.Models;
 using Hubletix.Infrastructure.Services;
 using Hubletix.Core.Constants;
+using Hubletix.Api.Services;
 
 namespace Hubletix.Api.Pages.Tenant.Admin;
 
@@ -26,11 +27,13 @@ public class EventsModel : AdminPageModel
     public EventsModel(
         AppDbContext dbContext,
         ITenantConfigService tenantConfigService,
-        IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor
+        IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
+        IUserContextService userContext
     ) : base(
         multiTenantContextAccessor,
         tenantConfigService,
-        dbContext
+        dbContext,
+        userContext
     )
     { }
 

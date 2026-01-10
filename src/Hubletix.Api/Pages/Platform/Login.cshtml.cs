@@ -1,13 +1,20 @@
+using Hubletix.Core.Enums;
+using Hubletix.Infrastructure.Persistence;
 using Hubletix.Infrastructure.Services;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
+using Finbuckle.MultiTenant.Abstractions;
 
 namespace Hubletix.Api.Pages.Platform;
 
 public class LoginModel : PageModel
 {
     private readonly IAccountService _accountService;
-    private readonly ITokenService _tokenService;
+    private readonly AppDbContext _db;
     private readonly ILogger<LoginModel> _logger;
 
     [BindProperty]
@@ -15,9 +22,6 @@ public class LoginModel : PageModel
     
     [BindProperty]
     public string? Password { get; set; }
-    
-    [BindProperty]
-    public bool RememberMe { get; set; }
     
     [BindProperty]
     public string? FirstName { get; set; }
@@ -39,17 +43,22 @@ public class LoginModel : PageModel
 
     public LoginModel(
         IAccountService accountService,
-        ITokenService tokenService,
+        AppDbContext db,
         ILogger<LoginModel> logger
     )
     {
         _accountService = accountService;
-        _tokenService = tokenService;
+        _db = db;
         _logger = logger;
     }
 
     public IActionResult OnGet()
     {
+        // If already authenticated, redirect to home
+        if (User?.Identity?.IsAuthenticated ?? false)
+        {
+            return RedirectToPage("/Platform/Index");
+        }
         return Page();
     }
 
@@ -70,12 +79,64 @@ public class LoginModel : PageModel
         if (returnUrl.Contains("//") || returnUrl.Contains("\\"))
             return false;
 
-        // Validate against allowed route patterns
+        // Allow /Tenant routes (post-login redirect)
+        if (returnUrl.StartsWith("/Tenant", StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        // Allow other platform routes
         var allowedPrefixes = new[] { "/admin", "/login", "/signup", "/" };
         return allowedPrefixes.Any(prefix => 
             returnUrl.Equals(prefix, StringComparison.OrdinalIgnoreCase) || 
             returnUrl.StartsWith(prefix + "/", StringComparison.OrdinalIgnoreCase)
         );
+    }
+
+    /// <summary>
+    /// Gets the tenant ID from the current request context (from subdomain).
+    /// Returns null if on the root domain (platform context).
+    /// </summary>
+    private string? GetCurrentTenantId()
+    {
+        var tenantContextAccessor = HttpContext.RequestServices
+            .GetRequiredService<IMultiTenantContextAccessor<ClubTenantInfo>>();
+        var tenantInfo = tenantContextAccessor.MultiTenantContext?.TenantInfo;
+        return tenantInfo?.Id;
+    }
+
+    /// <summary>
+    /// Builds a claims principal for Cookie authentication, including tenant context if applicable.
+    /// </summary>
+    private ClaimsPrincipal BuildClaimsPrincipal(
+        Core.Entities.User identityUser,
+        Core.Entities.PlatformUser platformUser,
+        string? tenantId = null,
+        Core.Entities.TenantUser? tenantUser = null)
+    {
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, identityUser.Id),
+            new Claim(ClaimTypes.Email, identityUser.Email ?? ""),
+            new Claim("platform_user_id", platformUser.Id),
+            new Claim("first_name", platformUser.FirstName)
+        };
+
+        // Add tenant context if provided
+        if (!string.IsNullOrEmpty(tenantId) && tenantUser != null)
+        {
+            claims.Add(new Claim("tenant_id", tenantId));
+            claims.Add(new Claim("tenant_role", tenantUser.Role.ToString()));
+            claims.Add(new Claim("is_tenant_owner", tenantUser.IsOwner.ToString().ToLower()));
+        }
+        // If no tenant context but user has a default tenant, add it
+        else if (string.IsNullOrEmpty(tenantId) && !string.IsNullOrEmpty(platformUser.DefaultTenantId))
+        {
+            claims.Add(new Claim("tenant_id", platformUser.DefaultTenantId));
+            claims.Add(new Claim("tenant_role", TenantRole.Member.ToString()));
+            claims.Add(new Claim("is_tenant_owner", "false"));
+        }
+
+        var identity = new ClaimsIdentity(claims, IdentityConstants.ApplicationScheme);
+        return new ClaimsPrincipal(identity);
     }
 
     /// <summary>
@@ -91,10 +152,13 @@ public class LoginModel : PageModel
 
         try
         {
-            // Attempt login without tenant scoping
+            var currentTenantId = GetCurrentTenantId();
+
+            // Attempt login with optional tenant context
             var (success, error, identityUser, platformUser) = await _accountService.LoginAsync(
                 Email,
-                Password
+                Password,
+                currentTenantId
             );
 
             if (!success || identityUser == null || platformUser == null)
@@ -103,30 +167,32 @@ public class LoginModel : PageModel
                 return Page();
             }
 
-            // Create JWT tokens
-            var (accessToken, refreshToken) = await _tokenService.CreateTokensAsync(
-                identityUser,
-                platformUser.Id
-            );
-
-            // Store tokens in HTTP-only cookies for web sessions
-            Response.Cookies.Append("access_token", accessToken, new CookieOptions
+            // If on a tenant subdomain, get the user's tenant role
+            Hubletix.Core.Entities.TenantUser? tenantUser = null;
+            if (!string.IsNullOrEmpty(currentTenantId))
             {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTimeOffset.UtcNow.AddMinutes(15)
-            });
+                tenantUser = await _db.TenantUsers
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(tu => tu.PlatformUserId == platformUser.Id
+                        && tu.TenantId == currentTenantId
+                        && tu.Status == TenantUserStatus.Active);
+            }
 
-            Response.Cookies.Append("refresh_token", refreshToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTimeOffset.UtcNow.AddDays(30)
-            });
+            // Build claims principal (includes tenant context if applicable)
+            var principal = BuildClaimsPrincipal(identityUser, platformUser, currentTenantId, tenantUser);
 
-            _logger.LogInformation("User {Email} logged in successfully", Email);
+            // Sign in with cookie authentication
+            await HttpContext.SignInAsync(
+                IdentityConstants.ApplicationScheme,
+                principal,
+                new AuthenticationProperties
+                {
+                    IsPersistent = false,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8)
+                });
+
+            _logger.LogInformation("User {Email} logged in successfully. TenantId: {TenantId}",
+                Email, currentTenantId ?? "N/A");
 
             SuccessMessage = "Login successful! Welcome back.";
             
@@ -136,8 +202,14 @@ public class LoginModel : PageModel
                 return LocalRedirect(ReturnUrl!);
             }
 
+            // If on tenant subdomain, redirect to tenant home
+            if (!string.IsNullOrEmpty(currentTenantId))
+            {
+                return RedirectToPage("/Tenant/Index");
+            }
+
             // Redirect to platform home
-            return RedirectToPage("/");
+            return RedirectToPage("/Platform/Index");
         }
         catch (Exception ex)
         {
@@ -182,41 +254,25 @@ public class LoginModel : PageModel
                 return Page();
             }
 
-            // Create JWT tokens
-            var (accessToken, refreshToken) = await _tokenService.CreateTokensAsync(
-                identityUser,
-                platformUser.Id
-            );
+            // Build claims principal (no tenant context for new signup)
+            var principal = BuildClaimsPrincipal(identityUser, platformUser);
 
-            // Store tokens in HTTP-only cookies
-            Response.Cookies.Append("access_token", accessToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTimeOffset.UtcNow.AddMinutes(15)
-            });
-
-            Response.Cookies.Append("refresh_token", refreshToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTimeOffset.UtcNow.AddDays(30)
-            });
+            // Sign in with cookie authentication
+            await HttpContext.SignInAsync(
+                IdentityConstants.ApplicationScheme,
+                principal,
+                new AuthenticationProperties
+                {
+                    IsPersistent = false,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8)
+                });
 
             _logger.LogInformation("User {Email} registered successfully", Email);
 
             SuccessMessage = $"Welcome, {FirstName}! Your account has been created.";
             
-            // Redirect to return URL if valid, otherwise redirect based on context
-            if (IsValidReturnUrl(ReturnUrl))
-            {
-                return LocalRedirect(ReturnUrl!);
-            }
-
-            // Redirect to platform home
-            return RedirectToPage("/");
+            // Redirect to signup flow next step
+            return RedirectToPage("/Platform/Signup/CreateTenant");
         }
         catch (Exception ex)
         {

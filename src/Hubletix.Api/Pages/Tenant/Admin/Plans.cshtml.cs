@@ -3,6 +3,7 @@ using Hubletix.Infrastructure.Persistence;
 using Finbuckle.MultiTenant.Abstractions;
 using Hubletix.Api.Utils;
 using Hubletix.Infrastructure.Services;
+using Hubletix.Api.Services;
 
 namespace Hubletix.Api.Pages.Tenant.Admin;
 
@@ -23,11 +24,13 @@ public class PlansModel : AdminPageModel
     public PlansModel(
         AppDbContext dbContext,
         ITenantConfigService tenantConfigService,
-        IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor
+        IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
+        IUserContextService userContext
     ) : base(
         multiTenantContextAccessor,
         tenantConfigService,
-        dbContext
+        dbContext,
+        userContext
     )
     { }
 

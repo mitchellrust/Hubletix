@@ -5,6 +5,7 @@ using Hubletix.Core.Models;
 using Hubletix.Api.Validators;
 using Hubletix.Api.Pages;
 using Hubletix.Api.Middleware;
+using Hubletix.Api.Services;
 using Finbuckle.MultiTenant.Extensions;
 using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
@@ -31,7 +32,6 @@ builder.Services.AddMultiTenant<ClubTenantInfo>()
 builder.Services.AddScoped<ITenantOnboardingService, TenantOnboardingService>();
 
 // Register authentication services
-builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 
 // Configure Identity
@@ -57,35 +57,17 @@ builder.Services.AddIdentity<Hubletix.Core.Entities.User, Microsoft.AspNetCore.I
     .AddEntityFrameworkStores<AppDbContext>()
     .AddUserValidator<RequireEmailValidator>();
 
-// Configure JWT settings
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
-
-// JWT Authentication
-var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
-var key = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
-    System.Text.Encoding.UTF8.GetBytes(jwtSettings!.Secret)
-);
-
-builder.Services.AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
-    {
-        options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
-        options.SaveToken = true;
-        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtSettings.Issuer,
-            ValidAudience = jwtSettings.Audience,
-            IssuerSigningKey = key,
-            ClockSkew = TimeSpan.FromSeconds(30)
-        };
-    });
+// Configure Identity's Application Cookie (used for web authentication)
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Platform/Login";
+    options.LogoutPath = "/Platform/Logout";
+    options.AccessDeniedPath = "/Tenant/NoAccess";
+    options.ExpireTimeSpan = TimeSpan.FromHours(8);
+    options.SlidingExpiration = true;
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SameSite = SameSiteMode.Strict;
+});
 
 // Authorization policies
 builder.Services.AddAuthorization(options =>
@@ -94,8 +76,7 @@ builder.Services.AddAuthorization(options =>
         policy.RequireClaim("platform_role", "PlatformAdmin"));
     
     options.AddPolicy("TenantAdmin", policy =>
-        policy.RequireClaim("tenant_role", "Admin")
-              .RequireClaim("tenant_id"));
+        policy.RequireClaim("tenant_role", "Admin"));
     
     options.AddPolicy("TenantMember", policy =>
         policy.RequireClaim("tenant_id"));
@@ -108,6 +89,10 @@ builder.Services.AddScoped<DatabaseInitializationService>();
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<ICacheService, CacheService>();
 builder.Services.AddScoped<ITenantConfigService, TenantConfigService>();
+
+// Register user context service for accessing claims
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IUserContextService, UserContextService>();
 
 // Configure Stripe settings
 builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
@@ -127,6 +112,21 @@ if (builder.Environment.IsDevelopment())
             options.RootDirectory = "/Pages";
             // Allows custom routing convention to strip /Platform and /Tenant from page routes
             options.Conventions.Add(new PageRoutingConvention());
+
+            // Authorization conventions for /Tenant pages
+            // All /Tenant pages require authentication
+            options.Conventions.AuthorizeFolder("/Tenant");
+
+            // All /Tenant/Admin pages require TenantAdmin policy (tenant_role = Admin claim)
+            options.Conventions.AuthorizeFolder("/Tenant/Admin", "TenantAdmin");
+
+            // Apply TenantAuthorizationFilter to /Tenant pages to validate tenant membership
+            // This is done via FolderApplicationModelConvention which allows us to add filters by type
+            options.Conventions.AddFolderApplicationModelConvention("/Tenant", model =>
+            {
+                // Add the filter by type, ASP.NET Core will resolve dependencies from DI
+                model.Filters.Add(new Microsoft.AspNetCore.Mvc.TypeFilterAttribute(typeof(Hubletix.Api.Filters.TenantAuthorizationFilter)));
+            });
         })
         .AddRazorOptions(options =>
         {
@@ -143,6 +143,21 @@ else
             options.RootDirectory = "/Pages";
             // Allows custom routing convention to strip /Platform and /Tenant from page routes
             options.Conventions.Add(new PageRoutingConvention());
+
+            // Authorization conventions for /Tenant pages
+            // All /Tenant pages require authentication
+            options.Conventions.AuthorizeFolder("/Tenant");
+
+            // All /Tenant/Admin pages require TenantAdmin policy (tenant_role = Admin claim)
+            options.Conventions.AuthorizeFolder("/Tenant/Admin", "TenantAdmin");
+
+            // Apply TenantAuthorizationFilter to /Tenant pages to validate tenant membership
+            // This is done via FolderApplicationModelConvention which allows us to add filters by type
+            options.Conventions.AddFolderApplicationModelConvention("/Tenant", model =>
+            {
+                // Add the filter by type, ASP.NET Core will resolve dependencies from DI
+                model.Filters.Add(new Microsoft.AspNetCore.Mvc.TypeFilterAttribute(typeof(Hubletix.Api.Filters.TenantAuthorizationFilter)));
+            });
         })
         .AddRazorOptions(options =>
         {

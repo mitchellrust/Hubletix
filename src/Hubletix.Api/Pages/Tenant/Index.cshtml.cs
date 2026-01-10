@@ -3,6 +3,7 @@ using Finbuckle.MultiTenant.Abstractions;
 using Hubletix.Infrastructure.Persistence;
 using Hubletix.Infrastructure.Services;
 using Hubletix.Core.Models;
+using Hubletix.Api.Services;
 
 namespace Hubletix.Api.Pages.Tenant;
 
@@ -13,11 +14,13 @@ public class IndexModel : PublicPageModel
     public IndexModel(
         AppDbContext dbContext,
         ITenantConfigService tenantConfigService,
-        IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor
+        IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
+        IUserContextService userContext
     ) : base(
         multiTenantContextAccessor,
         tenantConfigService,
-        dbContext
+        dbContext,
+        userContext
     )
     { }
 

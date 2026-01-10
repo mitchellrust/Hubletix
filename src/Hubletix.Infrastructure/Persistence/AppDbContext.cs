@@ -61,7 +61,6 @@ public class AppDbContext : IdentityDbContext<User>
     public DbSet<PlatformPlan> PlatformPlans { get; set; } = null!;
     public DbSet<TenantSubscription> TenantSubscriptions { get; set; } = null!;
     public DbSet<SignupSession> SignupSessions { get; set; } = null!;
-    public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -269,20 +268,6 @@ public class AppDbContext : IdentityDbContext<User>
             .HasIndex(ss => ss.Email);
         builder.Entity<SignupSession>()
             .HasIndex(ss => ss.StripeCheckoutSessionId);
-
-        // Configure RefreshToken
-        builder.Entity<RefreshToken>()
-            .HasKey(rt => rt.Id);
-        builder.Entity<RefreshToken>()
-            .HasOne(rt => rt.User)
-            .WithMany()
-            .HasForeignKey(rt => rt.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
-        builder.Entity<RefreshToken>()
-            .HasIndex(rt => rt.TokenHash)
-            .IsUnique();
-        builder.Entity<RefreshToken>()
-            .HasIndex(rt => rt.UserId);
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

@@ -4,6 +4,7 @@ using Hubletix.Infrastructure.Persistence;
 using Hubletix.Infrastructure.Services;
 using Finbuckle.MultiTenant.Abstractions;
 using Hubletix.Core.Constants;
+using Hubletix.Api.Services;
 
 namespace Hubletix.Api.Pages.Tenant;
 
@@ -15,8 +16,9 @@ public class MembershipPlansModel : PublicPageModel
     public MembershipPlansModel(
         IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
         ITenantConfigService tenantConfigService,
-        AppDbContext dbContext
-    ) : base(multiTenantContextAccessor, tenantConfigService, dbContext)
+        AppDbContext dbContext,
+        IUserContextService userContext
+    ) : base(multiTenantContextAccessor, tenantConfigService, dbContext, userContext)
     {}
 
     public async Task<IActionResult> OnGetAsync()
