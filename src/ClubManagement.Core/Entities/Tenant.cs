@@ -35,7 +35,7 @@ public class Tenant : BaseEntity
     
     // Navigation properties
     public ICollection<Location> Locations { get; set; } = new List<Location>();
-    public ICollection<User> Users { get; set; } = new List<User>();
+    public ICollection<TenantUser> TenantUsers { get; set; } = new List<TenantUser>();
     public ICollection<MembershipPlan> MembershipPlans { get; set; } = new List<MembershipPlan>();
     public ICollection<Event> Events { get; set; } = new List<Event>();
     public ICollection<Payment> Payments { get; set; } = new List<Payment>();

@@ -14,9 +14,9 @@ public class EventRegistration: BaseEntity
     public required string EventId { get; set; }
     
     /// <summary>
-    /// Foreign key to User
+    /// Foreign key to PlatformUser
     /// </summary>
-    public required string UserId { get; set; }
+    public required string PlatformUserId { get; set; }
     
     /// <summary>
     /// Signup status: "registered", "cancelled", "attended"
@@ -34,6 +34,6 @@ public class EventRegistration: BaseEntity
     public DateTime SignedUpAt { get; set; } = DateTime.UtcNow;
     
     // Navigation properties
-    public User User { get; set; } = null!;
+    public PlatformUser PlatformUser { get; set; } = null!;
     public Event Event { get; set; } = null!;
 }

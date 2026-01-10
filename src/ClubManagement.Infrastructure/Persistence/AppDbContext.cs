@@ -51,6 +51,8 @@ public class AppDbContext : IdentityDbContext<User>
 
     // DbSets
     public DbSet<Tenant> Tenants { get; set; } = null!;
+    public DbSet<PlatformUser> PlatformUsers { get; set; } = null!;
+    public DbSet<TenantUser> TenantUsers { get; set; } = null!;
     public DbSet<Location> Locations { get; set; } = null!;
     public DbSet<MembershipPlan> MembershipPlans { get; set; } = null!;
     public DbSet<Event> Events { get; set; } = null!;
@@ -60,7 +62,6 @@ public class AppDbContext : IdentityDbContext<User>
     public DbSet<TenantSubscription> TenantSubscriptions { get; set; } = null!;
     public DbSet<SignupSession> SignupSessions { get; set; } = null!;
     public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
-    public DbSet<TenantUserRole> TenantUserRoles { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -76,6 +77,47 @@ public class AppDbContext : IdentityDbContext<User>
             .Property(t => t.ConfigJson)
             .HasColumnType("jsonb");
 
+        // Configure PlatformUser with 1:1 relationship to User (IdentityUser)
+        builder.Entity<PlatformUser>()
+            .HasKey(pu => pu.Id);
+        builder.Entity<PlatformUser>()
+            .HasOne(pu => pu.IdentityUser)
+            .WithOne(u => u.PlatformUser)
+            .HasForeignKey<PlatformUser>(pu => pu.IdentityUserId)
+            .OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<PlatformUser>()
+            .HasOne(pu => pu.DefaultTenant)
+            .WithMany()
+            .HasForeignKey(pu => pu.DefaultTenantId)
+            .OnDelete(DeleteBehavior.SetNull)
+            .IsRequired(false);
+        builder.Entity<PlatformUser>()
+            .HasIndex(pu => pu.IdentityUserId)
+            .IsUnique();
+
+        // Configure TenantUser (join entity for multi-tenant membership)
+        builder.Entity<TenantUser>()
+            .HasKey(tu => tu.Id);
+        builder.Entity<TenantUser>()
+            .HasOne(tu => tu.Tenant)
+            .WithMany(t => t.TenantUsers)
+            .HasForeignKey(tu => tu.TenantId)
+            .OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<TenantUser>()
+            .HasOne(tu => tu.PlatformUser)
+            .WithMany(pu => pu.TenantMemberships)
+            .HasForeignKey(tu => tu.PlatformUserId)
+            .OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<TenantUser>()
+            .HasIndex(tu => new { tu.TenantId, tu.PlatformUserId })
+            .IsUnique(); // One role per user per tenant
+        builder.Entity<TenantUser>()
+            .Property(tu => tu.Role)
+            .HasConversion<int>(); // Store enum as int
+        builder.Entity<TenantUser>()
+            .Property(tu => tu.Status)
+            .HasConversion<int>(); // Store enum as int
+
         // Configure Location with multi-tenant query filter
         builder.Entity<Location>()
             .HasKey(l => l.Id);
@@ -89,23 +131,7 @@ public class AppDbContext : IdentityDbContext<User>
         builder.Entity<Location>()
             .HasQueryFilter(l => _multiTenantContextAccessor!.MultiTenantContext!.TenantInfo!.Id == l.TenantId);
 
-        // Configure User with multi-tenant query filter
-        builder.Entity<User>()
-            .HasOne(u => u.Tenant)
-            .WithMany(t => t.Users)
-            .HasForeignKey(u => u.TenantId)
-            .OnDelete(DeleteBehavior.Cascade)
-            .IsRequired(false); // Allow null for platform users
-        builder.Entity<User>()
-            .HasOne(u => u.Location)
-            .WithMany(l => l.Users)
-            .HasForeignKey(u => u.LocationId)
-            .OnDelete(DeleteBehavior.Restrict);
-        builder.Entity<User>()
-            .HasIndex(u => u.Email)
-            .IsUnique();
-        builder.Entity<User>()
-            .HasQueryFilter(u => u.TenantId == null || _multiTenantContextAccessor!.MultiTenantContext!.TenantInfo!.Id == u.TenantId);
+        // User (IdentityUser) - no longer has tenant relationships or query filters
 
         // Configure MembershipPlan with multi-tenant query filter
         builder.Entity<MembershipPlan>()
@@ -139,6 +165,12 @@ public class AppDbContext : IdentityDbContext<User>
             .HasForeignKey(e => e.LocationId)
             .OnDelete(DeleteBehavior.Restrict);
         builder.Entity<Event>()
+            .HasOne(e => e.Coach)
+            .WithMany(tu => tu.CoachedEvents)
+            .HasForeignKey(e => e.CoachId)
+            .OnDelete(DeleteBehavior.SetNull)
+            .IsRequired(false);
+        builder.Entity<Event>()
             .HasQueryFilter(e => _multiTenantContextAccessor!.MultiTenantContext!.TenantInfo!.Id == e.TenantId);
 
         // Configure EventRegistration with multi-tenant query filter (via Event)
@@ -150,9 +182,9 @@ public class AppDbContext : IdentityDbContext<User>
             .HasForeignKey(s => s.EventId)
             .OnDelete(DeleteBehavior.Cascade);
         builder.Entity<EventRegistration>()
-            .HasOne(s => s.User)
-            .WithMany(u => u.EventRegistrations)
-            .HasForeignKey(s => s.UserId)
+            .HasOne(s => s.PlatformUser)
+            .WithMany(pu => pu.EventRegistrations)
+            .HasForeignKey(s => s.PlatformUserId)
             .OnDelete(DeleteBehavior.Cascade);
         // EventRegistration filtered through Event relationship
 
@@ -165,9 +197,9 @@ public class AppDbContext : IdentityDbContext<User>
             .HasForeignKey(p => p.TenantId)
             .OnDelete(DeleteBehavior.Cascade);
         builder.Entity<Payment>()
-            .HasOne(p => p.User)
-            .WithMany(u => u.Payments)
-            .HasForeignKey(p => p.UserId)
+            .HasOne(p => p.PlatformUser)
+            .WithMany(pu => pu.Payments)
+            .HasForeignKey(p => p.PlatformUserId)
             .OnDelete(DeleteBehavior.SetNull)
             .IsRequired(false);
         builder.Entity<Payment>()
@@ -239,23 +271,6 @@ public class AppDbContext : IdentityDbContext<User>
             .IsUnique();
         builder.Entity<RefreshToken>()
             .HasIndex(rt => rt.UserId);
-
-        // Configure TenantUserRole
-        builder.Entity<TenantUserRole>()
-            .HasKey(tur => tur.Id);
-        builder.Entity<TenantUserRole>()
-            .HasOne(tur => tur.Tenant)
-            .WithMany()
-            .HasForeignKey(tur => tur.TenantId)
-            .OnDelete(DeleteBehavior.Cascade);
-        builder.Entity<TenantUserRole>()
-            .HasOne(tur => tur.User)
-            .WithMany()
-            .HasForeignKey(tur => tur.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
-        builder.Entity<TenantUserRole>()
-            .HasIndex(tur => new { tur.TenantId, tur.UserId })
-            .IsUnique();
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
