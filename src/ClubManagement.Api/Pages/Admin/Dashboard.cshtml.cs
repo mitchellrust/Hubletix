@@ -34,8 +34,8 @@ public class DashboardModel : AdminPageModel
         var utcNow = DateTime.UtcNow;
 
         // Fetch tenant statistics
-        TenantStats.TotalMembers = await DbContext.Users
-            .Where(u => u.TenantId == CurrentTenantInfo.Id)
+        TenantStats.TotalMembers = await DbContext.TenantUsers
+            .Where(tu => tu.TenantId == CurrentTenantInfo.Id)
             .CountAsync();
 
         TenantStats.ActiveEvents = await DbContext.Events

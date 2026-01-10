@@ -113,11 +113,11 @@ public class EventDetailModel : AdminPageModel
             .Where(
                 r => r.EventId == eventId
             )
-            .Include(r => r.User)
+            .Include(r => r.PlatformUser)
             .Select(r => new
             {
                 Registration = r,
-                UserName = r.User.FirstName + " " + r.User.LastName
+                UserName = r.PlatformUser.FirstName + " " + r.PlatformUser.LastName
             });
 
         // Apply status filter
@@ -154,7 +154,7 @@ public class EventDetailModel : AdminPageModel
         Registrations = results.Select(r => new EventRegistrationDto
         {
             Id = r.Registration.Id,
-            UserId = r.Registration.UserId,
+            UserId = r.Registration.PlatformUserId,
             UserName = r.UserName,
             EventId = r.Registration.EventId,
             Status = r.Registration.Status,

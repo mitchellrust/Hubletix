@@ -117,6 +117,18 @@ public class AppDbContext : IdentityDbContext<User>
         builder.Entity<TenantUser>()
             .Property(tu => tu.Status)
             .HasConversion<int>(); // Store enum as int
+        builder.Entity<TenantUser>()
+            .HasOne(tu => tu.Location)
+            .WithMany()
+            .HasForeignKey(tu => tu.LocationId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .IsRequired(false);
+        builder.Entity<TenantUser>()
+            .HasOne(tu => tu.MembershipPlan)
+            .WithMany()
+            .HasForeignKey(tu => tu.MembershipPlanId)
+            .OnDelete(DeleteBehavior.SetNull)
+            .IsRequired(false);
 
         // Configure Location with multi-tenant query filter
         builder.Entity<Location>()

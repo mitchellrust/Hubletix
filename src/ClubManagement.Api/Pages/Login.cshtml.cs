@@ -76,13 +76,13 @@ public class LoginModel : PublicPageModel
         try
         {
             // Attempt login with tenant context
-            var (success, error, user) = await _accountService.LoginAsync(
+            var (success, error, identityUser, platformUser) = await _accountService.LoginAsync(
                 Email,
                 Password,
                 CurrentTenantInfo?.Id
             );
 
-            if (!success || user == null)
+            if (!success || identityUser == null || platformUser == null)
             {
                 ErrorMessage = error ?? "Login failed. Please try again.";
                 return Page();
@@ -90,7 +90,8 @@ public class LoginModel : PublicPageModel
 
             // Create JWT tokens
             var (accessToken, refreshToken) = await _tokenService.CreateTokensAsync(
-                user,
+                identityUser,
+                platformUser.Id,
                 CurrentTenantInfo?.Id
             );
 
@@ -150,16 +151,16 @@ public class LoginModel : PublicPageModel
         try
         {
             // Register new user with tenant context
-            var (success, error, user) = await _accountService.RegisterAsync(
+            var (success, error, identityUser, platformUser) = await _accountService.RegisterAsync(
                 Email,
                 Password,
                 FirstName,
                 LastName,
                 CurrentTenantInfo?.Id,
-                ClubManagement.Core.Constants.UserRoles.Member
+                Core.Enums.TenantRole.Member
             );
 
-            if (!success || user == null)
+            if (!success || identityUser == null || platformUser == null)
             {
                 ErrorMessage = error ?? "Registration failed. Please try again.";
                 return Page();
@@ -167,7 +168,8 @@ public class LoginModel : PublicPageModel
 
             // Create JWT tokens
             var (accessToken, refreshToken) = await _tokenService.CreateTokensAsync(
-                user,
+                identityUser,
+                platformUser.Id,
                 CurrentTenantInfo?.Id
             );
 

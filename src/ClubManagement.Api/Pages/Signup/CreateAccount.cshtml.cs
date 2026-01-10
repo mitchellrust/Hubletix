@@ -93,7 +93,7 @@ public class CreateAccountModel : PageModel
         try
         {
             // Create admin user
-            var user = await _onboardingService.CreateAdminUserAsync(
+            var (identityUser, platformUser) = await _onboardingService.CreateAdminUserAsync(
                 SessionId,
                 Email,
                 FirstName,
@@ -104,7 +104,7 @@ public class CreateAccountModel : PageModel
             _logger.LogInformation(
                 "Created admin user: SessionId={SessionId}, UserId={UserId}",
                 SessionId,
-                user.Id
+                platformUser.Id
             );
 
             // Redirect to organization setup
