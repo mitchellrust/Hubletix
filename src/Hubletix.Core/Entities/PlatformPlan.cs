@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using ClubManagement.Core.Constants;
-using ClubManagement.Core.Models;
+using Hubletix.Core.Constants;
+using Hubletix.Core.Models;
 
-namespace ClubManagement.Core.Entities;
+namespace Hubletix.Core.Entities;
 
 /// <summary>
 /// Represents a platform subscription plan offered to tenants

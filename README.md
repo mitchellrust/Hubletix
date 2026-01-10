@@ -6,9 +6,9 @@ A comprehensive multi-tenant SaaS platform for sports clubs built with .NET 10, 
 
 ```
 src/
-├── ClubManagement.Api/           # Web application (Razor Pages + API)
-├── ClubManagement.Core/          # Domain models and entities
-└── ClubManagement.Infrastructure/ # EF Core, DbContext, services
+├── Hubletix.Api/           # Web application (Razor Pages + API)
+├── Hubletix.Core/          # Domain models and entities
+└── Hubletix.Infrastructure/ # EF Core, DbContext, services
 ```
 
 ## Tech Stack
@@ -51,7 +51,7 @@ Finbuckle eliminates the need for manual:
 ### Create Database
 
 ```bash
-psql -U postgres -c "CREATE DATABASE clubmanagement;"
+psql -U postgres -c "CREATE DATABASE hubletix;"
 ```
 
 Or create via pgAdmin.
@@ -64,12 +64,12 @@ Migrations are applied automatically when the application starts.
 
 ### 1. Configure Connection String
 
-Edit `src/ClubManagement.Api/appsettings.json`:
+Edit `src/Hubletix.Api/appsettings.json`:
 
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Port=5432;Database=clubmanagement;Username=postgres;Password=postgres"
+    "DefaultConnection": "Host=localhost;Port=5432;Database=hubletix;Username=postgres;Password=postgres"
   }
 }
 ```
@@ -77,14 +77,14 @@ Edit `src/ClubManagement.Api/appsettings.json`:
 ### 2. Build the Solution
 
 ```bash
-cd /Users/mitchellrust/dev/ClubManagement
+cd /Users/mitchellrust/dev/Hubletix
 dotnet build
 ```
 
 ### 3. Run the Application
 
 ```bash
-cd src/ClubManagement.Api
+cd src/Hubletix.Api
 dotnet run
 ```
 
@@ -178,18 +178,18 @@ The `IMultiTenantContext<ClubTenantInfo>` is managed by Finbuckle:
 
 ## Project Dependencies
 
-### ClubManagement.Core
+### Hubletix.Core
 - Microsoft.AspNetCore.Identity.EntityFrameworkCore
 - System.Text.Json
 
-### ClubManagement.Infrastructure
+### Hubletix.Infrastructure
 - Microsoft.EntityFrameworkCore
 - Npgsql.EntityFrameworkCore.PostgreSQL
 - Microsoft.AspNetCore.Identity.EntityFrameworkCore
 - **Finbuckle.MultiTenant** (7.5.0)
-- → References ClubManagement.Core
+- → References Hubletix.Core
 
-### ClubManagement.Api
+### Hubletix.Api
 - Microsoft.EntityFrameworkCore.Design
 - Microsoft.AspNetCore.Identity.UI
 - **Finbuckle.MultiTenant** (7.5.0)
@@ -217,8 +217,8 @@ The `IMultiTenantContext<ClubTenantInfo>` is managed by Finbuckle:
 - Query database: `SELECT * FROM "Tenants";`
 
 ### Migration Issues
-- Run migrations explicitly: `dotnet ef database update -p src/ClubManagement.Infrastructure -s src/ClubManagement.Api`
-- View pending migrations: `dotnet ef migrations list -p src/ClubManagement.Infrastructure -s src/ClubManagement.Api`
+- Run migrations explicitly: `dotnet ef database update -p src/Hubletix.Infrastructure -s src/Hubletix.Api`
+- View pending migrations: `dotnet ef migrations list -p src/Hubletix.Infrastructure -s src/Hubletix.Api`
 
 ## Development Commands
 
@@ -230,13 +230,13 @@ dotnet build
 dotnet test
 
 # Add new migration
-dotnet ef migrations add MigrationName -p src/ClubManagement.Infrastructure -s src/ClubManagement.Api
+dotnet ef migrations add MigrationName -p src/Hubletix.Infrastructure -s src/Hubletix.Api
 
 # Update database
-dotnet ef database update -p src/ClubManagement.Infrastructure -s src/ClubManagement.Api
+dotnet ef database update -p src/Hubletix.Infrastructure -s src/Hubletix.Api
 
 # View database (via psql)
-psql -U postgres -d clubmanagement -c "SELECT * FROM \"Tenants\";"
+psql -U postgres -d hubletix -c "SELECT * FROM \"Tenants\";"
 ```
 
 ## Architecture Notes

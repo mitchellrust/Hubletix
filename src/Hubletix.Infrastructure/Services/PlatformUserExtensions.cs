@@ -1,9 +1,9 @@
-using ClubManagement.Core.Entities;
-using ClubManagement.Core.Enums;
-using ClubManagement.Infrastructure.Persistence;
+using Hubletix.Core.Entities;
+using Hubletix.Core.Enums;
+using Hubletix.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace ClubManagement.Infrastructure.Services;
+namespace Hubletix.Infrastructure.Services;
 
 /// <summary>
 /// Extension methods for querying PlatformUser and TenantUser relationships.

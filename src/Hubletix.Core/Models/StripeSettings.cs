@@ -1,4 +1,4 @@
-namespace ClubManagement.Core.Models;
+namespace Hubletix.Core.Models;
 
 /// <summary>
 /// Configuration settings for Stripe integration.

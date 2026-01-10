@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace ClubManagement.Core.Entities;
+namespace Hubletix.Core.Entities;
 
 /// <summary>
 /// Identity user for authentication (ASP.NET Core Identity).

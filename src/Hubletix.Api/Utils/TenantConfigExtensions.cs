@@ -1,8 +1,8 @@
 using System.Text.Json;
-using ClubManagement.Core.Entities;
-using ClubManagement.Core.Models;
+using Hubletix.Core.Entities;
+using Hubletix.Core.Models;
 
-namespace ClubManagement.Api.Utils;
+namespace Hubletix.Api.Utils;
 
 /// <summary>
 /// Extension methods for working with Tenant configuration.

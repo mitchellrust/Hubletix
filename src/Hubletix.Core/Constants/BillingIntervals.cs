@@ -1,4 +1,4 @@
-namespace ClubManagement.Core.Constants;
+namespace Hubletix.Core.Constants;
 
 /// <summary>
 /// Billing constants for different cycle types.

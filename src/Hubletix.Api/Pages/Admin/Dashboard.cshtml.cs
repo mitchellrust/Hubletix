@@ -1,12 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
-using ClubManagement.Infrastructure.Persistence;
+using Hubletix.Infrastructure.Persistence;
 using Finbuckle.MultiTenant.Abstractions;
-using ClubManagement.Api.Utils;
-using ClubManagement.Infrastructure.Services;
-using ClubManagement.Core.Constants;
+using Hubletix.Api.Utils;
+using Hubletix.Infrastructure.Services;
+using Hubletix.Core.Constants;
 
-namespace ClubManagement.Api.Pages.Admin;
+namespace Hubletix.Api.Pages.Admin;
 
 public class DashboardModel : AdminPageModel
 {

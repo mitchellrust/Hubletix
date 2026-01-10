@@ -2,7 +2,7 @@
 
 ## Overview
 
-Your ClubManagement application now has a comprehensive Stripe integration with two distinct payment flows:
+Your Hubletix application now has a comprehensive Stripe integration with two distinct payment flows:
 
 1. **Stripe Connect** - For tenant payment processing (members pay tenants)
 2. **Stripe Platform** - For platform payment processing (tenants pay platform)

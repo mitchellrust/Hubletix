@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ClubManagement.Infrastructure.Persistence;
-using ClubManagement.Infrastructure.Services;
+using Hubletix.Infrastructure.Persistence;
+using Hubletix.Infrastructure.Services;
 using Finbuckle.MultiTenant.Abstractions;
-using ClubManagement.Api.Utils;
+using Hubletix.Api.Utils;
 
-namespace ClubManagement.Api.Pages;
+namespace Hubletix.Api.Pages;
 
 public class EventDetailModel : PublicPageModel
 {

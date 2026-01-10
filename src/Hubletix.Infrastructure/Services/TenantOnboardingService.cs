@@ -1,13 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
-using ClubManagement.Core.Entities;
-using ClubManagement.Core.Constants;
-using ClubManagement.Core.Enums;
-using ClubManagement.Infrastructure.Persistence;
-using ClubManagement.Core.Models;
+using Hubletix.Core.Entities;
+using Hubletix.Core.Constants;
+using Hubletix.Core.Enums;
+using Hubletix.Infrastructure.Persistence;
+using Hubletix.Core.Models;
 using System.Text.Json;
 
-namespace ClubManagement.Infrastructure.Services;
+namespace Hubletix.Infrastructure.Services;
 
 /// <summary>
 /// Service for tenant onboarding flow.

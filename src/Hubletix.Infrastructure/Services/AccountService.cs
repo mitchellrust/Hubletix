@@ -1,11 +1,11 @@
-using ClubManagement.Core.Entities;
-using ClubManagement.Core.Enums;
-using ClubManagement.Infrastructure.Persistence;
+using Hubletix.Core.Entities;
+using Hubletix.Core.Enums;
+using Hubletix.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace ClubManagement.Infrastructure.Services;
+namespace Hubletix.Infrastructure.Services;
 
 public interface IAccountService
 {

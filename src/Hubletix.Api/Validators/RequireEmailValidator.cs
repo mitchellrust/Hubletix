@@ -1,7 +1,7 @@
-using ClubManagement.Core.Entities;
+using Hubletix.Core.Entities;
 using Microsoft.AspNetCore.Identity;
 
-namespace ClubManagement.Api.Validators;
+namespace Hubletix.Api.Validators;
 
 /// <summary>
 /// Custom validator to ensure users always have an email address.

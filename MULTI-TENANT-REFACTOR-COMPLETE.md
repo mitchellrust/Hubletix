@@ -32,25 +32,25 @@ Successfully refactored the tenant-user relationship from single-tenant with con
 ## Created Files
 
 ### Enums
-1. **TenantRole.cs** (`ClubManagement.Core/Enums/`)
+1. **TenantRole.cs** (`Hubletix.Core/Enums/`)
    - Member = 1
    - Coach = 2
    - Admin = 3
 
-2. **TenantUserStatus.cs** (`ClubManagement.Core/Enums/`)
+2. **TenantUserStatus.cs** (`Hubletix.Core/Enums/`)
    - Active = 1
    - Inactive = 2
    - Suspended = 3
    - PendingInvite = 4
 
 ### Entities
-3. **PlatformUser.cs** (`ClubManagement.Core/Entities/`)
+3. **PlatformUser.cs** (`Hubletix.Core/Entities/`)
    - `IdentityUserId` (FK to AspNetUsers)
    - `FirstName`, `LastName`, `IsActive`
    - `DefaultTenantId` (nullable FK to Tenant)
    - Navigation properties to IdentityUser, DefaultTenant, TenantMemberships, EventRegistrations, Payments
 
-4. **TenantUser.cs** (`ClubManagement.Core/Entities/`)
+4. **TenantUser.cs** (`Hubletix.Core/Entities/`)
    - Inherits from BaseEntity (provides TenantId, CreatedAt, CreatedBy)
    - `PlatformUserId` (FK to PlatformUser)
    - `Role` (TenantRole enum)
@@ -59,7 +59,7 @@ Successfully refactored the tenant-user relationship from single-tenant with con
    - Navigation properties to Tenant, PlatformUser, CoachedEvents
 
 ### Services
-5. **PlatformUserExtensions.cs** (`ClubManagement.Infrastructure/Services/`)
+5. **PlatformUserExtensions.cs** (`Hubletix.Infrastructure/Services/`)
    - `GetTenantUserAsync()` - Get TenantUser membership
    - `GetUserTenantsAsync()` - Get all tenants for a user
    - `HasRoleInTenantAsync()` - Check role authorization
@@ -248,7 +248,7 @@ var members = await _dbContext.GetTenantMembersAsync(tenantId, TenantUserStatus.
 
 1. **Create EF Core Migration**
    ```bash
-   cd src/ClubManagement.Infrastructure
+   cd src/Hubletix.Infrastructure
    dotnet ef migrations add RefactorMultiTenantUserArchitecture --context AppDbContext
    ```
 

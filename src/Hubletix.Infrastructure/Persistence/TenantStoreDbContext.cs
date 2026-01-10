@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Finbuckle.MultiTenant.EntityFrameworkCore.Stores;
 
-namespace ClubManagement.Infrastructure.Persistence;
+namespace Hubletix.Infrastructure.Persistence;
 
 /// <summary>
 /// Standalone DbContext for Finbuckle.MultiTenant tenant store.

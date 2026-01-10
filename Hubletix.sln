@@ -2,11 +2,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 10.0.40219.6
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClubManagement.Api", "src\ClubManagement.Api\ClubManagement.Api.csproj", "{F1A1B2C3-D4E5-F6G7-H8I9-J0K1L2M3N4O5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hubletix.Api", "src\Hubletix.Api\Hubletix.Api.csproj", "{F1A1B2C3-D4E5-F6G7-H8I9-J0K1L2M3N4O5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClubManagement.Core", "src\ClubManagement.Core\ClubManagement.Core.csproj", "{E2B2C3D4-E5F6-G7H8-I9J0-K1L2M3N4O5P6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hubletix.Core", "src\Hubletix.Core\Hubletix.Core.csproj", "{E2B2C3D4-E5F6-G7H8-I9J0-K1L2M3N4O5P6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClubManagement.Infrastructure", "src\ClubManagement.Infrastructure\ClubManagement.Infrastructure.csproj", "{D3C3D4E5-F6G7-H8I9-J0K1-L2M3N4O5P6Q7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hubletix.Infrastructure", "src\Hubletix.Infrastructure\Hubletix.Infrastructure.csproj", "{D3C3D4E5-F6G7-H8I9-J0K1-L2M3N4O5P6Q7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

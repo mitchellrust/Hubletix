@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Options;
 using Stripe;
 using Stripe.Checkout;
-using ClubManagement.Core.Models;
+using Hubletix.Core.Models;
 
-namespace ClubManagement.Infrastructure.Services;
+namespace Hubletix.Infrastructure.Services;
 
 /// <summary>
 /// Implementation of Stripe platform service for direct platform payments.

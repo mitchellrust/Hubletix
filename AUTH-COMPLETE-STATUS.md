@@ -2,7 +2,7 @@
 
 ## 🎉 FULLY IMPLEMENTED
 
-Your ClubManagement application now has a **production-ready authentication system** with comprehensive email validation.
+Your Hubletix application now has a **production-ready authentication system** with comprehensive email validation.
 
 ---
 
@@ -39,7 +39,7 @@ Your ClubManagement application now has a **production-ready authentication syst
 
 ### Core Layer
 ```
-src/ClubManagement.Core/
+src/Hubletix.Core/
 ├── Entities/
 │   ├── RefreshToken.cs          ✅ NEW - Token storage with rotation
 │   ├── TenantUserRole.cs        ✅ NEW - Multi-tenant role mapping
@@ -52,7 +52,7 @@ src/ClubManagement.Core/
 
 ### Infrastructure Layer
 ```
-src/ClubManagement.Infrastructure/
+src/Hubletix.Infrastructure/
 ├── Services/
 │   ├── TokenService.cs          ✅ NEW - JWT generation, refresh, revocation
 │   └── AccountService.cs        ✅ MODIFIED - Added validation & error handling
@@ -62,7 +62,7 @@ src/ClubManagement.Infrastructure/
 
 ### API Layer
 ```
-src/ClubManagement.Api/
+src/Hubletix.Api/
 ├── Validators/
 │   └── RequireEmailValidator.cs ✅ NEW - Email enforcement
 ├── Pages/
@@ -88,8 +88,8 @@ src/ClubManagement.Api/
 {
   "Jwt": {
     "Secret": "CHANGE_THIS_TO_A_SECURE_RANDOM_KEY_AT_LEAST_32_CHARS_LONG_IN_PRODUCTION",
-    "Issuer": "ClubManagement",
-    "Audience": "ClubManagementApp",
+    "Issuer": "Hubletix",
+    "Audience": "HubletixApp",
     "AccessTokenExpirationMinutes": 15,
     "RefreshTokenExpirationDays": 30
   }
@@ -128,17 +128,17 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 **This is the critical next step!** Create Identity tables:
 
 ```bash
-cd /home/mitchellrust/github/mitchellrust/ClubManagement
+cd /home/mitchellrust/github/mitchellrust/Hubletix
 
 # Create migration
 dotnet ef migrations add AddIdentityAuthentication \
-  --project src/ClubManagement.Infrastructure \
-  --startup-project src/ClubManagement.Api
+  --project src/Hubletix.Infrastructure \
+  --startup-project src/Hubletix.Api
 
 # Apply migration
 dotnet ef database update \
-  --project src/ClubManagement.Infrastructure \
-  --startup-project src/ClubManagement.Api
+  --project src/Hubletix.Infrastructure \
+  --startup-project src/Hubletix.Api
 ```
 
 **Tables that will be created:**
@@ -168,7 +168,7 @@ if (!await roleManager.RoleExistsAsync("PlatformUser"))
 ```
 
 ### 3. Test the Login Flow
-1. Start the app: `dotnet run --project src/ClubManagement.Api`
+1. Start the app: `dotnet run --project src/Hubletix.Api`
 2. Navigate to: `https://demo.localhost:5001/Login`
 3. Test registration (signup tab)
 4. Test login
@@ -337,8 +337,8 @@ dotnet restore
 ### Migration Issues
 ```bash
 # Drop and recreate database (dev only!)
-dotnet ef database drop --project src/ClubManagement.Infrastructure --startup-project src/ClubManagement.Api
-dotnet ef database update --project src/ClubManagement.Infrastructure --startup-project src/ClubManagement.Api
+dotnet ef database drop --project src/Hubletix.Infrastructure --startup-project src/Hubletix.Api
+dotnet ef database update --project src/Hubletix.Infrastructure --startup-project src/Hubletix.Api
 ```
 
 ### Token Issues

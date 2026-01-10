@@ -1,12 +1,12 @@
 using Microsoft.EntityFrameworkCore;
-using ClubManagement.Infrastructure.Persistence;
+using Hubletix.Infrastructure.Persistence;
 using Finbuckle.MultiTenant.Abstractions;
-using ClubManagement.Api.Utils;
-using ClubManagement.Api.Models;
-using ClubManagement.Infrastructure.Services;
-using ClubManagement.Core.Constants;
+using Hubletix.Api.Utils;
+using Hubletix.Api.Models;
+using Hubletix.Infrastructure.Services;
+using Hubletix.Core.Constants;
 
-namespace ClubManagement.Api.Pages.Admin;
+namespace Hubletix.Api.Pages.Admin;
 
 public class EventsModel : AdminPageModel
 {

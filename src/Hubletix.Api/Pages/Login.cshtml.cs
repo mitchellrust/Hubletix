@@ -1,10 +1,10 @@
-using ClubManagement.Infrastructure.Persistence;
-using ClubManagement.Infrastructure.Services;
+using Hubletix.Infrastructure.Persistence;
+using Hubletix.Infrastructure.Services;
 using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace ClubManagement.Api.Pages;
+namespace Hubletix.Api.Pages;
 
 public class LoginModel : PublicPageModel
 {

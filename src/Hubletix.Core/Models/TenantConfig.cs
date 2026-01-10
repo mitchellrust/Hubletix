@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ClubManagement.Core.Models;
+namespace Hubletix.Core.Models;
 
 /// <summary>
 /// Represents the configuration stored in Tenant.ConfigJson.

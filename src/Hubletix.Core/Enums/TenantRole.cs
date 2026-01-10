@@ -1,4 +1,4 @@
-namespace ClubManagement.Core.Enums;
+namespace Hubletix.Core.Enums;
 
 /// <summary>
 /// Defines the role a user has within a specific tenant.

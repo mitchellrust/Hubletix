@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using ClubManagement.Core.Constants;
-using ClubManagement.Core.Entities;
-using ClubManagement.Infrastructure.Persistence;
+using Hubletix.Core.Constants;
+using Hubletix.Core.Entities;
+using Hubletix.Infrastructure.Persistence;
 using Finbuckle.MultiTenant.Abstractions;
-using ClubManagement.Api.Utils;
-using ClubManagement.Infrastructure.Services;
+using Hubletix.Api.Utils;
+using Hubletix.Infrastructure.Services;
 
-namespace ClubManagement.Api.Pages.Admin;
+namespace Hubletix.Api.Pages.Admin;
 
 public class CreatePlanModel : AdminPageModel
 {

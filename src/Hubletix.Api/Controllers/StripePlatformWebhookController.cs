@@ -1,14 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
 using Stripe;
 using Stripe.Checkout;
-using ClubManagement.Infrastructure.Services;
+using Hubletix.Infrastructure.Services;
 using Microsoft.Extensions.Options;
-using ClubManagement.Core.Models;
-using ClubManagement.Infrastructure.Persistence;
+using Hubletix.Core.Models;
+using Hubletix.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using ClubManagement.Core.Constants;
+using Hubletix.Core.Constants;
 
-namespace ClubManagement.Api.Controllers;
+namespace Hubletix.Api.Controllers;
 
 /// <summary>
 /// Webhook controller for handling Stripe platform payment events.

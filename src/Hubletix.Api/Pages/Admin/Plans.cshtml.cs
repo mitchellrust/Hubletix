@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using ClubManagement.Infrastructure.Persistence;
+using Hubletix.Infrastructure.Persistence;
 using Finbuckle.MultiTenant.Abstractions;
-using ClubManagement.Api.Utils;
-using ClubManagement.Infrastructure.Services;
+using Hubletix.Api.Utils;
+using Hubletix.Infrastructure.Services;
 
-namespace ClubManagement.Api.Pages.Admin;
+namespace Hubletix.Api.Pages.Admin;
 
 public class PlansModel : AdminPageModel
 {

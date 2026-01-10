@@ -1,4 +1,4 @@
-namespace ClubManagement.Api.Models;
+namespace Hubletix.Api.Models;
 
 /// <summary>
 /// View model for the public navbar

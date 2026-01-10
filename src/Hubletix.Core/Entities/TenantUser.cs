@@ -1,7 +1,7 @@
-using ClubManagement.Core.Enums;
-using ClubManagement.Core.Models;
+using Hubletix.Core.Enums;
+using Hubletix.Core.Models;
 
-namespace ClubManagement.Core.Entities;
+namespace Hubletix.Core.Entities;
 
 /// <summary>
 /// Join entity representing a platform user's membership in a specific tenant.

@@ -1,14 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Identity;
-using ClubManagement.Infrastructure.Persistence;
-using ClubManagement.Core.Entities;
-using ClubManagement.Core.Models;
-using ClubManagement.Core.Enums;
+using Hubletix.Infrastructure.Persistence;
+using Hubletix.Core.Entities;
+using Hubletix.Core.Models;
+using Hubletix.Core.Enums;
 using System.Text.Json;
-using ClubManagement.Core.Constants;
+using Hubletix.Core.Constants;
 
-namespace ClubManagement.Infrastructure.Services;
+namespace Hubletix.Infrastructure.Services;
 
 /// <summary>
 /// Service responsible for database initialization, migration application, and seeding.

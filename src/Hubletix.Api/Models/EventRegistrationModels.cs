@@ -1,4 +1,4 @@
-namespace ClubManagement.Api.Models;
+namespace Hubletix.Api.Models;
 
 public class EventRegistrationDto
 {

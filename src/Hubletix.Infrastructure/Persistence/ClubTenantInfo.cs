@@ -1,6 +1,6 @@
 using Finbuckle.MultiTenant.Abstractions;
 
-namespace ClubManagement.Infrastructure.Persistence;
+namespace Hubletix.Infrastructure.Persistence;
 
 /// <summary>
 /// Represents the current tenant context for the request.

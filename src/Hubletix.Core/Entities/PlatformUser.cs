@@ -1,6 +1,6 @@
-using ClubManagement.Core.Models;
+using Hubletix.Core.Models;
 
-namespace ClubManagement.Core.Entities;
+namespace Hubletix.Core.Entities;
 
 /// <summary>
 /// Represents a platform user - a real person authenticated via Identity.

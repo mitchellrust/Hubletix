@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace ClubManagement.Infrastructure.Migrations.App
+namespace Hubletix.Infrastructure.Migrations.App
 {
     /// <inheritdoc />
     public partial class AppIdentity : Migration

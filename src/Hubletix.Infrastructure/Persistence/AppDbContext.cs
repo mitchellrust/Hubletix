@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Finbuckle.MultiTenant.Abstractions;
-using ClubManagement.Core.Entities;
+using Hubletix.Core.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 
-namespace ClubManagement.Infrastructure.Persistence;
+namespace Hubletix.Infrastructure.Persistence;
 
 /// <summary>
 /// Application DbContext with multi-tenant support via Finbuckle.MultiTenant and Identity support.

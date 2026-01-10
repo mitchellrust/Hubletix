@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using ClubManagement.Infrastructure.Services;
+using Hubletix.Infrastructure.Services;
 
-namespace ClubManagement.Api.Pages.Signup;
+namespace Hubletix.Api.Pages.Signup;
 
 public class SetupOrganizationModel : PageModel
 {

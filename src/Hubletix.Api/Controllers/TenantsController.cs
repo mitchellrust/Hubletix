@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Finbuckle.MultiTenant.Abstractions;
-using ClubManagement.Infrastructure.Persistence;
-using ClubManagement.Infrastructure.Services;
+using Hubletix.Infrastructure.Persistence;
+using Hubletix.Infrastructure.Services;
 
-namespace ClubManagement.Api.Controllers;
+namespace Hubletix.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]

@@ -1,8 +1,8 @@
-using ClubManagement.Core.Entities;
-using ClubManagement.Infrastructure.Persistence;
+using Hubletix.Core.Entities;
+using Hubletix.Infrastructure.Persistence;
 using Microsoft.Extensions.Logging;
 
-namespace ClubManagement.Infrastructure.Services;
+namespace Hubletix.Infrastructure.Services;
 
 /// <summary>
 /// Service for managing tenant configuration.

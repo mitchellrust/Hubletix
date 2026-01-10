@@ -1,7 +1,7 @@
-using ClubManagement.Core.Constants;
-using ClubManagement.Core.Models;
+using Hubletix.Core.Constants;
+using Hubletix.Core.Models;
 
-namespace ClubManagement.Core.Entities;
+namespace Hubletix.Core.Entities;
 
 /// <summary>
 /// Represents a tenant's subscription to a platform plan
