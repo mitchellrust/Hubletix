@@ -4,7 +4,10 @@ namespace Hubletix.Api.Pages.Platform;
 
 public class IndexModel : PageModel
 {
+    public bool IsAuthenticated { get; set; }
+
     public void OnGet()
     {
+        IsAuthenticated = User.Identity?.IsAuthenticated ?? false;
     }
 }

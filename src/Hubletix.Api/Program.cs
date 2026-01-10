@@ -60,8 +60,8 @@ builder.Services.AddIdentity<Hubletix.Core.Entities.User, Microsoft.AspNetCore.I
 // Configure Identity's Application Cookie (used for web authentication)
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.LoginPath = "/Platform/Login";
-    options.LogoutPath = "/Platform/Logout";
+    options.LoginPath = "/login";
+    options.LogoutPath = "/logout";
     options.AccessDeniedPath = "/Tenant/NoAccess";
     options.ExpireTimeSpan = TimeSpan.FromHours(8);
     options.SlidingExpiration = true;

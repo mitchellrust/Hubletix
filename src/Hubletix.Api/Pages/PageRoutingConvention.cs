@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.AspNetCore.Routing;
 
 namespace Hubletix.Api.Pages;
 

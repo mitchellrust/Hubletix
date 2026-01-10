@@ -22,6 +22,7 @@ public class LogoutModel : PageModel
             await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
         }
 
+        TempData["SuccessMessage"] = "You have been logged out successfully.";
         return RedirectToPage("/Platform/Login");
     }
 }
