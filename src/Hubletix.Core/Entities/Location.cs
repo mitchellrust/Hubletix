@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using ClubManagement.Core.Models;
+using Hubletix.Core.Models;
 
-namespace ClubManagement.Core.Entities;
+namespace Hubletix.Core.Entities;
 
 /// <summary>
 /// Represents a physical location for a tenant (club).

@@ -1,4 +1,4 @@
-namespace ClubManagement.Core.Constants;
+namespace Hubletix.Core.Constants;
 
 /// NOTE: These values should align with Stripe's subscription status values,
 /// which is why they are snake case strings.

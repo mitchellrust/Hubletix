@@ -2,7 +2,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace ClubManagement.Infrastructure.Services;
+namespace Hubletix.Infrastructure.Services;
 
 /// <summary>
 /// Generic caching service that can be used across the application.

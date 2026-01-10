@@ -1,10 +1,10 @@
-using ClubManagement.Api.Models;
+using Hubletix.Api.Models;
 using Finbuckle.MultiTenant.Abstractions;
-using ClubManagement.Infrastructure.Persistence;
-using ClubManagement.Infrastructure.Services;
-using ClubManagement.Core.Models;
+using Hubletix.Infrastructure.Persistence;
+using Hubletix.Infrastructure.Services;
+using Hubletix.Core.Models;
 
-namespace ClubManagement.Api.Pages;
+namespace Hubletix.Api.Pages;
 
 public class IndexModel : PublicPageModel
 {

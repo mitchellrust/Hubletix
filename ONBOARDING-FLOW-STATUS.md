@@ -66,13 +66,13 @@ The Invoice object in Stripe doesn't have a full Subscription object by default.
 
 ### 1. Database Migration (HIGH PRIORITY)
 ```bash
-cd /home/mitchellrust/github/mitchellrust/ClubManagement
+cd /home/mitchellrust/github/mitchellrust/Hubletix
 dotnet ef migrations add TenantOnboardingFlow \
-  --project src/ClubManagement.Infrastructure \
-  --startup-project src/ClubManagement.Api
+  --project src/Hubletix.Infrastructure \
+  --startup-project src/Hubletix.Api
 dotnet ef database update \
-  --project src/ClubManagement.Infrastructure \
-  --startup-project src/ClubManagement.Api
+  --project src/Hubletix.Infrastructure \
+  --startup-project src/Hubletix.Api
 ```
 
 ### 2. Seed Platform Plans

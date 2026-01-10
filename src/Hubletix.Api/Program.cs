@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using ClubManagement.Infrastructure.Persistence;
-using ClubManagement.Infrastructure.Services;
-using ClubManagement.Core.Models;
-using ClubManagement.Api.Validators;
+using Hubletix.Infrastructure.Persistence;
+using Hubletix.Infrastructure.Services;
+using Hubletix.Core.Models;
+using Hubletix.Api.Validators;
 using Finbuckle.MultiTenant.Extensions;
 using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
@@ -43,7 +43,7 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 
 // Configure Identity
-builder.Services.AddIdentity<ClubManagement.Core.Entities.User, Microsoft.AspNetCore.Identity.IdentityRole>(options =>
+builder.Services.AddIdentity<Hubletix.Core.Entities.User, Microsoft.AspNetCore.Identity.IdentityRole>(options =>
     {
         // Password settings
         options.Password.RequireDigit = true;

@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using ClubManagement.Core.Models;
+using Hubletix.Core.Models;
 
-namespace ClubManagement.Core.Entities;
+namespace Hubletix.Core.Entities;
 
 /// <summary>
 /// Represents an event (class, training session, etc.) offered by a tenant.

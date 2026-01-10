@@ -1,4 +1,4 @@
-namespace ClubManagement.Core.Constants;
+namespace Hubletix.Core.Constants;
 
 /// <summary>
 /// Platform-level roles for system administration.

@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using ClubManagement.Infrastructure.Services;
-using ClubManagement.Core.Constants;
+using Hubletix.Infrastructure.Services;
+using Hubletix.Core.Constants;
 
-namespace ClubManagement.Api.Pages.Signup;
+namespace Hubletix.Api.Pages.Signup;
 
 public class SuccessModel : PageModel
 {

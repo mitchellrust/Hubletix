@@ -1,4 +1,4 @@
-namespace ClubManagement.Core.Enums;
+namespace Hubletix.Core.Enums;
 
 /// <summary>
 /// Defines the membership status of a user within a specific tenant.

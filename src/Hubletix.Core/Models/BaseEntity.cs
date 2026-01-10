@@ -1,4 +1,4 @@
-namespace ClubManagement.Core.Models;
+namespace Hubletix.Core.Models;
 
 /// <summary>
 /// Base entity for all multi-tenant entities in the application.

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes the JWT-based authentication and authorization system implemented for the ClubManagement application. The system supports multi-tenant architecture with both platform-level and tenant-level roles.
+This document describes the JWT-based authentication and authorization system implemented for the Hubletix application. The system supports multi-tenant architecture with both platform-level and tenant-level roles.
 
 ## Architecture
 
@@ -57,8 +57,8 @@ This document describes the JWT-based authentication and authorization system im
   "tenant_id": "tenant-123",          // Optional
   "tenant_role": "Admin",             // Optional
   "exp": "expiration-timestamp",
-  "iss": "ClubManagement",
-  "aud": "ClubManagementApp"
+  "iss": "Hubletix",
+  "aud": "HubletixApp"
 }
 ```
 
@@ -172,8 +172,8 @@ public IActionResult MemberDashboard() { }
 {
   "Jwt": {
     "Secret": "CHANGE_THIS_IN_PRODUCTION",
-    "Issuer": "ClubManagement",
-    "Audience": "ClubManagementApp",
+    "Issuer": "Hubletix",
+    "Audience": "HubletixApp",
     "AccessTokenExpirationMinutes": 15,
     "RefreshTokenExpirationDays": 30
   }
@@ -209,15 +209,15 @@ public IActionResult MemberDashboard() { }
 ### Create Migration
 ```bash
 dotnet ef migrations add AddIdentityAuth \
-  --project src/ClubManagement.Infrastructure \
-  --startup-project src/ClubManagement.Api
+  --project src/Hubletix.Infrastructure \
+  --startup-project src/Hubletix.Api
 ```
 
 ### Apply Migration
 ```bash
 dotnet ef database update \
-  --project src/ClubManagement.Infrastructure \
-  --startup-project src/ClubManagement.Api
+  --project src/Hubletix.Infrastructure \
+  --startup-project src/Hubletix.Api
 ```
 
 ## Testing Checklist

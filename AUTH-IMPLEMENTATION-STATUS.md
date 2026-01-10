@@ -49,17 +49,17 @@
 Create and apply the migration for Identity and auth tables:
 
 ```bash
-cd /home/mitchellrust/github/mitchellrust/ClubManagement
+cd /home/mitchellrust/github/mitchellrust/Hubletix
 
 # Create migration
 dotnet ef migrations add AddIdentityAuthentication \
-  --project src/ClubManagement.Infrastructure \
-  --startup-project src/ClubManagement.Api
+  --project src/Hubletix.Infrastructure \
+  --startup-project src/Hubletix.Api
 
 # Apply migration
 dotnet ef database update \
-  --project src/ClubManagement.Infrastructure \
-  --startup-project src/ClubManagement.Api
+  --project src/Hubletix.Infrastructure \
+  --startup-project src/Hubletix.Api
 ```
 
 ### 2. Seed Initial Roles
@@ -107,24 +107,24 @@ Update the onboarding service to:
 ## Key Files Modified
 
 ### Core Layer
-- `src/ClubManagement.Core/Entities/User.cs` - Extended with Identity
-- `src/ClubManagement.Core/Entities/RefreshToken.cs` - New
-- `src/ClubManagement.Core/Entities/TenantUserRole.cs` - New
-- `src/ClubManagement.Core/Models/JwtSettings.cs` - New
-- `src/ClubManagement.Core/Constants/PlatformRoles.cs` - New
-- `src/ClubManagement.Core/ClubManagement.Core.csproj` - Added Identity package
+- `src/Hubletix.Core/Entities/User.cs` - Extended with Identity
+- `src/Hubletix.Core/Entities/RefreshToken.cs` - New
+- `src/Hubletix.Core/Entities/TenantUserRole.cs` - New
+- `src/Hubletix.Core/Models/JwtSettings.cs` - New
+- `src/Hubletix.Core/Constants/PlatformRoles.cs` - New
+- `src/Hubletix.Core/Hubletix.Core.csproj` - Added Identity package
 
 ### Infrastructure Layer
-- `src/ClubManagement.Infrastructure/Persistence/AppDbContext.cs` - Identity integration
-- `src/ClubManagement.Infrastructure/Services/TokenService.cs` - New
-- `src/ClubManagement.Infrastructure/Services/AccountService.cs` - Already existed
-- `src/ClubManagement.Infrastructure/ClubManagement.Infrastructure.csproj` - Added packages
+- `src/Hubletix.Infrastructure/Persistence/AppDbContext.cs` - Identity integration
+- `src/Hubletix.Infrastructure/Services/TokenService.cs` - New
+- `src/Hubletix.Infrastructure/Services/AccountService.cs` - Already existed
+- `src/Hubletix.Infrastructure/Hubletix.Infrastructure.csproj` - Added packages
 
 ### API Layer
-- `src/ClubManagement.Api/Program.cs` - Identity & JWT configuration
-- `src/ClubManagement.Api/Pages/Login.cshtml.cs` - Real auth implementation
-- `src/ClubManagement.Api/appsettings.json` - JWT settings
-- `src/ClubManagement.Api/ClubManagement.Api.csproj` - Added JWT bearer package
+- `src/Hubletix.Api/Program.cs` - Identity & JWT configuration
+- `src/Hubletix.Api/Pages/Login.cshtml.cs` - Real auth implementation
+- `src/Hubletix.Api/appsettings.json` - JWT settings
+- `src/Hubletix.Api/Hubletix.Api.csproj` - Added JWT bearer package
 
 ## Configuration Required
 
@@ -133,8 +133,8 @@ Update the onboarding service to:
 {
   "Jwt": {
     "Secret": "CHANGE_THIS_TO_A_SECURE_RANDOM_KEY_AT_LEAST_32_CHARS_LONG_IN_PRODUCTION",
-    "Issuer": "ClubManagement",
-    "Audience": "ClubManagementApp",
+    "Issuer": "Hubletix",
+    "Audience": "HubletixApp",
     "AccessTokenExpirationMinutes": 15,
     "RefreshTokenExpirationDays": 30
   }
@@ -144,15 +144,15 @@ Update the onboarding service to:
 ### User Secrets (Production)
 ```bash
 dotnet user-secrets set "Jwt:Secret" "your-super-secure-random-key-here" \
-  --project src/ClubManagement.Api
+  --project src/Hubletix.Api
 ```
 
 ## Testing the Implementation
 
 ### 1. Start the Application
 ```bash
-cd /home/mitchellrust/github/mitchellrust/ClubManagement
-dotnet run --project src/ClubManagement.Api
+cd /home/mitchellrust/github/mitchellrust/Hubletix
+dotnet run --project src/Hubletix.Api
 ```
 
 ### 2. Navigate to Login Page

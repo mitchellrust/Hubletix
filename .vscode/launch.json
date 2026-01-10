@@ -6,9 +6,9 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
-      "program": "${workspaceFolder}/src/ClubManagement.Api/bin/Debug/net10.0/ClubManagement.Api.dll",
+      "program": "${workspaceFolder}/src/Hubletix.Api/bin/Debug/net10.0/Hubletix.Api.dll",
       "args": [],
-      "cwd": "${workspaceFolder}/src/ClubManagement.Api",
+      "cwd": "${workspaceFolder}/src/Hubletix.Api",
       "stopAtEntry": false,
       "serverReadyAction": {
         "action": "openExternally",

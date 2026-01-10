@@ -1,4 +1,4 @@
-namespace ClubManagement.Core.Entities;
+namespace Hubletix.Core.Entities;
 
 /// <summary>
 /// Refresh token for JWT authentication with rotation and revocation support.

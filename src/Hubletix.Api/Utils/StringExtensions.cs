@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using System.Globalization;
 
-namespace ClubManagement.Api.Utils;
+namespace Hubletix.Api.Utils;
 
 public static class StringExtensions
 {

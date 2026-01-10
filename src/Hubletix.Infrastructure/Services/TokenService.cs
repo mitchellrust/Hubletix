@@ -2,16 +2,16 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using ClubManagement.Core.Entities;
-using ClubManagement.Core.Models;
-using ClubManagement.Infrastructure.Persistence;
+using Hubletix.Core.Entities;
+using Hubletix.Core.Models;
+using Hubletix.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace ClubManagement.Infrastructure.Services;
+namespace Hubletix.Infrastructure.Services;
 
 public interface ITokenService
 {

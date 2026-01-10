@@ -1,7 +1,7 @@
 using Stripe;
 using Stripe.Checkout;
 
-namespace ClubManagement.Infrastructure.Services;
+namespace Hubletix.Infrastructure.Services;
 
 /// <summary>
 /// Service for handling direct Stripe operations on the platform account.

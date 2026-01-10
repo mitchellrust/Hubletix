@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using ClubManagement.Infrastructure.Services;
-using ClubManagement.Infrastructure.Persistence;
-using ClubManagement.Core.Constants;
+using Hubletix.Infrastructure.Services;
+using Hubletix.Infrastructure.Persistence;
+using Hubletix.Core.Constants;
 
-namespace ClubManagement.Api.Pages.Signup;
+namespace Hubletix.Api.Pages.Signup;
 
 /// <summary>
 /// TODO: This page and all the platform signup pages need some review and probably rewrite, didn't check copilot here.

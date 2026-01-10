@@ -20,8 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ClubManagement.Core\ClubManagement.Core.csproj" />
-    <ProjectReference Include="..\ClubManagement.Infrastructure\ClubManagement.Infrastructure.csproj" />
+    <ProjectReference Include="..\Hubletix.Core\Hubletix.Core.csproj" />
+    <ProjectReference Include="..\Hubletix.Infrastructure\Hubletix.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace ClubManagement.Infrastructure.Migrations.App
+namespace Hubletix.Infrastructure.Migrations.App
 {
     /// <inheritdoc />
     public partial class AddEventPriceLocationRegDeadline : Migration

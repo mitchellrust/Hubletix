@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace ClubManagement.Infrastructure.Migrations.TenantStore
+namespace Hubletix.Infrastructure.Migrations.TenantStore
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration

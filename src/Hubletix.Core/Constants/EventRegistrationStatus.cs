@@ -1,4 +1,4 @@
-namespace ClubManagement.Core.Constants;
+namespace Hubletix.Core.Constants;
 
 /// <summary>
 /// Represents the different types of events that can be offered by a club.

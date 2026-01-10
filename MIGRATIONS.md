@@ -14,8 +14,8 @@ All commands should be run from the solution root.
 **For TenantStore changes** (tenant metadata):
 ```bash
 dotnet ef migrations add <MigrationName> \
-  --startup-project src/ClubManagement.Api \
-  --project src/ClubManagement.Infrastructure \
+  --startup-project src/Hubletix.Api \
+  --project src/Hubletix.Infrastructure \
   --context TenantStoreDbContext \
   --output-dir Migrations/TenantStore
 ```
@@ -23,8 +23,8 @@ dotnet ef migrations add <MigrationName> \
 **For App changes** (application data):
 ```bash
 dotnet ef migrations add <MigrationName> \
-  --startup-project src/ClubManagement.Api \
-  --project src/ClubManagement.Infrastructure \
+  --startup-project src/Hubletix.Api \
+  --project src/Hubletix.Infrastructure \
   --context AppDbContext \
   --output-dir Migrations/App
 ```
@@ -32,8 +32,8 @@ dotnet ef migrations add <MigrationName> \
 **Example**: Adding a new field to Event entity:
 ```bash
 dotnet ef migrations add AddEventCapacity \
-  --startup-project src/ClubManagement.Api \
-  --project src/ClubManagement.Infrastructure \
+  --startup-project src/Hubletix.Api \
+  --project src/Hubletix.Infrastructure \
   --context AppDbContext \
   --output-dir Migrations/App
 ```
@@ -49,14 +49,14 @@ dotnet ef migrations add AddEventCapacity \
 ```bash
 # Apply TenantStore migrations
 dotnet ef database update \
-  --startup-project src/ClubManagement.Api \
-  --project src/ClubManagement.Infrastructure \
+  --startup-project src/Hubletix.Api \
+  --project src/Hubletix.Infrastructure \
   --context TenantStoreDbContext
 
 # Apply App migrations
 dotnet ef database update \
-  --startup-project src/ClubManagement.Api \
-  --project src/ClubManagement.Infrastructure \
+  --startup-project src/Hubletix.Api \
+  --project src/Hubletix.Infrastructure \
   --context AppDbContext
 ```
 
@@ -66,14 +66,14 @@ dotnet ef database update \
 ```bash
 # For TenantStore
 dotnet ef migrations remove \
-  --startup-project src/ClubManagement.Api \
-  --project src/ClubManagement.Infrastructure \
+  --startup-project src/Hubletix.Api \
+  --project src/Hubletix.Infrastructure \
   --context TenantStoreDbContext
 
 # For App
 dotnet ef migrations remove \
-  --startup-project src/ClubManagement.Api \
-  --project src/ClubManagement.Infrastructure \
+  --startup-project src/Hubletix.Api \
+  --project src/Hubletix.Infrastructure \
   --context AppDbContext
 ```
 
@@ -83,16 +83,16 @@ dotnet ef migrations remove \
 ```bash
 # Generate SQL for all pending migrations
 dotnet ef migrations script \
-  --startup-project src/ClubManagement.Api \
-  --project src/ClubManagement.Infrastructure \
+  --startup-project src/Hubletix.Api \
+  --project src/Hubletix.Infrastructure \
   --context AppDbContext \
   --output migration.sql \
   --idempotent
 
 # Generate SQL for specific migration range
 dotnet ef migrations script <FromMigration> <ToMigration> \
-  --startup-project src/ClubManagement.Api \
-  --project src/ClubManagement.Infrastructure \
+  --startup-project src/Hubletix.Api \
+  --project src/Hubletix.Infrastructure \
   --context AppDbContext \
   --output migration.sql
 ```
@@ -102,8 +102,8 @@ dotnet ef migrations script <FromMigration> <ToMigration> \
 ```bash
 # List applied migrations
 dotnet ef migrations list \
-  --startup-project src/ClubManagement.Api \
-  --project src/ClubManagement.Infrastructure \
+  --startup-project src/Hubletix.Api \
+  --project src/Hubletix.Infrastructure \
   --context AppDbContext
 ```
 
@@ -115,13 +115,13 @@ dotnet ef migrations list \
 
 When you need to add/modify entities:
 
-1. **Modify your entity classes** in `ClubManagement.Core/Entities/`
+1. **Modify your entity classes** in `Hubletix.Core/Entities/`
 2. **Update DbContext configuration** if needed (relationships, indexes, etc.)
 3. **Create migration**:
    ```bash
    dotnet ef migrations add DescriptiveNameOfChange \
-     --startup-project src/ClubManagement.Api \
-     --project src/ClubManagement.Infrastructure \
+     --startup-project src/Hubletix.Api \
+     --project src/Hubletix.Infrastructure \
      --context AppDbContext \
      --output-dir Migrations/App
    ```
@@ -215,8 +215,8 @@ Your `DatabaseInitializationService` already does this.
 1. **Generate SQL script**:
    ```bash
    dotnet ef migrations script \
-     --startup-project src/ClubManagement.Api \
-     --project src/ClubManagement.Infrastructure \
+     --startup-project src/Hubletix.Api \
+     --project src/Hubletix.Infrastructure \
      --context AppDbContext \
      --output production-migration.sql \
      --idempotent
@@ -228,7 +228,7 @@ Your `DatabaseInitializationService` already does this.
 
 4. **Apply during maintenance window**:
    ```bash
-   psql -U postgres -d clubmanagement_app -f production-migration.sql
+   psql -U postgres -d hubletix_app -f production-migration.sql
    ```
 
 5. **Deploy application** without auto-migration enabled
@@ -302,20 +302,20 @@ if (app.Environment.IsDevelopment())
 **Check migration status**:
 ```bash
 dotnet ef migrations list --context AppDbContext \
-  --startup-project src/ClubManagement.Api \
-  --project src/ClubManagement.Infrastructure
+  --startup-project src/Hubletix.Api \
+  --project src/Hubletix.Infrastructure
 ```
 
 **View DbContext model**:
 ```bash
 dotnet ef dbcontext info --context AppDbContext \
-  --startup-project src/ClubManagement.Api \
-  --project src/ClubManagement.Infrastructure
+  --startup-project src/Hubletix.Api \
+  --project src/Hubletix.Infrastructure
 ```
 
 **Optimize DbContext**:
 ```bash
 dotnet ef dbcontext optimize --context AppDbContext \
-  --startup-project src/ClubManagement.Api \
-  --project src/ClubManagement.Infrastructure
+  --startup-project src/Hubletix.Api \
+  --project src/Hubletix.Infrastructure
 ```

@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Finbuckle.MultiTenant.Abstractions;
-using ClubManagement.Infrastructure.Persistence;
-using ClubManagement.Core.Models;
-using ClubManagement.Infrastructure.Services;
-using ClubManagement.Api.Utils;
-using ClubManagement.Api.Models;
+using Hubletix.Infrastructure.Persistence;
+using Hubletix.Core.Models;
+using Hubletix.Infrastructure.Services;
+using Hubletix.Api.Utils;
+using Hubletix.Api.Models;
 
-namespace ClubManagement.Api.Pages;
+namespace Hubletix.Api.Pages;
 
 /// <summary>
 /// Public page model that provides tenant context to all inheriting pages.

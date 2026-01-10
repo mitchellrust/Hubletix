@@ -1,4 +1,4 @@
-namespace ClubManagement.Core.Constants;
+namespace Hubletix.Core.Constants;
 
 /// <summary>
 /// Role constants for role-based access control.

@@ -1,4 +1,4 @@
-namespace ClubManagement.Api.Utils;
+namespace Hubletix.Api.Utils;
 
 /// <summary>
 /// Extension methods for working with timezones.
