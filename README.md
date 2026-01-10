@@ -1,4 +1,4 @@
-# Club Management - Multi-Tenant SaaS Platform
+# Hubletix - Multi-Tenant SaaS Platform
 
 A comprehensive multi-tenant SaaS platform for sports clubs built with .NET 10, ASP.NET Core, and PostgreSQL.
 
