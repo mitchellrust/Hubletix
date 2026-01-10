@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Routing;
 
 namespace Hubletix.Api.Pages;
 
@@ -33,18 +34,41 @@ public class PageRoutingConvention : IPageRouteModelConvention
             // For example: /Platform/Login -> /login
             // For example: /Tenant/Events -> /events
             // For example: /Tenant/Admin/Dashboard -> /admin/dashboard
-            
-            var newPath = "/" + string.Join("/", segments.Skip(1));
-            
+
+            var pathSegments = segments.Skip(1).ToArray();
+            var lastSegment = pathSegments.LastOrDefault();
+            var newPath = "/";
+
+            // Map Index pages to root "/"; other pages to their lowercase path
+            if (!string.Equals(lastSegment, "Index", StringComparison.OrdinalIgnoreCase))
+            {
+                newPath = "/" + string.Join("/", pathSegments).ToLower();
+            }
+
             // Clear existing selectors and add new ones without the prefix
             model.Selectors.Clear();
-            model.Selectors.Add(new SelectorModel
+
+            var selector = new SelectorModel
             {
                 AttributeRouteModel = new AttributeRouteModel
                 {
-                    Template = newPath == "/" ? "/" : newPath.ToLower()
+                    Template = newPath
                 }
-            });
+            };
+
+            // Add host constraints to avoid route collisions:
+            // - Platform pages: root domain only (hubletix.com, localhost)
+            // - Tenant pages: subdomains only (*.hubletix.com, *.localhost)
+            if (segments[0].Equals("Platform", StringComparison.OrdinalIgnoreCase))
+            {
+                selector.EndpointMetadata.Add(new HostAttribute("hubletix.com", "localhost"));
+            }
+            else
+            {
+                selector.EndpointMetadata.Add(new HostAttribute("*.hubletix.com", "*.localhost"));
+            }
+
+            model.Selectors.Add(selector);
         }
     }
 }

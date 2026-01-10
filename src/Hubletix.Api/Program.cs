@@ -130,7 +130,9 @@ if (builder.Environment.IsDevelopment())
         })
         .AddRazorOptions(options =>
         {
-            options.PageViewLocationFormats.Add("/Pages/Admin/Shared/{0}.cshtml");
+            options.PageViewLocationFormats.Add("/Pages/Platform/Shared/{0}.cshtml");
+            options.PageViewLocationFormats.Add("/Pages/Tenant/Shared/{0}.cshtml");
+            options.PageViewLocationFormats.Add("/Pages/Tenant/Admin/Shared/{0}.cshtml");
         });
 }
 else
@@ -144,7 +146,9 @@ else
         })
         .AddRazorOptions(options =>
         {
-            options.PageViewLocationFormats.Add("/Pages/Admin/Shared/{0}.cshtml");
+            options.PageViewLocationFormats.Add("/Pages/Platform/Shared/{0}.cshtml");
+            options.PageViewLocationFormats.Add("/Pages/Tenant/Shared/{0}.cshtml");
+            options.PageViewLocationFormats.Add("/Pages/Tenant/Admin/Shared/{0}.cshtml");
         });
 }
 

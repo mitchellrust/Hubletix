@@ -23,7 +23,6 @@ public class SubdomainRoutingMiddleware
     {
         "/", // For tenant-specific home page
         "/events",
-        "/eventdetail",
         "/membershipplans",
         "/admin"
     };
