@@ -1,11 +1,10 @@
-using Hubletix.Infrastructure.Persistence;
 using Hubletix.Infrastructure.Services;
-using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Hubletix.Api.Pages.Platform;
 
-public class LoginModel : PublicPageModel
+public class LoginModel : PageModel
 {
     private readonly IAccountService _accountService;
     private readonly ITokenService _tokenService;
@@ -39,28 +38,18 @@ public class LoginModel : PublicPageModel
     public string? ReturnUrl { get; set; }
 
     public LoginModel(
-        IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
-        ITenantConfigService tenantConfigService,
-        AppDbContext dbContext,
         IAccountService accountService,
         ITokenService tokenService,
         ILogger<LoginModel> logger
-    ) : base(multiTenantContextAccessor, tenantConfigService, dbContext)
+    )
     {
         _accountService = accountService;
         _tokenService = tokenService;
         _logger = logger;
     }
 
-    public async Task<IActionResult> OnGetAsync()
+    public IActionResult OnGet()
     {
-        // Check if user signup is enabled for this tenant
-        if (!TenantConfig.Features.EnableUserSignup)
-        {
-            ErrorMessage = "Member registration is currently not available.";
-            return RedirectToPage("/Index");
-        }
-
         return Page();
     }
 
@@ -82,7 +71,7 @@ public class LoginModel : PublicPageModel
             return false;
 
         // Validate against allowed route patterns
-        var allowedPrefixes = new[] { "/events", "/eventdetail", "/membershipplans", "/admin", "/login", "/signup", "/" };
+        var allowedPrefixes = new[] { "/admin", "/login", "/signup", "/" };
         return allowedPrefixes.Any(prefix => 
             returnUrl.Equals(prefix, StringComparison.OrdinalIgnoreCase) || 
             returnUrl.StartsWith(prefix + "/", StringComparison.OrdinalIgnoreCase)
@@ -102,11 +91,10 @@ public class LoginModel : PublicPageModel
 
         try
         {
-            // Attempt login with tenant context
+            // Attempt login without tenant scoping
             var (success, error, identityUser, platformUser) = await _accountService.LoginAsync(
                 Email,
-                Password,
-                CurrentTenantInfo?.Id
+                Password
             );
 
             if (!success || identityUser == null || platformUser == null)
@@ -118,8 +106,7 @@ public class LoginModel : PublicPageModel
             // Create JWT tokens
             var (accessToken, refreshToken) = await _tokenService.CreateTokensAsync(
                 identityUser,
-                platformUser.Id,
-                CurrentTenantInfo?.Id
+                platformUser.Id
             );
 
             // Store tokens in HTTP-only cookies for web sessions
@@ -139,8 +126,7 @@ public class LoginModel : PublicPageModel
                 Expires = DateTimeOffset.UtcNow.AddDays(30)
             });
 
-            _logger.LogInformation("User {Email} logged in successfully to tenant {TenantId}",
-                Email, CurrentTenantInfo?.Id);
+            _logger.LogInformation("User {Email} logged in successfully", Email);
 
             SuccessMessage = "Login successful! Welcome back.";
             
@@ -150,14 +136,8 @@ public class LoginModel : PublicPageModel
                 return LocalRedirect(ReturnUrl!);
             }
 
-            // If on a subdomain (tenant context), redirect to tenant events page
-            if (CurrentTenantInfo != null)
-            {
-                return RedirectToPage("/Events", new { area = "" });
-            }
-
-            // Otherwise, redirect to platform home
-            return RedirectToPage("/Index");
+            // Redirect to platform home
+            return RedirectToPage("/");
         }
         catch (Exception ex)
         {
@@ -188,14 +168,12 @@ public class LoginModel : PublicPageModel
 
         try
         {
-            // Register new user with tenant context
+            // Register new user without tenant scoping
             var (success, error, identityUser, platformUser) = await _accountService.RegisterAsync(
                 Email,
                 Password,
                 FirstName,
-                LastName,
-                CurrentTenantInfo?.Id,
-                Core.Enums.TenantRole.Member
+                LastName
             );
 
             if (!success || identityUser == null || platformUser == null)
@@ -207,8 +185,7 @@ public class LoginModel : PublicPageModel
             // Create JWT tokens
             var (accessToken, refreshToken) = await _tokenService.CreateTokensAsync(
                 identityUser,
-                platformUser.Id,
-                CurrentTenantInfo?.Id
+                platformUser.Id
             );
 
             // Store tokens in HTTP-only cookies
@@ -228,8 +205,7 @@ public class LoginModel : PublicPageModel
                 Expires = DateTimeOffset.UtcNow.AddDays(30)
             });
 
-            _logger.LogInformation("User {Email} registered successfully for tenant {TenantId}",
-                Email, CurrentTenantInfo?.Id);
+            _logger.LogInformation("User {Email} registered successfully", Email);
 
             SuccessMessage = $"Welcome, {FirstName}! Your account has been created.";
             
@@ -239,14 +215,8 @@ public class LoginModel : PublicPageModel
                 return LocalRedirect(ReturnUrl!);
             }
 
-            // If on a subdomain (tenant context), redirect to tenant events page
-            if (CurrentTenantInfo != null)
-            {
-                return RedirectToPage("/Events", new { area = "" });
-            }
-
-            // Otherwise, redirect to platform home
-            return RedirectToPage("/Index");
+            // Redirect to platform home
+            return RedirectToPage("/");
         }
         catch (Exception ex)
         {
