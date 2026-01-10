@@ -3,6 +3,7 @@ using Finbuckle.MultiTenant.Abstractions;
 using Hubletix.Infrastructure.Persistence;
 using Hubletix.Infrastructure.Services;
 using Hubletix.Core.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Hubletix.Api.Pages;
 
@@ -21,8 +22,22 @@ public class IndexModel : PublicPageModel
     )
     { }
 
-    public async Task OnGetAsync()
+    public async Task<IActionResult> OnGetAsync()
     {
+        // If no tenant context (root domain), redirect based on authentication
+        if (!HasTenantContext)
+        {
+            // Unauthenticated users see the platform landing page
+            if (!User.Identity?.IsAuthenticated ?? true)
+            {
+                return RedirectToPage("/Platform/Index");
+            }
+
+            // Authenticated users go to tenant selector
+            return RedirectToPage("/Platform/TenantSelector");
+        }
+
+        // We have tenant context, show tenant home page
         var primaryColor = TenantConfig.Theme?.PrimaryColor;
         var secondaryColor = TenantConfig.Theme?.SecondaryColor;
 
@@ -69,6 +84,8 @@ public class IndexModel : PublicPageModel
         HomePage.ShowHero = TenantConfig.HomePage?.Visibility.ShowHero ?? true;
         HomePage.ShowAbout = TenantConfig.HomePage?.Visibility.ShowAbout ?? true;
         HomePage.ShowServices = TenantConfig.HomePage?.Visibility.ShowServices ?? true;
+
+        return Page();
     }
 
     private List<FeatureCard> GetFeatureCards(List<FeatureCardConfig>? configs, string? primaryColor)

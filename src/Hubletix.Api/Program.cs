@@ -21,19 +21,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 
 // Register Finbuckle.MultiTenant with EFCore Tenant Store
-if (builder.Environment.IsDevelopment())
-{
-    builder.Services.AddMultiTenant<ClubTenantInfo>()
-        .WithHostStrategy()
-        .WithStaticStrategy("demo") // Default to demo if not found, useful for local development
-        .WithEFCoreStore<TenantStoreDbContext, ClubTenantInfo>();
-}
-else
-{
-    builder.Services.AddMultiTenant<ClubTenantInfo>()
+builder.Services.AddMultiTenant<ClubTenantInfo>()
         .WithHostStrategy()
         .WithEFCoreStore<TenantStoreDbContext, ClubTenantInfo>();
-}
 
 // Register onboarding service
 builder.Services.AddScoped<ITenantOnboardingService, TenantOnboardingService>();

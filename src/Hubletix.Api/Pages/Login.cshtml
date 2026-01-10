@@ -1,7 +1,7 @@
 @page
 @model LoginModel
 @{
-    ViewData["Title"] = $"{Model.CurrentTenantInfo.Name} - Member Login";
+    ViewData["Title"] = $"{Model.CurrentTenantInfo?.Name ?? "Login"} - Member Login";
     Layout = "_PublicLayout";
 }
 
