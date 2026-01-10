@@ -47,12 +47,12 @@ public class EventRegistrationsModel : AdminPageModel
 
         // Build query
         var query = DbContext.EventRegistrations
-            .Include(r => r.User)
+            .Include(r => r.PlatformUser)
             .Include(r => r.Event)
             .Select(r => new
             {
                 Registration = r,
-                UserName = r.User.FirstName + " " + r.User.LastName,
+                UserName = r.PlatformUser.FirstName + " " + r.PlatformUser.LastName,
                 EventName = r.Event.Name,
                 EventStartTime = r.Event.StartTimeUtc,
                 EventEndTime = r.Event.EndTimeUtc
@@ -109,7 +109,7 @@ public class EventRegistrationsModel : AdminPageModel
         Registrations = results.Select(r => new EventRegistrationDto
         {
             Id = r.Registration.Id,
-            UserId = r.Registration.UserId,
+            UserId = r.Registration.PlatformUserId,
             UserName = r.UserName,
             EventId = r.Registration.EventId,
             EventName = r.EventName,

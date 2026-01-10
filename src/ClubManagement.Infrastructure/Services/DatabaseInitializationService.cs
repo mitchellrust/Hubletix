@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Identity;
 using ClubManagement.Infrastructure.Persistence;
 using ClubManagement.Core.Entities;
 using ClubManagement.Core.Models;
+using ClubManagement.Core.Enums;
 using System.Text.Json;
 using ClubManagement.Core.Constants;
 
@@ -15,10 +17,14 @@ namespace ClubManagement.Infrastructure.Services;
 public class DatabaseInitializationService
 {
     private readonly ILogger<DatabaseInitializationService> _logger;
+    private readonly UserManager<User> _userManager;
 
-    public DatabaseInitializationService(ILogger<DatabaseInitializationService> logger)
+    public DatabaseInitializationService(
+        ILogger<DatabaseInitializationService> logger,
+        UserManager<User> userManager)
     {
         _logger = logger;
+        _userManager = userManager;
     }
 
     /// <summary>
@@ -96,8 +102,8 @@ public class DatabaseInitializationService
                     Name = "Starter",
                     Description = "Basic features for small clubs.",
                     PriceInCents = 2900, // $ 29.00,
-                    StripeProductId = "prod_Tg7eQ22S6skvJS",
-                    StripePriceId = "price_1SilOxIRfoYJ66hasQ7q0WbW",
+                    StripeProductId = "prod_TlQitMVQTItdGh",
+                    StripePriceId = "price_1SntqmIRfoYJ66ha4mdc7GMo",
                 },
                 new PlatformPlan
                 {
@@ -105,8 +111,8 @@ public class DatabaseInitializationService
                     Name = "Growth",
                     Description = "Advanced features for growing clubs.",
                     PriceInCents = 11900, // $119.00,
-                    StripeProductId = "prod_Tg7gmYfIQZpdCv",
-                    StripePriceId = "price_1SilQrIRfoYJ66haHe2GhAfj",
+                    StripeProductId = "prod_TlQikV4h2hysiY",
+                    StripePriceId = "price_1SntqyIRfoYJ66hacitOlh9O",
                 },
                 new PlatformPlan
                 {
@@ -114,8 +120,8 @@ public class DatabaseInitializationService
                     Name = "Professional",
                     Description = "All features for large clubs.",
                     PriceInCents = 39900, // $399.00
-                    StripeProductId = "prod_Tg7guM5UpEpbIA",
-                    StripePriceId = "price_1SilRYIRfoYJ66hal0mKXdma",
+                    StripeProductId = "prod_TlQi4bCt3pG6wK",
+                    StripePriceId = "price_1Sntr8IRfoYJ66haF8r2v88s",
                 }
             };
 
@@ -303,16 +309,18 @@ public class DatabaseInitializationService
                 }
             };
 
-            var demoUsers = GenerateDemoUsers(demoTenant.Id, demoTenant.Locations.First().Id, 100);
-            demoUsers.ForEach(u =>
-                {
-                    if (u.IsActive)
-                    {
-                        // Add a membership plan to the user
-                        u.MembershipPlanId = demoPlans[new Random().Next(demoPlans.Count)].Id;
-                    }
-                }
-            );
+            // Save tenant, locations, and membership plans first so they exist for FK constraints
+            context.Tenants.Add(demoTenant);
+            context.MembershipPlans.AddRange(demoPlans);
+            await context.SaveChangesAsync();
+
+            // Generate demo users (creates Identity users, PlatformUsers, and TenantUsers)
+            var demoPlatformUsers = await GenerateDemoUsersAsync(
+                context, 
+                demoTenant.Id, 
+                demoTenant.Locations.First().Id,
+                demoPlans,
+                10);
 
             // Get Timezone info set up for event dates
             var tzString = "America/Denver";
@@ -361,7 +369,7 @@ public class DatabaseInitializationService
                             Id = Guid.NewGuid().ToString(),
                             TenantId = demoTenantInfo.Id,
                             EventId = "12345678-aaaa-bbbb-cccc-1234567890ab",
-                            UserId = demoUsers[0].Id,
+                            PlatformUserId = demoPlatformUsers[0].Id,
                             Status = EventRegistrationStatus.Registered,
                             SignedUpAt = todayDateInTz.AddDays(-1).AddHours(-2).ToUniversalTime(),
                             CreatedBy = "System"
@@ -371,7 +379,7 @@ public class DatabaseInitializationService
                             Id = Guid.NewGuid().ToString(),
                             TenantId = demoTenantInfo.Id,
                             EventId = "12345678-aaaa-bbbb-cccc-1234567890ab",
-                            UserId = demoUsers[2].Id,
+                            PlatformUserId = demoPlatformUsers[2].Id,
                             Status = EventRegistrationStatus.Registered,
                             SignedUpAt = todayDateInTz.AddHours(-5).ToUniversalTime(),
                             CreatedBy = "System"
@@ -381,7 +389,7 @@ public class DatabaseInitializationService
                             Id = Guid.NewGuid().ToString(),
                             TenantId = demoTenantInfo.Id,
                             EventId = "12345678-aaaa-bbbb-cccc-1234567890ab",
-                            UserId = demoUsers[3].Id,
+                            PlatformUserId = demoPlatformUsers[3].Id,
                             Status = EventRegistrationStatus.Cancelled,
                             CancellationReason = "Can't make it",
                             SignedUpAt = todayDateInTz.AddHours(-5).ToUniversalTime(),
@@ -411,7 +419,7 @@ public class DatabaseInitializationService
                             Id = Guid.NewGuid().ToString(),
                             TenantId = demoTenantInfo.Id,
                             EventId = "87654321-bbbb-cccc-dddd-0987654321ba",
-                            UserId = demoUsers[0].Id,
+                            PlatformUserId = demoPlatformUsers[0].Id,
                             Status = EventRegistrationStatus.Registered,
                             SignedUpAt = todayDateInTz.AddHours(-1).ToUniversalTime(),
                             CreatedBy = "System"
@@ -453,9 +461,7 @@ public class DatabaseInitializationService
                 }
             };
 
-            context.Tenants.Add(demoTenant);
-            context.MembershipPlans.AddRange(demoPlans);
-            context.Users.AddRange(demoUsers);
+            // Save events (tenant, locations, plans, and users already saved earlier)
             context.Events.AddRange(demoEvents);
             await context.SaveChangesAsync();
 
@@ -603,22 +609,15 @@ public class DatabaseInitializationService
     }
 
     /// <summary>
-    /// Generate demo users with random names and emails.
-    /// TODO: This method needs to be updated to use the new PlatformUser/TenantUser architecture.
-    /// Currently creates User entities directly without:
-    /// 1. Using UserManager for password hashing
-    /// 2. Creating corresponding PlatformUser entities
-    /// 3. Creating TenantUser memberships with proper enum roles
-    /// 
-    /// This will fail after migration to new architecture. Database should be recreated.
-    /// 
-    /// Required changes:
-    /// - Inject UserManager&lt;User&gt; into DatabaseInitializationService
-    /// - Use UserManager.CreateAsync() with generated passwords
-    /// - Create PlatformUser for each IdentityUser
-    /// - Create TenantUser with TenantRole enum and TenantUserStatus.Active
+    /// Generate demo users with proper Identity authentication, PlatformUser domain entities,
+    /// and TenantUser memberships.
     /// </summary>
-    private static List<User> GenerateDemoUsers(string tenantId, string locationId, int count)
+    private async Task<List<PlatformUser>> GenerateDemoUsersAsync(
+        AppDbContext context,
+        string tenantId,
+        string locationId,
+        List<MembershipPlan> membershipPlans,
+        int count)
     {
         var firstNames = new[] 
         { 
@@ -646,26 +645,67 @@ public class DatabaseInitializationService
         };
 
         var random = new Random(42); // Fixed seed for reproducibility
-        var users = new List<User>();
+        var platformUsers = new List<PlatformUser>();
+        var roles = new[] { TenantRole.Member, TenantRole.Coach, TenantRole.Admin };
 
         for (int i = 0; i < count; i++)
         {
             var firstName = firstNames[i % firstNames.Length];
             var lastName = lastNames[i % lastNames.Length];
             var email = $"{firstName.ToLower()}.{lastName.ToLower()}{(i > 50 ? i.ToString() : "")}@demo.com";
+            var isActive = random.Next(100) > 10; // 90% active
             
-            users.Add(new User
+            // Create Identity user with password
+            var identityUser = new User
             {
-                Id = Guid.NewGuid().ToString(),
-                TenantId = tenantId,
-                LocationId = locationId,
+                UserName = email,
                 Email = email,
+                EmailConfirmed = true
+            };
+
+            var result = await _userManager.CreateAsync(identityUser, "Demo123!"); // Demo password
+            
+            if (!result.Succeeded)
+            {
+                _logger.LogWarning("Failed to create demo user {Email}: {Errors}", 
+                    email, string.Join(", ", result.Errors.Select(e => e.Description)));
+                continue;
+            }
+
+            // Create PlatformUser (domain entity)
+            var platformUser = new PlatformUser
+            {
+                IdentityUserId = identityUser.Id,
                 FirstName = firstName,
                 LastName = lastName,
-                IsActive = random.Next(100) > 10 // 90% active
-            });
+                IsActive = isActive,
+                DefaultTenantId = tenantId
+            };
+
+            context.PlatformUsers.Add(platformUser);
+            await context.SaveChangesAsync(); // Save to get PlatformUser.Id
+
+            // Create TenantUser membership with random role
+            var role = roles[random.Next(roles.Length)];
+            var tenantUser = new TenantUser
+            {
+                TenantId = tenantId,
+                PlatformUserId = platformUser.Id,
+                Role = role,
+                Status = isActive ? TenantUserStatus.Active : TenantUserStatus.Inactive,
+                IsOwner = false,
+                LocationId = locationId,
+                MembershipPlanId = isActive ? membershipPlans[random.Next(membershipPlans.Count)].Id : null,
+                CreatedBy = "System"
+            };
+
+            context.TenantUsers.Add(tenantUser);
+            await context.SaveChangesAsync();
+
+            platformUsers.Add(platformUser);
         }
 
-        return users;
+        _logger.LogInformation("Generated {Count} demo users with PlatformUser and TenantUser entities", platformUsers.Count);
+        return platformUsers;
     }
 }

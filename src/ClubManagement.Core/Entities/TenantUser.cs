@@ -35,6 +35,16 @@ public class TenantUser : BaseEntity
     /// </summary>
     public bool IsOwner { get; set; }
     
+    /// <summary>
+    /// Foreign key to Location within this tenant (nullable)
+    /// </summary>
+    public string? LocationId { get; set; }
+    
+    /// <summary>
+    /// Foreign key to MembershipPlan within this tenant (nullable)
+    /// </summary>
+    public string? MembershipPlanId { get; set; }
+    
     // CreatedAt and CreatedBy inherited from BaseEntity
     
     // Navigation Properties
@@ -48,6 +58,16 @@ public class TenantUser : BaseEntity
     /// Navigation to the platform user
     /// </summary>
     public PlatformUser PlatformUser { get; set; } = null!;
+    
+    /// <summary>
+    /// Navigation to the location within this tenant
+    /// </summary>
+    public Location? Location { get; set; }
+    
+    /// <summary>
+    /// Navigation to the membership plan within this tenant
+    /// </summary>
+    public MembershipPlan? MembershipPlan { get; set; }
     
     /// <summary>
     /// Events coached by this user in this tenant

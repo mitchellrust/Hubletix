@@ -46,15 +46,16 @@ public class MembersModel : AdminPageModel
         MembershipPlanFilter = plan;
 
         // Build a deferred query for users
-        var query = DbContext.Users
+        var query = DbContext.TenantUsers
             .Where(u => u.TenantId == CurrentTenantInfo.Id)
             .Select(u => new
                 {
-                    User = u,
+                    TenantUserId = u.Id,
+                    MembershipPlanId = u.MembershipPlanId,
+                    PlatformUser = u.PlatformUser,
+                    Email = u.PlatformUser.IdentityUser.Email,
                     MembershipPlanName = DbContext.MembershipPlans
-                        .Where(
-                            p => p.Id == u.MembershipPlanId
-                        )
+                        .Where(p => p.Id == u.MembershipPlanId)
                         .Select(p => p.Name)
                         .FirstOrDefault()
                 }
@@ -63,8 +64,8 @@ public class MembersModel : AdminPageModel
         // Apply status filter
         query = StatusFilter switch
         {
-            "active" => query.Where(u => u.User.IsActive),
-            "inactive" => query.Where(u => !u.User.IsActive),
+            "active" => query.Where(u => u.PlatformUser.IsActive),
+            "inactive" => query.Where(u => !u.PlatformUser.IsActive),
             _ => query // "all" - no filter
         };
         
@@ -73,11 +74,11 @@ public class MembersModel : AdminPageModel
         {
             if (MembershipPlanFilter == "none")
             {
-                query = query.Where(u => u.User.MembershipPlanId == null);
+                query = query.Where(u => u.MembershipPlanId == null);
             }
             else
             {
-                query = query.Where(u => u.User.MembershipPlanId == MembershipPlanFilter);
+                query = query.Where(u => u.MembershipPlanId == MembershipPlanFilter);
             }
         }
 
@@ -88,14 +89,14 @@ public class MembersModel : AdminPageModel
         query = SortField switch
         {
             "email" => SortDirection == _sortDirectionAsc
-                ? query.OrderBy(u => u.User.Email)
-                : query.OrderByDescending(u => u.User.Email),
+                ? query.OrderBy(u => u.Email)
+                : query.OrderByDescending(u => u.Email),
             "membershipplan" => SortDirection == _sortDirectionAsc
                 ? query.OrderBy(u => u.MembershipPlanName)
                 : query.OrderByDescending(u => u.MembershipPlanName),
             _ => SortDirection == _sortDirectionAsc
-                ? query.OrderBy(u => u.User.FirstName).ThenBy(u => u.User.LastName)
-                : query.OrderByDescending(u => u.User.FirstName).ThenByDescending(u => u.User.LastName)
+                ? query.OrderBy(u => u.PlatformUser.FirstName).ThenBy(u => u.PlatformUser.LastName)
+                : query.OrderByDescending(u => u.PlatformUser.FirstName).ThenByDescending(u => u.PlatformUser.LastName)
         };
 
         // Get total count for pagination
@@ -111,13 +112,13 @@ public class MembersModel : AdminPageModel
         // Project to DTO
         Members = users.Select(u => new MemberDto
         {
-            Id = u.User.Id,
-            FirstName = u.User.FirstName,
-            LastName = u.User.LastName,
-            FullName = $"{u.User.FirstName} {u.User.LastName}",
-            Email = u.User.Email!,
-            IsActive = u.User.IsActive,
-            MembershipPlanId = u.User.MembershipPlanId,
+            Id = u.TenantUserId,
+            FirstName = u.PlatformUser.FirstName,
+            LastName = u.PlatformUser.LastName,
+            FullName = u.PlatformUser.FullName,
+            Email = u.Email!,
+            IsActive = u.PlatformUser.IsActive,
+            MembershipPlanId = u.MembershipPlanId,
             MembershipPlanName = u.MembershipPlanName
         }).ToList();
     }
@@ -125,16 +126,17 @@ public class MembersModel : AdminPageModel
     private async Task LoadMembershipPlanFacetsAsync()
     {
         // Build base query with status filter applied
-        var userQuery = DbContext.Users
+        var userQuery = DbContext.TenantUsers
+            .Include(tu => tu.PlatformUser)
             .Where(u => u.TenantId == CurrentTenantInfo.Id);
         
         if (StatusFilter == "active")
         {
-            userQuery = userQuery.Where(u => u.IsActive);
+            userQuery = userQuery.Where(u => u.PlatformUser.IsActive);
         }
         else if (StatusFilter == "inactive")
         {
-            userQuery = userQuery.Where(u => !u.IsActive);
+            userQuery = userQuery.Where(u => !u.PlatformUser.IsActive);
         }
         // "all" or null - no filter applied
         
