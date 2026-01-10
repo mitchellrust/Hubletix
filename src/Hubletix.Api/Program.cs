@@ -3,6 +3,8 @@ using Hubletix.Infrastructure.Persistence;
 using Hubletix.Infrastructure.Services;
 using Hubletix.Core.Models;
 using Hubletix.Api.Validators;
+using Hubletix.Api.Pages;
+using Hubletix.Api.Middleware;
 using Finbuckle.MultiTenant.Extensions;
 using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
@@ -21,19 +23,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 
 // Register Finbuckle.MultiTenant with EFCore Tenant Store
-if (builder.Environment.IsDevelopment())
-{
-    builder.Services.AddMultiTenant<ClubTenantInfo>()
-        .WithHostStrategy()
-        .WithStaticStrategy("demo") // Default to demo if not found, useful for local development
-        .WithEFCoreStore<TenantStoreDbContext, ClubTenantInfo>();
-}
-else
-{
-    builder.Services.AddMultiTenant<ClubTenantInfo>()
+builder.Services.AddMultiTenant<ClubTenantInfo>()
         .WithHostStrategy()
         .WithEFCoreStore<TenantStoreDbContext, ClubTenantInfo>();
-}
 
 // Register onboarding service
 builder.Services.AddScoped<ITenantOnboardingService, TenantOnboardingService>();
@@ -133,6 +125,8 @@ if (builder.Environment.IsDevelopment())
         .AddRazorPagesOptions(options =>
         {
             options.RootDirectory = "/Pages";
+            // Allows custom routing convention to strip /Platform and /Tenant from page routes
+            options.Conventions.Add(new PageRoutingConvention());
         })
         .AddRazorOptions(options =>
         {
@@ -145,6 +139,8 @@ else
         .AddRazorPagesOptions(options =>
         {
             options.RootDirectory = "/Pages";
+            // Allows custom routing convention to strip /Platform and /Tenant from page routes
+            options.Conventions.Add(new PageRoutingConvention());
         })
         .AddRazorOptions(options =>
         {
@@ -193,6 +189,9 @@ app.UseStaticFiles();
 
 // Finbuckle MultiTenant middleware - resolves tenant from subdomain or query param
 app.UseMultiTenant();
+
+// Subdomain-based routing middleware - enforces access control between platform and tenant routes
+app.UseSubdomainRouting();
 
 app.UseRouting();
 app.UseAuthentication();

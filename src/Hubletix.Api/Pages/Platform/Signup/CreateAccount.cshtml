@@ -1,0 +1,165 @@
+@page
+@model Hubletix.Api.Pages.Platform.Signup.CreateAccountModel
+@{
+    ViewData["Title"] = "Create Your Account";
+    Layout = "_PlatformLayout";
+}
+
+<div class="bg-light min-vh-100 py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-6">
+                <!-- Progress Bar -->
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="small fw-semibold text-primary">Step 1 of 3</span>
+                        <span class="small text-muted">Create Account</span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar" role="progressbar" style="width: 33%" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+
+                <div class="card shadow-lg border-0">
+                    <div class="card-body p-4 p-md-5">
+                        <h1 class="card-title h2 fw-bold mb-2">Create Your Account</h1>
+                        <p class="text-muted mb-4">You've selected the <strong>@Model.PlanName</strong> plan</p>
+
+                        @if (!ModelState.IsValid)
+                        {
+                            <div class="alert alert-danger d-flex align-items-start" role="alert">
+                                <i class="bi bi-exclamation-triangle-fill me-2 mt-1"></i>
+                                <div>
+                                    <strong>Please fix the following errors:</strong>
+                                    <ul class="mb-0 mt-2">
+                                        @foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                                        {
+                                            <li>@error.ErrorMessage</li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        }
+
+                        <form method="post">
+                            <input type="hidden" asp-for="SessionId" />
+
+                            <div class="mb-3">
+                                <label asp-for="FirstName" class="form-label fw-semibold">
+                                    First Name <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="FirstName" class="form-control form-control-lg" placeholder="John" />
+                                <span asp-validation-for="FirstName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="LastName" class="form-label fw-semibold">
+                                    Last Name <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="LastName" class="form-control form-control-lg" placeholder="Doe" />
+                                <span asp-validation-for="LastName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Email" class="form-label fw-semibold">
+                                    Email Address <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Email" type="email" class="form-control form-control-lg" placeholder="john@example.com" />
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Password" class="form-label fw-semibold">
+                                    Password <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Password" type="password" class="form-control form-control-lg" placeholder="••••••••" />
+                                <div class="form-text">Minimum 8 characters, including uppercase, lowercase, and number</div>
+                                <span asp-validation-for="Password" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-4">
+                                <label asp-for="ConfirmPassword" class="form-label fw-semibold">
+                                    Confirm Password <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="ConfirmPassword" type="password" class="form-control form-control-lg" placeholder="••••••••" />
+                                <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                            </div>
+
+                            <div class="form-check mb-4">
+                                <input asp-for="AcceptTerms" type="checkbox" class="form-check-input" />
+                                <label asp-for="AcceptTerms" class="form-check-label">
+                                    I agree to the <a href="#" class="text-primary">Terms of Service</a> and 
+                                    <a href="#" class="text-primary">Privacy Policy</a>
+                                </label>
+                                <div>
+                                    <span asp-validation-for="AcceptTerms" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex">
+                                <a href="/Signup/SelectPlan" class="btn btn-outline-secondary btn-lg flex-fill">
+                                    <i class="bi bi-arrow-left me-1"></i> Back
+                                </a>
+                                <button type="submit" class="btn btn-primary btn-lg flex-fill">
+                                    Continue <i class="bi bi-arrow-right ms-1"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Security Badge -->
+                <div class="text-center mt-4">
+                    <div class="text-muted small">
+                        <i class="bi bi-shield-lock-fill me-1"></i>
+                        Your information is secure and encrypted
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Password confirmation validation
+        document.querySelector('form')?.addEventListener('submit', function(e) {
+            const password = document.querySelector('input[name="Password"]').value;
+            const confirmPassword = document.querySelector('input[name="ConfirmPassword"]').value;
+            const acceptTerms = document.querySelector('input[name="AcceptTerms"]').checked;
+            
+            // Check if passwords match
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                alert('Passwords do not match. Please try again.');
+                return false;
+            }
+            
+            // Check if terms are accepted
+            if (!acceptTerms) {
+                e.preventDefault();
+                alert('You must accept the Terms of Service and Privacy Policy to continue.');
+                return false;
+            }
+            
+            // Basic password strength check
+            if (password.length < 8) {
+                e.preventDefault();
+                alert('Password must be at least 8 characters long.');
+                return false;
+            }
+        });
+        
+        // Real-time password match indicator
+        const passwordInput = document.querySelector('input[name="Password"]');
+        const confirmPasswordInput = document.querySelector('input[name="ConfirmPassword"]');
+        
+        confirmPasswordInput?.addEventListener('input', function() {
+            if (this.value && passwordInput.value !== this.value) {
+                this.classList.add('is-invalid');
+            } else {
+                this.classList.remove('is-invalid');
+            }
+        });
+    </script>
+}
