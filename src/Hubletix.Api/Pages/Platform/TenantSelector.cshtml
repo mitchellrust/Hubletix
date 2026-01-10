@@ -1,0 +1,196 @@
+@page
+@model Hubletix.Api.Pages.Platform.TenantSelectorModel
+@{
+    ViewData["Title"] = "Select Organization - Hubletix";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #0066cc;
+            --secondary-color: #00509e;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        
+        .tenant-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .tenant-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 102, 204, 0.2);
+        }
+        
+        .tenant-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+        }
+        
+        .navbar-custom {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-custom">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/Platform">
+                <i class="bi bi-trophy-fill text-primary me-2"></i>Hubletix
+            </a>
+            <div class="d-flex align-items-center">
+                <span class="text-muted me-3">
+                    <i class="bi bi-person-circle me-1"></i>@Model.FullName
+                </span>
+                <form method="post" asp-page-handler="Logout" class="d-inline">
+                    <button type="submit" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-box-arrow-right me-1"></i>Sign Out
+                    </button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10 col-xl-8">
+                <!-- Header -->
+                <div class="text-center mb-5">
+                    <h1 class="display-5 fw-bold mb-3">Select Your Organization</h1>
+                    <p class="lead text-muted">Choose an organization to access its dashboard and features</p>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        @Model.ErrorMessage
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+
+                @if (Model.UserTenants == null || !Model.UserTenants.Any())
+                {
+                    <!-- No Tenants -->
+                    <div class="card border-0 shadow-sm text-center p-5">
+                        <div class="mb-4">
+                            <i class="bi bi-inbox display-1 text-muted"></i>
+                        </div>
+                        <h4 class="mb-3">No Organizations Found</h4>
+                        <p class="text-muted mb-4">
+                            You're not currently a member of any organizations. 
+                            Create a new organization or ask an admin to invite you.
+                        </p>
+                        <div>
+                            <a href="/Signup/SelectPlan" class="btn btn-primary">
+                                <i class="bi bi-plus-circle me-2"></i>Create New Organization
+                            </a>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <!-- Tenant Cards -->
+                    <div class="row g-4">
+                        @foreach (var tenantUser in Model.UserTenants)
+                        {
+                            <div class="col-md-6">
+                                <a href="javascript:void(0)" 
+                                   onclick="selectTenant('@tenantUser.Tenant.Subdomain', '@tenantUser.Tenant.Name')"
+                                   class="text-decoration-none">
+                                    <div class="card tenant-card border-0 shadow-sm h-100">
+                                        <div class="card-body p-4">
+                                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                                <div>
+                                                    <h4 class="mb-1">@tenantUser.Tenant.Name</h4>
+                                                    <p class="text-muted small mb-0">
+                                                        <i class="bi bi-globe me-1"></i>@(tenantUser.Tenant.Subdomain).hubletix.app
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    @if (tenantUser.IsOwner)
+                                                    {
+                                                        <span class="badge bg-primary tenant-badge">
+                                                            <i class="bi bi-star-fill me-1"></i>Owner
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-secondary tenant-badge">
+                                                            @tenantUser.Role.ToString()
+                                                        </span>
+                                                    }
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="d-flex align-items-center text-muted small">
+                                                <i class="bi bi-person-badge me-2"></i>
+                                                <span>@tenantUser.Role.ToString() Access</span>
+                                                <span class="ms-auto">
+                                                    <i class="bi bi-arrow-right-circle"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Create New Organization -->
+                    <div class="text-center mt-5">
+                        <hr class="my-4">
+                        <p class="text-muted mb-3">Need to manage another organization?</p>
+                        <a href="/Signup/SelectPlan" class="btn btn-outline-primary">
+                            <i class="bi bi-plus-circle me-2"></i>Create New Organization
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function selectTenant(identifier, name) {
+            // Redirect to tenant subdomain
+            // In development: tenant.localhost:5000
+            // In production: tenant.hubletix.app
+            const protocol = window.location.protocol;
+            const port = window.location.port ? ':' + window.location.port : '';
+            const hostname = window.location.hostname;
+            
+            // Determine base domain
+            let baseDomain = hostname;
+            if (hostname === 'localhost' || hostname === '127.0.0.1') {
+                // Development environment
+                window.location.href = `${protocol}//${identifier}.${hostname}${port}/`;
+            } else {
+                // Production environment - extract base domain
+                // Remove any existing subdomain
+                const parts = hostname.split('.');
+                if (parts.length > 2) {
+                    baseDomain = parts.slice(-2).join('.');
+                }
+                window.location.href = `${protocol}//${identifier}.${baseDomain}${port}/`;
+            }
+        }
+    </script>
+</body>
+</html>

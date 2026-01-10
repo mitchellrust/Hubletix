@@ -1,7 +1,7 @@
 @page
 @model IndexModel
 @{
-    ViewData["Title"] = $"{Model.CurrentTenantInfo.Name} - Home";
+    ViewData["Title"] = $"{Model.CurrentTenantInfo?.Name ?? "Home"} - Home";
     Layout = "_PublicLayout";
 }
 
