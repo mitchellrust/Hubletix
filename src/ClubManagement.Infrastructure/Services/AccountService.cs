@@ -1,5 +1,5 @@
-using ClubManagement.Core.Constants;
 using ClubManagement.Core.Entities;
+using ClubManagement.Core.Enums;
 using ClubManagement.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -9,25 +9,26 @@ namespace ClubManagement.Infrastructure.Services;
 
 public interface IAccountService
 {
-    Task<(bool success, string? error, User? user)> RegisterAsync(
+    Task<(bool success, string? error, User? identityUser, PlatformUser? platformUser)> RegisterAsync(
         string email,
         string password,
         string firstName,
         string lastName,
         string? tenantId = null,
-        string? tenantRole = null,
+        TenantRole tenantRole = TenantRole.Member,
         CancellationToken ct = default);
 
-    Task<(bool success, string? error, User? user)> LoginAsync(
+    Task<(bool success, string? error, User? identityUser, PlatformUser? platformUser)> LoginAsync(
         string email,
         string password,
         string? tenantId = null,
         CancellationToken ct = default);
 
     Task<bool> AssignTenantRoleAsync(
-        string userId,
+        string platformUserId,
         string tenantId,
-        string role,
+        TenantRole role,
+        bool isOwner = false,
         CancellationToken ct = default);
 }
 
@@ -50,13 +51,13 @@ public class AccountService : IAccountService
         _logger = logger;
     }
 
-    public async Task<(bool success, string? error, User? user)> RegisterAsync(
+    public async Task<(bool success, string? error, User? identityUser, PlatformUser? platformUser)> RegisterAsync(
         string email,
         string password,
         string firstName,
         string lastName,
         string? tenantId = null,
-        string? tenantRole = null,
+        TenantRole tenantRole = TenantRole.Member,
         CancellationToken ct = default)
     {
         try
@@ -64,77 +65,79 @@ public class AccountService : IAccountService
             // Validate required fields
             if (string.IsNullOrWhiteSpace(email))
             {
-                return (false, "Email is required.", null);
+                return (false, "Email is required.", null, null);
             }
 
             if (string.IsNullOrWhiteSpace(password))
             {
-                return (false, "Password is required.", null);
+                return (false, "Password is required.", null, null);
             }
 
             if (string.IsNullOrWhiteSpace(firstName))
             {
-                return (false, "First name is required.", null);
+                return (false, "First name is required.", null, null);
             }
 
             if (string.IsNullOrWhiteSpace(lastName))
             {
-                return (false, "Last name is required.", null);
+                return (false, "Last name is required.", null, null);
             }
 
             // Check if user already exists
             var existingUser = await _userManager.FindByEmailAsync(email);
             if (existingUser != null)
             {
-                return (false, "An account with this email already exists.", null);
+                return (false, "An account with this email already exists.", null, null);
             }
 
-            var user = new User
+            // Create Identity user (authentication layer)
+            var identityUser = new User
             {
                 UserName = email,
                 Email = email,
-                EmailConfirmed = false, // Set to true for now, add email confirmation later
-                FirstName = firstName,
-                LastName = lastName,
-                TenantId = tenantId,
-                IsActive = true
+                EmailConfirmed = false // Set to true for now, add email confirmation later
             };
 
-            var result = await _userManager.CreateAsync(user, password);
+            var result = await _userManager.CreateAsync(identityUser, password);
 
             if (!result.Succeeded)
             {
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
                 _logger.LogWarning("User registration failed for {Email}: {Errors}", email, errors);
-                return (false, errors, null);
+                return (false, errors, null, null);
             }
 
-            _logger.LogInformation("User {UserId} registered successfully with email {Email}", user.Id, email);
-
-            // Assign tenant role if provided
-            if (!string.IsNullOrEmpty(tenantId) && !string.IsNullOrEmpty(tenantRole))
+            // Create PlatformUser (domain layer)
+            var platformUser = new PlatformUser
             {
-                await AssignTenantRoleAsync(user.Id, tenantId, tenantRole, ct);
-            }
-            else
+                IdentityUserId = identityUser.Id,
+                FirstName = firstName,
+                LastName = lastName,
+                IsActive = true,
+                DefaultTenantId = tenantId
+            };
+
+            _db.PlatformUsers.Add(platformUser);
+            await _db.SaveChangesAsync(ct);
+
+            _logger.LogInformation("User {UserId} registered successfully with email {Email}", identityUser.Id, email);
+
+            // Assign tenant role if tenantId provided
+            if (!string.IsNullOrEmpty(tenantId))
             {
-                // Assign default tenant role as Member
-                if (!string.IsNullOrEmpty(tenantId))
-                {
-                    await AssignTenantRoleAsync(user.Id, tenantId, UserRoles.Member, ct);
-                }
+                await AssignTenantRoleAsync(platformUser.Id, tenantId, tenantRole, false, ct);
             }
 
-            return (true, null, user);
+            return (true, null, identityUser, platformUser);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error during user registration for {Email}", email);
-            return (false, "An error occurred during registration. Please try again.", null);
+            return (false, "An error occurred during registration. Please try again.", null, null);
         }
     }
 
-    public async Task<(bool success, string? error, User? user)> LoginAsync(
+    public async Task<(bool success, string? error, User? identityUser, PlatformUser? platformUser)> LoginAsync(
         string email,
         string password,
         string? tenantId = null,
@@ -145,96 +148,112 @@ public class AccountService : IAccountService
             // Validate required fields
             if (string.IsNullOrWhiteSpace(email))
             {
-                return (false, "Email is required.", null);
+                return (false, "Email is required.", null, null);
             }
 
             if (string.IsNullOrWhiteSpace(password))
             {
-                return (false, "Password is required.", null);
+                return (false, "Password is required.", null, null);
             }
 
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
+            var identityUser = await _userManager.FindByEmailAsync(email);
+            if (identityUser == null)
             {
                 _logger.LogWarning("Login failed: user not found for email {Email}", email);
-                return (false, "Invalid email or password.", null);
+                return (false, "Invalid email or password.", null, null);
             }
 
-            if (!user.IsActive)
+            // Fetch PlatformUser
+            var platformUser = await _db.PlatformUsers
+                .FirstOrDefaultAsync(pu => pu.IdentityUserId == identityUser.Id, ct);
+
+            if (platformUser == null)
             {
-                _logger.LogWarning("Login failed: user {UserId} is inactive", user.Id);
-                return (false, "Your account has been deactivated. Please contact support.", null);
+                _logger.LogError("Login failed: PlatformUser not found for identity user {UserId}", identityUser.Id);
+                return (false, "Account configuration error. Please contact support.", null, null);
             }
 
-            // Check if user has access to the specified tenant
+            if (!platformUser.IsActive)
+            {
+                _logger.LogWarning("Login failed: user {UserId} is inactive", platformUser.Id);
+                return (false, "Your account has been deactivated. Please contact support.", null, null);
+            }
+
+            // Check if user has access to the specified tenant (REQUIRED)
             if (!string.IsNullOrEmpty(tenantId))
             {
-                var hasTenantAccess = await _db.Set<TenantUserRole>()
-                    .AnyAsync(tr => tr.UserId == user.Id && tr.TenantId == tenantId, ct);
+                var hasTenantAccess = await _db.TenantUsers
+                    .AnyAsync(tu => tu.PlatformUserId == platformUser.Id 
+                        && tu.TenantId == tenantId 
+                        && tu.Status == TenantUserStatus.Active, ct);
 
-                if (!hasTenantAccess && user.TenantId != tenantId)
+                if (!hasTenantAccess)
                 {
-                    _logger.LogWarning("Login failed: user {UserId} does not have access to tenant {TenantId}",
-                        user.Id, tenantId);
-                    return (false, "You do not have access to this organization.", null);
+                    _logger.LogWarning("Login failed: user {PlatformUserId} does not have access to tenant {TenantId}",
+                        platformUser.Id, tenantId);
+                    return (false, "You do not have access to this organization.", null, null);
                 }
             }
 
-            var result = await _signInManager.CheckPasswordSignInAsync(user, password, lockoutOnFailure: true);
+            var result = await _signInManager.CheckPasswordSignInAsync(identityUser, password, lockoutOnFailure: true);
 
             if (!result.Succeeded)
             {
                 if (result.IsLockedOut)
                 {
-                    _logger.LogWarning("Login failed: user {UserId} is locked out", user.Id);
-                    return (false, "Your account is locked due to too many failed login attempts. Please try again later.", null);
+                    _logger.LogWarning("Login failed: user {UserId} is locked out", identityUser.Id);
+                    return (false, "Your account is locked due to too many failed login attempts. Please try again later.", null, null);
                 }
 
                 _logger.LogWarning("Login failed: invalid password for user {Email}", email);
-                return (false, "Invalid email or password.", null);
+                return (false, "Invalid email or password.", null, null);
             }
             
-            _logger.LogInformation("User {UserId} logged in successfully", user.Id);
-            return (true, null, user);
+            _logger.LogInformation("User {UserId} logged in successfully", identityUser.Id);
+            return (true, null, identityUser, platformUser);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error during login for {Email}", email);
-            return (false, "An error occurred during login. Please try again.", null);
+            return (false, "An error occurred during login. Please try again.", null, null);
         }
     }
 
     public async Task<bool> AssignTenantRoleAsync(
-        string userId,
+        string platformUserId,
         string tenantId,
-        string role,
+        TenantRole role,
+        bool isOwner = false,
         CancellationToken ct = default)
     {
-        // Check if role already exists
-        var existingRole = await _db.Set<TenantUserRole>()
-            .FirstOrDefaultAsync(tr => tr.UserId == userId && tr.TenantId == tenantId, ct);
+        // Check if tenant membership already exists
+        var existingTenantUser = await _db.TenantUsers
+            .FirstOrDefaultAsync(tu => tu.PlatformUserId == platformUserId && tu.TenantId == tenantId, ct);
 
-        if (existingRole != null)
+        if (existingTenantUser != null)
         {
-            // Update existing role
-            existingRole.Role = role;
-            _logger.LogInformation("Updated tenant role for user {UserId} in tenant {TenantId} to {Role}",
-                userId, tenantId, role);
+            // Update existing membership
+            existingTenantUser.Role = role;
+            existingTenantUser.IsOwner = isOwner;
+            _logger.LogInformation("Updated tenant role for platform user {PlatformUserId} in tenant {TenantId} to {Role}",
+                platformUserId, tenantId, role);
         }
         else
         {
-            // Create new role
-            var tenantRole = new TenantUserRole
+            // Create new tenant membership
+            var tenantUser = new TenantUser
             {
-                UserId = userId,
+                PlatformUserId = platformUserId,
                 TenantId = tenantId,
                 Role = role,
+                Status = TenantUserStatus.Active,
+                IsOwner = isOwner,
                 CreatedAt = DateTime.UtcNow
             };
 
-            _db.Set<TenantUserRole>().Add(tenantRole);
-            _logger.LogInformation("Assigned tenant role {Role} to user {UserId} in tenant {TenantId}",
-                role, userId, tenantId);
+            _db.TenantUsers.Add(tenantUser);
+            _logger.LogInformation("Assigned tenant role {Role} to platform user {PlatformUserId} in tenant {TenantId}",
+                role, platformUserId, tenantId);
         }
 
         await _db.SaveChangesAsync(ct);

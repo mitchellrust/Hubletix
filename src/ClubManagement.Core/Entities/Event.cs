@@ -47,6 +47,11 @@ public class Event : BaseEntity
     /// Price in cents (e.g., 9999 = $99.99)
     /// </summary>
     public int PriceInCents { get; set; }
+    
+    /// <summary>
+    /// Foreign key to TenantUser (coach for this event within tenant context)
+    /// </summary>
+    public string? CoachId { get; set; }
 
     /// <summary>
     /// Price formatted to dollar amount (e.g., 99.99)
@@ -85,5 +90,6 @@ public class Event : BaseEntity
     // Navigation properties
     public Tenant Tenant { get; set; } = null!;
     public Location Location { get; set; } = null!;
+    public TenantUser? Coach { get; set; }
     public ICollection<EventRegistration> EventRegistrations { get; set; } = new List<EventRegistration>();
 }

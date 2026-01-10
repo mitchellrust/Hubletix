@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using ClubManagement.Core.Entities;
 using ClubManagement.Core.Constants;
+using ClubManagement.Core.Enums;
 using ClubManagement.Infrastructure.Persistence;
 using ClubManagement.Core.Models;
 using System.Text.Json;
@@ -22,14 +24,14 @@ public interface ITenantOnboardingService
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Step 2: Create admin user and associate with signup session
+    /// Step 2: Create admin user (Identity + PlatformUser) and associate with signup session
     /// </summary>
-    Task<User> CreateAdminUserAsync(
+    Task<(User identityUser, PlatformUser platformUser)> CreateAdminUserAsync(
         string signupSessionId,
         string email,
         string firstName,
         string lastName,
-        string password, // TODO: Will be hashed when Identity is implemented
+        string password,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -99,6 +101,7 @@ public class TenantOnboardingService : ITenantOnboardingService
 {
     private readonly AppDbContext _dbContext;
     private readonly TenantStoreDbContext _tenantStoreDbContext;
+    private readonly UserManager<User> _userManager;
     private readonly IStripeConnectService _stripeConnectService;
     private readonly IStripePlatformService _stripePlatformService;
     private readonly ITenantConfigService _tenantConfigService;
@@ -109,12 +112,14 @@ public class TenantOnboardingService : ITenantOnboardingService
     public TenantOnboardingService(
         AppDbContext dbContext,
         TenantStoreDbContext tenantStoreDbContext,
+        UserManager<User> userManager,
         IStripeConnectService stripeConnectService,
         IStripePlatformService stripePlatformService,
         ITenantConfigService tenantConfigService)
     {
         _dbContext = dbContext;
         _tenantStoreDbContext = tenantStoreDbContext;
+        _userManager = userManager;
         _stripeConnectService = stripeConnectService;
         _stripePlatformService = stripePlatformService;
         _tenantConfigService = tenantConfigService;
@@ -170,14 +175,14 @@ public class TenantOnboardingService : ITenantOnboardingService
     }
 
     /// <summary>
-    /// Step 2: Create admin user and associate with signup session
+    /// Step 2: Create admin user (Identity + PlatformUser) and associate with signup session
     /// </summary>
-    public async Task<User> CreateAdminUserAsync(
+    public async Task<(User identityUser, PlatformUser platformUser)> CreateAdminUserAsync(
         string signupSessionId,
         string email,
         string firstName,
         string lastName,
-        string password, // TODO: Will be hashed when Identity is implemented
+        string password,
         CancellationToken cancellationToken = default)
     {
         var session = await ValidateSessionAsync(signupSessionId, SignupSessionState.Started, cancellationToken);
@@ -189,31 +194,43 @@ public class TenantOnboardingService : ITenantOnboardingService
         }
 
         // Check if email already exists
-        var existingUser = await _dbContext.Users
-            .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
+        var existingUser = await _userManager.FindByEmailAsync(email);
         
         if (existingUser != null)
         {
             throw new InvalidOperationException($"User with email '{email}' already exists.");
         }
 
-        // Create admin user (without tenant yet - will be associated in step 3)
-        var user = new User
+        // Create Identity user (authentication layer) with password hashing
+        var identityUser = new User
         {
-            Id = Guid.NewGuid().ToString(),
+            UserName = email,
             Email = email,
-            FirstName = firstName,
-            LastName = lastName,
-            Role = UserRoles.Admin,
-            IsActive = true,
-            TenantId = null!, // Will be set when tenant is created
-            LocationId = null // Will be set later during onboarding
+            EmailConfirmed = true // Auto-confirm for now
         };
 
-        _dbContext.Users.Add(user);
+        var result = await _userManager.CreateAsync(identityUser, password);
+        
+        if (!result.Succeeded)
+        {
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            throw new InvalidOperationException($"Failed to create user: {errors}");
+        }
+
+        // Create PlatformUser (domain layer)
+        var platformUser = new PlatformUser
+        {
+            IdentityUserId = identityUser.Id,
+            FirstName = firstName,
+            LastName = lastName,
+            IsActive = true,
+            DefaultTenantId = null // Will be set when tenant is created
+        };
+
+        _dbContext.PlatformUsers.Add(platformUser);
 
         // Update session
-        session.UserId = user.Id;
+        session.UserId = identityUser.Id; // Store IdentityUser ID for auth compatibility
         session.FirstName = firstName;
         session.LastName = lastName;
         session.State = SignupSessionState.UserCreated;
@@ -221,7 +238,7 @@ public class TenantOnboardingService : ITenantOnboardingService
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return user;
+        return (identityUser, platformUser);
     }
 
     /// <summary>
@@ -267,12 +284,31 @@ public class TenantOnboardingService : ITenantOnboardingService
 
         _dbContext.Tenants.Add(tenant);
 
-        // Associate user with tenant
-        var user = await _dbContext.Users.FindAsync([session.UserId], cancellationToken);
-        if (user != null)
+        // Get PlatformUser for this Identity user and create TenantUser with owner role
+        var platformUser = await _dbContext.PlatformUsers
+            .FirstOrDefaultAsync(pu => pu.IdentityUserId == session.UserId, cancellationToken);
+        
+        if (platformUser == null)
         {
-            user.TenantId = tenant.Id;
+            throw new InvalidOperationException("PlatformUser not found for signup session.");
         }
+
+        // Set default tenant for UX convenience
+        platformUser.DefaultTenantId = tenant.Id;
+
+        // Create TenantUser membership with Admin role and IsOwner flag
+        var tenantUser = new TenantUser
+        {
+            PlatformUserId = platformUser.Id,
+            TenantId = tenant.Id,
+            Role = TenantRole.Admin,
+            Status = TenantUserStatus.Active,
+            IsOwner = true,
+            CreatedAt = DateTime.UtcNow,
+            CreatedBy = "System"
+        };
+
+        _dbContext.TenantUsers.Add(tenantUser);
 
         // Update session
         session.TenantId = tenant.Id;

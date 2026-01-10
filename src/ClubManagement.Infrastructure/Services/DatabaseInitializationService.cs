@@ -604,6 +604,19 @@ public class DatabaseInitializationService
 
     /// <summary>
     /// Generate demo users with random names and emails.
+    /// TODO: This method needs to be updated to use the new PlatformUser/TenantUser architecture.
+    /// Currently creates User entities directly without:
+    /// 1. Using UserManager for password hashing
+    /// 2. Creating corresponding PlatformUser entities
+    /// 3. Creating TenantUser memberships with proper enum roles
+    /// 
+    /// This will fail after migration to new architecture. Database should be recreated.
+    /// 
+    /// Required changes:
+    /// - Inject UserManager&lt;User&gt; into DatabaseInitializationService
+    /// - Use UserManager.CreateAsync() with generated passwords
+    /// - Create PlatformUser for each IdentityUser
+    /// - Create TenantUser with TenantRole enum and TenantUserStatus.Active
     /// </summary>
     private static List<User> GenerateDemoUsers(string tenantId, string locationId, int count)
     {

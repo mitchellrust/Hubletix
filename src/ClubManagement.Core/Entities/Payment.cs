@@ -8,9 +8,9 @@ namespace ClubManagement.Core.Entities;
 public class Payment : BaseEntity
 {    
     /// <summary>
-    /// Foreign key to User (can be null for administrative payments)
+    /// Foreign key to PlatformUser (can be null for administrative payments)
     /// </summary>
-    public string? UserId { get; set; }
+    public string? PlatformUserId { get; set; }
     
     /// <summary>
     /// Stripe Payment Intent ID or Charge ID
@@ -49,5 +49,5 @@ public class Payment : BaseEntity
     
     // Navigation properties
     public Tenant Tenant { get; set; } = null!;
-    public User? User { get; set; }
+    public PlatformUser? PlatformUser { get; set; }
 }

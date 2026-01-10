@@ -80,7 +80,6 @@ public class Location : BaseEntity
     
     // Navigation properties
     public Tenant Tenant { get; set; } = null!;
-    public ICollection<User> Users { get; set; } = new List<User>();
     public ICollection<Event> Events { get; set; } = new List<Event>();
     public ICollection<MembershipPlan> MembershipPlans { get; set; } = new List<MembershipPlan>();
 }

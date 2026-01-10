@@ -15,7 +15,7 @@ namespace ClubManagement.Infrastructure.Services;
 
 public interface ITokenService
 {
-    Task<(string accessToken, string refreshToken)> CreateTokensAsync(User user, string? tenantId = null, CancellationToken ct = default);
+    Task<(string accessToken, string refreshToken)> CreateTokensAsync(User identityUser, string platformUserId, string? tenantId = null, CancellationToken ct = default);
     Task<(string accessToken, string refreshToken)> RefreshAsync(string refreshToken, string ipAddress, CancellationToken ct = default);
     Task RevokeRefreshTokenAsync(string refreshToken, string ipAddress, string? reason = null, CancellationToken ct = default);
 }
@@ -40,7 +40,8 @@ public class TokenService : ITokenService
     }
 
     public async Task<(string accessToken, string refreshToken)> CreateTokensAsync(
-        User user,
+        User identityUser,
+        string platformUserId,
         string? tenantId = null,
         CancellationToken ct = default)
     {
@@ -48,14 +49,24 @@ public class TokenService : ITokenService
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         // Get platform roles from Identity
-        var platformRoles = await _userManager.GetRolesAsync(user);
+        var platformRoles = await _userManager.GetRolesAsync(identityUser);
+
+        // Get PlatformUser for name info
+        var platformUser = await _db.PlatformUsers
+            .FirstOrDefaultAsync(pu => pu.Id == platformUserId, ct);
+
+        if (platformUser == null)
+        {
+            throw new InvalidOperationException($"PlatformUser {platformUserId} not found");
+        }
 
         var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
-            new Claim(JwtRegisteredClaimNames.Name, $"{user.FirstName} {user.LastName}"),
-            new Claim("first_name", user.FirstName ?? string.Empty),
+            new Claim(JwtRegisteredClaimNames.Sub, identityUser.Id),
+            new Claim(JwtRegisteredClaimNames.Email, identityUser.Email ?? string.Empty),
+            new Claim(JwtRegisteredClaimNames.Name, platformUser.FullName),
+            new Claim("first_name", platformUser.FirstName),
+            new Claim("platform_user_id", platformUserId),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
@@ -68,17 +79,21 @@ public class TokenService : ITokenService
         // Add tenant-specific information
         if (!string.IsNullOrEmpty(tenantId))
         {
-            // Load tenant role from TenantUserRole
-            var tenantRole = await _db.Set<TenantUserRole>()
-                .Where(tr => tr.UserId == user.Id && tr.TenantId == tenantId)
-                .Select(tr => tr.Role)
+            // Load tenant role from TenantUser
+            var tenantUser = await _db.TenantUsers
+                .Where(tu => tu.PlatformUserId == platformUserId && tu.TenantId == tenantId)
                 .FirstOrDefaultAsync(ct);
 
             claims.Add(new Claim("tenant_id", tenantId));
 
-            if (!string.IsNullOrEmpty(tenantRole))
+            if (tenantUser != null)
             {
-                claims.Add(new Claim("tenant_role", tenantRole));
+                claims.Add(new Claim("tenant_role", tenantUser.Role.ToString()));
+                
+                if (tenantUser.IsOwner)
+                {
+                    claims.Add(new Claim("is_tenant_owner", "true"));
+                }
             }
         }
 
@@ -98,7 +113,7 @@ public class TokenService : ITokenService
 
         var rt = new RefreshToken
         {
-            UserId = user.Id,
+            UserId = identityUser.Id, // Store IdentityUser.Id for auth-level token
             TokenHash = refreshTokenHash,
             ExpiresAt = DateTime.UtcNow.AddDays(_jwt.RefreshTokenExpirationDays),
             CreatedAt = DateTime.UtcNow,
@@ -108,7 +123,7 @@ public class TokenService : ITokenService
         _db.RefreshTokens.Add(rt);
         await _db.SaveChangesAsync(ct);
 
-        _logger.LogInformation("Created tokens for user {UserId} (tenant: {TenantId})", user.Id, tenantId ?? "none");
+        _logger.LogInformation("Created tokens for user {PlatformUserId} (tenant: {TenantId})", platformUser.Id, tenantId ?? "none");
 
         return (accessToken, refreshToken);
     }
@@ -152,8 +167,17 @@ public class TokenService : ITokenService
 
         _logger.LogInformation("Refresh token rotated for user {UserId} from IP {IpAddress}", dbToken.UserId, ipAddress);
 
-        // Create new access token (without tenant context - can be added later)
-        var tokens = await CreateTokensAsync(dbToken.User, tenantId: dbToken.User.TenantId, ct);
+        // Fetch PlatformUser to get DefaultTenantId and platformUserId
+        var platformUser = await _db.PlatformUsers
+            .FirstOrDefaultAsync(pu => pu.IdentityUserId == dbToken.UserId, ct);
+        
+        if (platformUser == null)
+        {
+            throw new InvalidOperationException($"PlatformUser not found for IdentityUser {dbToken.UserId}");
+        }
+
+        // Create new access token with default tenant context
+        var tokens = await CreateTokensAsync(dbToken.User, platformUser.Id, platformUser.DefaultTenantId, ct);
         return (tokens.accessToken, newRefreshToken);
     }
 
