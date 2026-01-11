@@ -29,7 +29,7 @@ public class StripFolderPrefixConvention : IPageRouteModelConvention
                 template = template.Substring(9); // Remove "Platform/"
             }
 
-            selector.AttributeRouteModel.Template = template;
+            selector.AttributeRouteModel.Template = template.ToLowerInvariant();
         }
     }
 }

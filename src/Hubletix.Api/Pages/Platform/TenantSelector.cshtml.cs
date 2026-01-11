@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Hubletix.Api.Pages.Platform;
 
-[Authorize]
+// [Authorize]
 public class TenantSelectorModel : PlatformPageModel
 {
     private readonly AppDbContext _dbContext;
@@ -37,7 +37,7 @@ public class TenantSelectorModel : PlatformPageModel
         if (!IsAuthenticated || string.IsNullOrEmpty(PlatformUserId))
         {
             _logger.LogWarning("Unauthenticated user attempted to access TenantSelector");
-            return RedirectToPage("/login");
+            return RedirectToPage("/Platform/Login");
         }
 
         try
