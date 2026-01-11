@@ -31,9 +31,9 @@ public class PlatformUser : BaseEntity
     public User IdentityUser { get; set; } = null!;
         
     /// <summary>
-    /// All tenant memberships for this user
+    /// All tenant users for this platform user
     /// </summary>
-    public ICollection<TenantUser> TenantMemberships { get; set; } = new List<TenantUser>();
+    public ICollection<TenantUser> TenantUsers { get; set; } = new List<TenantUser>();
     
     /// <summary>
     /// Event registrations made by this user

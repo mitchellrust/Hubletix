@@ -10,4 +10,5 @@ public static class EventType
     public const string GroupTraining = "GroupTraining";
     public const string Social = "Social";
     public const string Other = "Other";
+    public const string League = "League";
 }

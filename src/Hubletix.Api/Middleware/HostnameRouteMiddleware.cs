@@ -1,5 +1,10 @@
 namespace Hubletix.Api.Middleware;
 
+/// <summary>
+/// Middleware to enforce routing rules based on hostname (root domain vs subdomains).
+/// Ensures that platform routes are only accessible via the root domain,
+/// and tenant routes are only accessible via subdomains.
+/// </summary>
 public class HostnameRouteMiddleware
 {
     private readonly RequestDelegate _next;
