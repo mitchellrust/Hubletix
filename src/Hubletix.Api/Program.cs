@@ -62,7 +62,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.SlidingExpiration = true;
     options.LoginPath = "/login";
     options.LogoutPath = "/logout";
-    options.AccessDeniedPath = "/accessdenied";
+    options.AccessDeniedPath = "/unauthorized";
 });
 
 // Authorization policies

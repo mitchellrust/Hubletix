@@ -4,9 +4,9 @@ using Hubletix.Infrastructure.Persistence;
 
 namespace Hubletix.Api.Pages.Platform;
 
-public class AccessDeniedModel : PlatformPageModel
+public class UnauthorizedModel : PlatformPageModel
 {
-    public AccessDeniedModel(
+    public UnauthorizedModel(
         IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor)
         : base(multiTenantContextAccessor)
     {
