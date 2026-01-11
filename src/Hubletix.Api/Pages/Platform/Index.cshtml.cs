@@ -15,12 +15,6 @@ public class IndexModel : PlatformPageModel
 
     public IActionResult OnGet()
     {
-        // If accessed via subdomain (tenant context), redirect to tenant home
-        if (HasTenantContext)
-        {
-            return RedirectToPage("/Index");
-        }
-
         // Show public landing page
         return Page();
     }

@@ -24,7 +24,7 @@ public class MembershipPlansModel : PublicPageModel
         // Verify memberships are enabled
         if (!TenantConfig.Features.EnableMemberships)
         {
-            return RedirectToPage("/Index");
+            return RedirectToPage("/Tenant/Home");
         }
 
         // Fetch all active membership plans for this tenant
