@@ -2,6 +2,11 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace Hubletix.Api.Conventions;
 
+/// <summary>
+/// Convention to strip specific folder prefixes from Razor Page routes.
+/// This is executed on app startup to modify routes, so all routable pages
+/// will not have that prefix at runtime.
+/// </summary>
 public class StripFolderPrefixConvention : IPageRouteModelConvention
 {
     public void Apply(PageRouteModel model)

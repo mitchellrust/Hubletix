@@ -98,7 +98,7 @@ public class AppDbContext : IdentityDbContext<User>
             .OnDelete(DeleteBehavior.Cascade);
         builder.Entity<TenantUser>()
             .HasOne(tu => tu.PlatformUser)
-            .WithMany(pu => pu.TenantMemberships)
+            .WithMany(pu => pu.TenantUsers)
             .HasForeignKey(tu => tu.PlatformUserId)
             .OnDelete(DeleteBehavior.Cascade);
         builder.Entity<TenantUser>()
