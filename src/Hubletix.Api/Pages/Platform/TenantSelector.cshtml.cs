@@ -37,7 +37,7 @@ public class TenantSelectorModel : PlatformPageModel
         if (!IsAuthenticated || string.IsNullOrEmpty(PlatformUserId))
         {
             _logger.LogWarning("Unauthenticated user attempted to access TenantSelector");
-            return RedirectToPage("/Platform/Login");
+            return RedirectToPage("/login");
         }
 
         try

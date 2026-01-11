@@ -51,7 +51,7 @@
     <!-- Navigation -->
     <nav class="navbar navbar-custom">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="/Platform">
+            <a class="navbar-brand fw-bold" href="/">
                 <i class="bi bi-trophy-fill text-primary me-2"></i>Hubletix
             </a>
             <div class="d-flex align-items-center">
@@ -98,7 +98,7 @@
                             Create a new organization or ask an admin to invite you.
                         </p>
                         <div>
-                            <a href="/signup/SelectPlan" class="btn btn-primary">
+                            <a href="/signup/selectplan" class="btn btn-primary">
                                 <i class="bi bi-plus-circle me-2"></i>Create New Organization
                             </a>
                         </div>
@@ -120,7 +120,7 @@
                                                 <div>
                                                     <h4 class="mb-1">@tenantUser.Tenant.Name</h4>
                                                     <p class="text-muted small mb-0">
-                                                        <i class="bi bi-globe me-1"></i>@(tenantUser.Tenant.Subdomain).hubletix.app
+                                                        <i class="bi bi-globe me-1"></i>@(tenantUser.Tenant.Subdomain).hubletix.com
                                                     </p>
                                                 </div>
                                                 <div>
@@ -157,7 +157,7 @@
                     <div class="text-center mt-5">
                         <hr class="my-4">
                         <p class="text-muted mb-3">Need to manage another organization?</p>
-                        <a href="/signup/SelectPlan" class="btn btn-outline-primary">
+                        <a href="/signup/selectplan" class="btn btn-outline-primary">
                             <i class="bi bi-plus-circle me-2"></i>Create New Organization
                         </a>
                     </div>
@@ -171,7 +171,7 @@
         function selectTenant(identifier, name) {
             // Redirect to tenant subdomain
             // In development: tenant.localhost:5000
-            // In production: tenant.hubletix.app
+            // In production: tenant.hubletix.com
             const protocol = window.location.protocol;
             const port = window.location.port ? ':' + window.location.port : '';
             const hostname = window.location.hostname;

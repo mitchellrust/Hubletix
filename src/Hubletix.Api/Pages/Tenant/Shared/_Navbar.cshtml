@@ -29,13 +29,7 @@
                 }
             </ul>
             <div class="d-flex align-items-center gap-2">
-                @if (Model.ShowLogInButton)
-                {
-                    <a href="/login" class="btn btn-outline-primary rounded-pill px-4" style="@(!string.IsNullOrEmpty(Model.PrimaryColor) ? $"border-color: {Model.PrimaryColor}; color: {Model.PrimaryColor};" : "")">
-                        Log In
-                    </a>
-                }
-                <a href="/Platform/TenantSelector" class="btn btn-sm btn-outline-secondary" title="Switch Organization">
+                <a href="/tenantselector" class="btn btn-sm btn-outline-secondary" title="Switch Organization">
                     <i class="bi bi-arrow-left-right"></i>
                     <span class="d-none d-md-inline ms-1">Switch</span>
                 </a>
