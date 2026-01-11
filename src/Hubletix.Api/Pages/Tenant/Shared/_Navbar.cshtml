@@ -20,20 +20,39 @@
             </button>
         }
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto me-3">
+            <ul class="navbar-nav ms-auto">
                 @foreach (var item in Model.NavItems)
                 {
                     <li class="nav-item">
                         <a class="nav-link @(item.IsActive ? "active" : "")" href="@item.Url">@item.Text</a>
                     </li>
                 }
+                @if (Model.IsUserAuthenticated)
+                {
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle"></i>
+                            <span class="ms-1">@(Model.UserEmail ?? "User")</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            @if (Model.IsUserTenantAdmin)
+                            {
+                                <li><a class="dropdown-item" href="/admin/dashboard"><i class="bi bi-speedometer2 me-2"></i>Admin Dashboard</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                            }
+                            <li><a class="dropdown-item" href="/tenantselector"><i class="bi bi-arrow-left-right me-2"></i>Switch Organization</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form method="post" action="/Account/Logout" class="px-3 py-1">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger w-100">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Sign Out
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                }
             </ul>
-            <div class="d-flex align-items-center gap-2">
-                <a href="/tenantselector" class="btn btn-sm btn-outline-secondary" title="Switch Organization">
-                    <i class="bi bi-arrow-left-right"></i>
-                    <span class="d-none d-md-inline ms-1">Switch</span>
-                </a>
-            </div>
         </div>
     </div>
 </nav>
