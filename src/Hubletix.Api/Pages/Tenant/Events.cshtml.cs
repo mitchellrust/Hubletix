@@ -39,7 +39,7 @@ public class EventsModel : PublicPageModel
         // Verify events are enabled
         if (!TenantConfig.Features.EnableEventRegistration)
         {
-            return RedirectToPage("/Index");
+            return RedirectToPage("/Tenant/Home");
         }
 
         // Get all event types dynamically from EventType constants
@@ -123,7 +123,7 @@ public class EventsModel : PublicPageModel
         // Verify events are enabled
         if (!TenantConfig.Features.EnableEventRegistration)
         {
-            return RedirectToPage("/Index");
+            return RedirectToPage("/Tenant/Home");
         }
         
         TypeFilter = typeFilter;

@@ -7,11 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Hubletix.Api.Pages.Tenant;
 
-public class IndexModel : PublicPageModel
+public class HomeModel : PublicPageModel
 {
     public HomePageViewModel HomePage { get; set; } = new();
 
-    public IndexModel(
+    public HomeModel(
         AppDbContext dbContext,
         ITenantConfigService tenantConfigService,
         IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor
