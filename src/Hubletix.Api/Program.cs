@@ -111,6 +111,8 @@ if (builder.Environment.IsDevelopment())
             options.RootDirectory = "/Pages";
             options.Conventions.ConfigureFilter(new Microsoft.AspNetCore.Mvc.AutoValidateAntiforgeryTokenAttribute());
             options.Conventions.Add(new StripFolderPrefixConvention());
+            // Add route for root path
+            options.Conventions.AddPageRoute("/Platform/Index", "");
         })
         .AddRazorRuntimeCompilation()
         .AddRazorOptions(options =>
@@ -126,6 +128,8 @@ else
             options.RootDirectory = "/Pages";
             options.Conventions.ConfigureFilter(new Microsoft.AspNetCore.Mvc.AutoValidateAntiforgeryTokenAttribute());
             options.Conventions.Add(new StripFolderPrefixConvention());
+            // Add route for root path
+            options.Conventions.AddPageRoute("/Platform/Index", "");
         })
         .AddRazorOptions(options =>
         {

@@ -36,11 +36,12 @@ public class HostnameRouteMiddleware
         var isRootDomain = IsRootDomain(host);
         var pathAndQuery = request.Path + request.QueryString;
 
-        // Handle root path redirects
+        // Handle root path redirect for subdomains only
+        // Root domain will use default routing (Platform/Index mapped to "")
         if (path == "/" && !isRootDomain)
         {
-            _logger.LogDebug("Redirecting subdomain / to /Home");
-            context.Response.Redirect("/Home");
+            _logger.LogDebug("Redirecting subdomain / to /home");
+            context.Response.Redirect("/home");
             return;
         }
 
