@@ -3,7 +3,7 @@ using Hubletix.Api.Models;
 using Hubletix.Infrastructure.Persistence;
 using Hubletix.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hubletix.Api.Pages.Platform;
@@ -92,7 +92,7 @@ public class LoginModel : PlatformPageModel
             };
 
             await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
+                IdentityConstants.ApplicationScheme,
                 principal,
                 authProperties
             );

@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using Hubletix.Core.Entities;
 using Hubletix.Infrastructure.Persistence;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -83,7 +82,7 @@ public class ClaimsPrincipalFactory : IClaimsPrincipalFactory
             }
         }
 
-        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var identity = new ClaimsIdentity(claims, IdentityConstants.ApplicationScheme);
         var principal = new ClaimsPrincipal(identity);
 
         _logger.LogInformation("Created claims principal for user {PlatformUserId} (tenant: {TenantId})", platformUser.Id, tenantId ?? "none");
