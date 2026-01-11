@@ -5,13 +5,11 @@ using Hubletix.Core.Enums;
 using Hubletix.Infrastructure.Persistence;
 using Hubletix.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hubletix.Api.Pages.Platform;
 
-// [Authorize]
 public class TenantSelectorModel : PlatformPageModel
 {
     private readonly AppDbContext _dbContext;
