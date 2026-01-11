@@ -8,7 +8,7 @@ using Hubletix.Core.Constants;
 
 namespace Hubletix.Api.Pages.Tenant.Admin;
 
-public class DashboardModel : AdminPageModel
+public class DashboardModel : TenantAdminPageModel
 {
     private readonly ITenantOnboardingService _tenantOnboardingService;
     

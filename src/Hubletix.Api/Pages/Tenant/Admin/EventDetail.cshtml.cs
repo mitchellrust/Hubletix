@@ -11,7 +11,7 @@ using Hubletix.Infrastructure.Services;
 
 namespace Hubletix.Api.Pages.Tenant.Admin;
 
-public class EventDetailModel : AdminPageModel
+public class EventDetailModel : TenantAdminPageModel
 {
     // Bind property so that form submission populates this object automatically based on property names
     [BindProperty]

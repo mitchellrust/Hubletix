@@ -8,7 +8,7 @@ using Hubletix.Core.Constants;
 
 namespace Hubletix.Api.Pages.Tenant.Admin;
 
-public class EventsModel : AdminPageModel
+public class EventsModel : TenantAdminPageModel
 {
     public List<EventDto> Events { get; set; } = new();
     public int PageNum { get; set; }

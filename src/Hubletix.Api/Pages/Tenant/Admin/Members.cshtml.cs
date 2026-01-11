@@ -5,7 +5,7 @@ using Hubletix.Infrastructure.Services;
 
 namespace Hubletix.Api.Pages.Tenant.Admin;
 
-public class MembersModel : AdminPageModel
+public class MembersModel : TenantAdminPageModel
 {
     public List<MemberDto> Members { get; set; } = new();
     public int PageNum { get; set; }

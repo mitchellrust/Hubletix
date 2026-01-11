@@ -7,7 +7,7 @@ using Hubletix.Core.Constants;
 
 namespace Hubletix.Api.Pages.Tenant;
 
-public class MembershipPlansModel : PublicPageModel
+public class MembershipPlansModel : TenantPageModel
 {
     public List<MembershipPlanDto> RecurringPlans { get; set; } = new();
     public List<MembershipPlanDto> OneTimePlans { get; set; } = new();

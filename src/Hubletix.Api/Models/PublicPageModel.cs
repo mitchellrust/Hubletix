@@ -5,14 +5,18 @@ using Hubletix.Core.Models;
 using Hubletix.Infrastructure.Services;
 using Hubletix.Api.Utils;
 using Hubletix.Api.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Hubletix.Core.Enums;
 
 namespace Hubletix.Api.Pages;
 
 /// <summary>
-/// Public page model that provides tenant context to all inheriting pages.
+/// Tenant page model that provides tenant context to all inheriting pages.
 /// Automatically injects and caches the current tenant information.
 /// </summary>
-public class PublicPageModel : PageModel
+[Authorize(Policy = "TenantMember")]
+public class TenantPageModel : PageModel
 {
     private IMultiTenantContextAccessor<ClubTenantInfo> _multiTenantContextAccessor { get; }
     protected AppDbContext DbContext { get; }
@@ -31,7 +35,7 @@ public class PublicPageModel : PageModel
     /// </summary>
     public bool HasTenantContext => CurrentTenantInfo != null;
 
-    public PublicPageModel(
+    public TenantPageModel(
       IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
       ITenantConfigService tenantConfigService,
       AppDbContext dbContext
@@ -47,9 +51,26 @@ public class PublicPageModel : PageModel
         Microsoft.AspNetCore.Mvc.Filters.PageHandlerExecutionDelegate next
     )
     {
-        // Only fetch tenant config if we're in a tenant context
+        // Verify user has active membership in current tenant
         if (HasTenantContext && CurrentTenantInfo != null)
         {
+            var platformUserId = User?.FindFirst("platform_user_id")?.Value;
+            
+            if (!string.IsNullOrEmpty(platformUserId))
+            {
+                var tenantUser = await DbContext.GetTenantUserAsync(
+                    platformUserId, 
+                    CurrentTenantInfo.Id
+                );
+
+                // Check if user is an active member of this tenant
+                if (tenantUser == null || tenantUser.Status != TenantUserStatus.Active)
+                {
+                    context.Result = new RedirectToPageResult("/Tenant/AccessDenied");
+                    return;
+                }
+            }
+            
             // Set tenant information in ViewData for use in layouts
             ViewData["TenantName"] = CurrentTenantInfo.Name;
 

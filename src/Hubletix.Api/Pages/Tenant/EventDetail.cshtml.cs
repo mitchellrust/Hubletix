@@ -7,7 +7,7 @@ using Hubletix.Api.Utils;
 
 namespace Hubletix.Api.Pages.Tenant;
 
-public class EventDetailModel : PublicPageModel
+public class EventDetailModel : TenantPageModel
 {
     public EventDetailDto? Event { get; set; }
 

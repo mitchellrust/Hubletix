@@ -6,7 +6,7 @@ using Hubletix.Infrastructure.Services;
 
 namespace Hubletix.Api.Pages.Tenant.Admin;
 
-public class EventRegistrationsModel : AdminPageModel
+public class EventRegistrationsModel : TenantAdminPageModel
 {
     public List<EventRegistrationDto> Registrations { get; set; } = new();
     public int PageNum { get; set; }
