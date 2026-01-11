@@ -5,14 +5,18 @@ using Hubletix.Core.Models;
 using Hubletix.Infrastructure.Services;
 using Hubletix.Api.Utils;
 using Hubletix.Api.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Hubletix.Core.Enums;
 
 namespace Hubletix.Api.Pages;
 
 /// <summary>
-/// Admin page model that provides tenant context to all inheriting pages.
+/// Tenant admin page model that provides tenant context to all inheriting pages.
 /// Automatically injects and caches the current tenant information.
 /// </summary>
-public class AdminPageModel : PageModel
+[Authorize(Policy = "TenantAdmin")]
+public class TenantAdminPageModel : PageModel
 {
     private IMultiTenantContextAccessor<ClubTenantInfo> _multiTenantContextAccessor { get; }
     protected AppDbContext DbContext { get; }
@@ -21,7 +25,7 @@ public class AdminPageModel : PageModel
     public ClubTenantInfo CurrentTenantInfo => _multiTenantContextAccessor.MultiTenantContext?.TenantInfo
       ?? throw new InvalidOperationException("Tenant information is not available in the current context.");
 
-    public AdminPageModel(
+    public TenantAdminPageModel(
       IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
       ITenantConfigService tenantConfigService,
       AppDbContext dbContext
@@ -37,6 +41,24 @@ public class AdminPageModel : PageModel
         Microsoft.AspNetCore.Mvc.Filters.PageHandlerExecutionDelegate next
     )
     {
+        // Verify user has Admin role in current tenant with Active status
+        var platformUserId = User?.FindFirst("platform_user_id")?.Value;
+        
+        if (!string.IsNullOrEmpty(platformUserId))
+        {
+            var hasAdminRole = await DbContext.HasRoleInTenantAsync(
+                platformUserId,
+                CurrentTenantInfo.Id,
+                TenantRole.Admin
+            );
+
+            if (!hasAdminRole)
+            {
+                context.Result = new RedirectToPageResult("/Tenant/AccessDenied");
+                return;
+            }
+        }
+        
         // Set tenant information in ViewData for use in layouts
         ViewData["TenantName"] = CurrentTenantInfo.Name;
 

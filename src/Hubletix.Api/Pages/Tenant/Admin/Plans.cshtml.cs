@@ -6,7 +6,7 @@ using Hubletix.Infrastructure.Services;
 
 namespace Hubletix.Api.Pages.Tenant.Admin;
 
-public class PlansModel : AdminPageModel
+public class PlansModel : TenantAdminPageModel
 {
     public List<PlanDto> Plans { get; set; } = new();
     public int PageNum { get; set; }

@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace Hubletix.Api.Pages.Tenant;
 
-public class EventsModel : PublicPageModel
+public class EventsModel : TenantPageModel
 {
     public List<EventCardDto> UpcomingEvents { get; set; } = new();
     public bool HasMoreEvents { get; set; }

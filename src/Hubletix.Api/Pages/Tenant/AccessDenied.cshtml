@@ -1,0 +1,39 @@
+@page
+@model AccessDeniedModel
+@{
+    ViewData["Title"] = "Access Denied";
+    Layout = "_PublicLayout";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <h1 class="display-4 text-danger">
+                <i class="bi bi-shield-x"></i> Access Denied
+            </h1>
+            <p class="lead mt-4">
+                You don't have access to this page or organization.
+            </p>
+            <p class="text-muted">
+                Please ensure you're logged in with the correct account and that you're a member of this organization.
+            </p>
+            <div class="mt-4">
+                @if (!Model.IsAuthenticated)
+                {
+                    <a href="/login" class="btn btn-primary me-2">
+                        <i class="bi bi-box-arrow-in-right"></i> Login
+                    </a>
+                }
+                else
+                {
+                    <a href="/tenantselector" class="btn btn-primary me-2">
+                        <i class="bi bi-building"></i> Switch Organizations
+                    </a>
+                }
+                <a href="/home" class="btn btn-outline-secondary">
+                    <i class="bi bi-house"></i> Go to Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

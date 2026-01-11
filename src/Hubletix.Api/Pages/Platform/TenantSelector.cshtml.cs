@@ -7,9 +7,11 @@ using Hubletix.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Hubletix.Api.Pages.Platform;
 
+[Authorize]
 public class TenantSelectorModel : PlatformPageModel
 {
     private readonly AppDbContext _dbContext;

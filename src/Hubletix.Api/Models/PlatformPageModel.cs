@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Finbuckle.MultiTenant.Abstractions;
 using Hubletix.Infrastructure.Persistence;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Hubletix.Api.Models;
 
@@ -9,6 +10,7 @@ namespace Hubletix.Api.Models;
 /// Platform-level page model that operates without tenant context.
 /// Used for pages accessible on the root domain that don't require a tenant.
 /// </summary>
+[AllowAnonymous]
 public class PlatformPageModel : PageModel
 {
     private readonly IMultiTenantContextAccessor<ClubTenantInfo> _multiTenantContextAccessor;

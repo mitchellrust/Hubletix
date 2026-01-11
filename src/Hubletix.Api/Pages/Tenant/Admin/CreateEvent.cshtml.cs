@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Hubletix.Api.Pages.Tenant.Admin;
 
-public class CreateEventModel : AdminPageModel
+public class CreateEventModel : TenantAdminPageModel
 {
     [BindProperty]
     public Event Event { get; set; } = new Event();

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Hubletix.Api.Pages.Tenant;
 
-public class HomeModel : PublicPageModel
+public class HomeModel : TenantPageModel
 {
     public HomePageViewModel HomePage { get; set; } = new();
 

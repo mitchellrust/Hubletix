@@ -10,7 +10,7 @@ using Hubletix.Infrastructure.Services;
 
 namespace Hubletix.Api.Pages.Tenant.Admin;
 
-public class PlanDetailModel : AdminPageModel
+public class PlanDetailModel : TenantAdminPageModel
 {
     [BindProperty]
     public MembershipPlan? Plan { get; set; }
