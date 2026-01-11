@@ -194,7 +194,7 @@ public class DatabaseInitializationService
                 await context.SaveChangesAsync();
 
                 _logger.LogInformation("Tenant created with identifier: {Subdomain}", tenant.Identifier);
-                _logger.LogInformation("Access the tenant at: http://{Subdomain}.localhost:5000", tenant.Identifier);
+                _logger.LogInformation("Access the tenant at: http://{Subdomain}.hubletix.local:5000", tenant.Identifier);
             }
             else
             {
