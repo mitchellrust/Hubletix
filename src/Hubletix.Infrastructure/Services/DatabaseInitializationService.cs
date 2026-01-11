@@ -86,8 +86,9 @@ public class DatabaseInitializationService
           await SeedAppPausedAsync(appContext, pausedTenantInfo, platformPlans);
 
           // Seed cross-cutting data (payments, signup sessions)
-          await SeedPaymentsAsync(appContext);
-          await SeedSignupSessionsAsync(appContext, platformPlans);
+          // Was having null pointer issues, so commenting out for now
+        //   await SeedPaymentsAsync(appContext);
+        //   await SeedSignupSessionsAsync(appContext, platformPlans);
 
           _logger.LogInformation("Database initialization completed successfully");
         }
