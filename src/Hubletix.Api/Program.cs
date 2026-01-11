@@ -3,6 +3,7 @@ using Hubletix.Infrastructure.Persistence;
 using Hubletix.Infrastructure.Services;
 using Hubletix.Core.Models;
 using Hubletix.Api.Validators;
+using Hubletix.Api.Conventions;
 using Finbuckle.MultiTenant.Extensions;
 using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
@@ -108,11 +109,12 @@ if (builder.Environment.IsDevelopment())
         {
             options.RootDirectory = "/Pages";
             options.Conventions.ConfigureFilter(new Microsoft.AspNetCore.Mvc.AutoValidateAntiforgeryTokenAttribute());
+            options.Conventions.Add(new StripFolderPrefixConvention());
         })
         .AddRazorRuntimeCompilation()
         .AddRazorOptions(options =>
         {
-            options.PageViewLocationFormats.Add("/Pages/Admin/Shared/{0}.cshtml");
+            options.PageViewLocationFormats.Add("/Pages/Tenant/Admin/Shared/{0}.cshtml");
         });
 }
 else
@@ -121,10 +123,11 @@ else
         {
             options.RootDirectory = "/Pages";
             options.Conventions.ConfigureFilter(new Microsoft.AspNetCore.Mvc.AutoValidateAntiforgeryTokenAttribute());
+            options.Conventions.Add(new StripFolderPrefixConvention());
         })
         .AddRazorOptions(options =>
         {
-            options.PageViewLocationFormats.Add("/Pages/Admin/Shared/{0}.cshtml");
+            options.PageViewLocationFormats.Add("/Pages/Tenant/Admin/Shared/{0}.cshtml");
         });
 }
 

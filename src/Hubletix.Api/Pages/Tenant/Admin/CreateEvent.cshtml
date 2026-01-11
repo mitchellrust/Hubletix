@@ -1,0 +1,148 @@
+@page
+@model CreateEventModel
+@{
+    ViewData["Title"] = "Create Event";
+    ViewData["TenantName"] = Model.CurrentTenantInfo.Name;
+    Layout = "_AdminLayout";
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <a href="/admin/events" class="btn btn-sm btn-outline-secondary mb-3">
+                <i class="bi bi-arrow-left"></i> Back to Events
+            </a>
+            <h1 class="display-5 fw-bold">Create New Event</h1>
+            <p class="text-muted">Set up a new event for your members.</p>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @Model.ErrorMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-12 col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0">Event Details</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        <div class="mb-3">
+                            <label asp-for="Event.Name" class="form-label">Event Name</label>
+                            <input class="form-control" asp-for="Event.Name" placeholder="Enter event name" required />
+                            <span asp-validation-for="Event.Name" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Event.Description" class="form-label">Description</label>
+                            <textarea class="form-control" asp-for="Event.Description" rows="3" placeholder="Enter event description"></textarea>
+                            <span asp-validation-for="Event.Description" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Event.LocationDetails" class="form-label">Location Details</label>
+                            <input class="form-control" asp-for="Event.LocationDetails" placeholder="Enter event location details (optional)" />
+                            <span asp-validation-for="Event.LocationDetails" class="text-danger small"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 col-md-6 mb-3">
+                                <label asp-for="Event.EventType" class="form-label">Event Type</label>
+                                <select class="form-select" asp-for="Event.EventType" asp-items="Model.EventTypeOptions"></select>
+                                <span asp-validation-for="Event.EventType" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12 col-md-6 mb-3">
+                                <label asp-for="Event.Capacity" class="form-label">Capacity</label>
+                                <input type="number" class="form-control" asp-for="Event.Capacity" min="1" placeholder="Enter max capacity" required />
+                                <span asp-validation-for="Event.Capacity" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 col-md-6 mb-3">
+                                <label asp-for="PriceInDollars" class="form-label">Price</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" asp-for="PriceInDollars" min="0" step="0.01" placeholder="0.00" />
+                                </div>
+                                <span class="text-muted small">Leave blank or set to 0 for free events</span>
+                            </div>
+
+                            <div class="col-12 col-md-6 mb-3">
+                                <label asp-for="LocalRegistrationDeadline" class="form-label">Registration Deadline</label>
+                                <input type="datetime-local" class="form-control" asp-for="LocalRegistrationDeadline" />
+                                <span class="text-muted small">Optional - leave blank for no deadline</span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 col-md-6 mb-3">
+                                <label asp-for="LocalStartTime" class="form-label">Start Time</label>
+                                <input type="datetime-local" class="form-control" asp-for="LocalStartTime" required />
+                                <span class="text-muted small">Local time in selected timezone</span>
+                            </div>
+
+                            <div class="col-12 col-md-6 mb-3">
+                                <label asp-for="LocalEndTime" class="form-label">End Time</label>
+                                <input type="datetime-local" class="form-control" asp-for="LocalEndTime" required />
+                                <span class="text-muted small">Local time in selected timezone</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Event.TimeZoneId" class="form-label">Time Zone</label>
+                            <select class="form-select" asp-for="Event.TimeZoneId" asp-items="Model.TimeZoneOptions"></select>
+                            <span asp-validation-for="Event.TimeZoneId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="isActive" asp-for="Event.IsActive" onchange="updateStatusLabel(this)" />
+                                <label class="form-check-label" for="isActive" id="statusLabel">
+                                    @(Model.Event.IsActive ? "Active" : "Inactive")
+                                </label>
+                            </div>
+                            <span class="text-muted small">Inactive events won't be visible to members</span>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">Create Event</button>
+                            <a href="/admin/events" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-4">
+            <div class="card border-0 shadow-sm bg-light">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0">Tips</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="small mb-0">
+                        <li class="mb-2"><strong>Event Name:</strong> Keep it clear and descriptive</li>
+                        <li class="mb-2"><strong>Capacity:</strong> Set a realistic limit based on your space</li>
+                        <li class="mb-2"><strong>Time Zone:</strong> Events are displayed in their local timezone</li>
+                        <li class="mb-2"><strong>Status:</strong> Create as inactive to prepare before publishing</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Update event status label on toggle
+        function updateStatusLabel(checkbox) {
+            document.getElementById('statusLabel').textContent = checkbox.checked ? 'Active' : 'Inactive';
+        }
+    </script>
+</div>
