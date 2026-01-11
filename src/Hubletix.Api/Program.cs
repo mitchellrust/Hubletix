@@ -55,22 +55,21 @@ builder.Services.AddIdentity<Hubletix.Core.Entities.User, Microsoft.AspNetCore.I
     .AddEntityFrameworkStores<AppDbContext>()
     .AddUserValidator<RequireEmailValidator>();
 
-// Cookie Authentication
-builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.Cookie.Name = "Hubletix.Auth";
-        options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = builder.Environment.IsDevelopment() 
-            ? CookieSecurePolicy.SameAsRequest 
-            : CookieSecurePolicy.Always;
-        options.Cookie.SameSite = SameSiteMode.Strict;
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(15);
-        options.SlidingExpiration = true;
-        options.LoginPath = "/Login";
-        options.LogoutPath = "/Platform/Logout";
-        options.AccessDeniedPath = "/AccessDenied";
-    });
+// Configure Cookie Authentication (used by Identity)
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.Name = "Hubletix.Auth";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment() 
+        ? CookieSecurePolicy.SameAsRequest 
+        : CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Strict;
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(15);
+    options.SlidingExpiration = true;
+    options.LoginPath = "/Platform/Login";
+    options.LogoutPath = "/Platform/Logout";
+    options.AccessDeniedPath = "/AccessDenied";
+});
 
 // Authorization policies
 builder.Services.AddAuthorization(options =>
