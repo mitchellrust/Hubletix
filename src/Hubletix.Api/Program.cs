@@ -11,25 +11,6 @@ using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add DbContext with factory for TenantStore
-builder.Services.AddDbContextFactory<TenantStoreDbContext>(options =>
-{
-    options.UseNpgsql(builder.Configuration.GetConnectionString("TenantStoreConnection"));
-});
-
-builder.Services.AddDbContext<AppDbContext>(options =>
-{
-    options.UseNpgsql(builder.Configuration.GetConnectionString("AppDbConnection"));
-});
-
-// Register Finbuckle.MultiTenant with EFCore Tenant Store
-builder.Services.AddMultiTenant<ClubTenantInfo>()
-        .WithHostStrategy()
-        .WithEFCoreStore<TenantStoreDbContext, ClubTenantInfo>();
-
-// Register onboarding service
-builder.Services.AddScoped<ITenantOnboardingService, TenantOnboardingService>();
-
 // Register authentication services
 builder.Services.AddScoped<IClaimsPrincipalFactory, ClaimsPrincipalFactory>();
 builder.Services.AddScoped<IAccountService, AccountService>();
@@ -86,6 +67,25 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("TenantMember", policy =>
         policy.RequireClaim("tenant_id"));
 });
+
+// Add DbContext with factory for TenantStore
+builder.Services.AddDbContextFactory<TenantStoreDbContext>(options =>
+{
+    options.UseNpgsql(builder.Configuration.GetConnectionString("TenantStoreConnection"));
+});
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    options.UseNpgsql(builder.Configuration.GetConnectionString("AppDbConnection"));
+});
+
+// Register Finbuckle.MultiTenant with EFCore Tenant Store
+builder.Services.AddMultiTenant<ClubTenantInfo>()
+        .WithHostStrategy()
+        .WithEFCoreStore<TenantStoreDbContext, ClubTenantInfo>();
+
+// Register onboarding service
+builder.Services.AddScoped<ITenantOnboardingService, TenantOnboardingService>();
 
 // Register database initialization service
 builder.Services.AddScoped<DatabaseInitializationService>();

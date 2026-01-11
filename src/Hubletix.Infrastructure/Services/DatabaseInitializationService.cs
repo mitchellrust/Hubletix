@@ -7,7 +7,6 @@ using Hubletix.Core.Models;
 using Hubletix.Core.Enums;
 using System.Text.Json;
 using Hubletix.Core.Constants;
-using Finbuckle.MultiTenant.Abstractions;
 
 namespace Hubletix.Infrastructure.Services;
 
@@ -19,13 +18,16 @@ public class DatabaseInitializationService
 {
     private readonly ILogger<DatabaseInitializationService> _logger;
     private readonly UserManager<User> _userManager;
+    private readonly RoleManager<IdentityRole> _roleManager;
 
     public DatabaseInitializationService(
         ILogger<DatabaseInitializationService> logger,
-        UserManager<User> userManager)
+        UserManager<User> userManager,
+        RoleManager<IdentityRole> roleManager)
     {
         _logger = logger;
         _userManager = userManager;
+        _roleManager = roleManager;
     }
 
     /// <summary>
@@ -50,44 +52,38 @@ public class DatabaseInitializationService
           await appContext.Database.MigrateAsync();
           _logger.LogInformation("App database migrations applied successfully");
 
+          // Seed platform roles
+          await SeedRolesAsync();
+
           // Seed platform wide data, i.e. platform plans
           var platformPlans = await SeedPlatformAsync(appContext);
 
           // Seed tenant store data with demo tenant if needed
-          ClubTenantInfo? demoTenantInfo = await SeedTenantStoreAsync(
+          ClubTenantInfo demoTenantInfo = await SeedTenantStoreAsync(
             tenantStoreContext,
             "demo"
           );
 
-          if (demoTenantInfo != null)
-          {
-            // Seed application data with demo tenant info.
-            await SeedAppDemoAsync(appContext, demoTenantInfo, platformPlans);
-          }
+          // Seed application data with demo tenant info.
+          await SeedAppDemoAsync(appContext, demoTenantInfo, platformPlans);
 
           // Seed tenant store data with acme tenant if needed
-          ClubTenantInfo? acmeTenantInfo = await SeedTenantStoreAsync(
+          ClubTenantInfo acmeTenantInfo = await SeedTenantStoreAsync(
             tenantStoreContext,
             "acme"
           );
 
-          if (acmeTenantInfo != null)
-          {
-            // Seed application data with acme tenant info.
-            await SeedAppAcmeAsync(appContext, acmeTenantInfo, platformPlans);
-          }
+          // Seed application data with acme tenant info.
+          await SeedAppAcmeAsync(appContext, acmeTenantInfo, platformPlans);
 
           // Seed tenant store data with paused tenant if needed
-          ClubTenantInfo? pausedTenantInfo = await SeedTenantStoreAsync(
+          ClubTenantInfo pausedTenantInfo = await SeedTenantStoreAsync(
             tenantStoreContext,
             "paused"
           );
 
-          if (pausedTenantInfo != null)
-          {
-            // Seed application data with paused tenant info.
-            await SeedAppPausedAsync(appContext, pausedTenantInfo, platformPlans);
-          }
+          // Seed application data with paused tenant info.
+          await SeedAppPausedAsync(appContext, pausedTenantInfo, platformPlans);
 
           // Seed cross-cutting data (payments, signup sessions)
           await SeedPaymentsAsync(appContext);
@@ -153,14 +149,31 @@ public class DatabaseInitializationService
     }
 
     /// <summary>
+    /// Seed platform roles for ASP.NET Core Identity.
+    /// </summary>
+    private async Task SeedRolesAsync()
+    {
+        var roles = new[] { PlatformRoles.PlatformAdmin };
+        
+        foreach (var role in roles)
+        {
+            if (!await _roleManager.RoleExistsAsync(role))
+            {
+                await _roleManager.CreateAsync(new IdentityRole(role));
+                _logger.LogInformation("Created role: {Role}", role);
+            }
+        }
+    }
+
+    /// <summary>
     /// Seed tenant store with tenant data if needed.
     /// </summary>
-    private async Task<ClubTenantInfo?> SeedTenantStoreAsync(
+    private async Task<ClubTenantInfo> SeedTenantStoreAsync(
         TenantStoreDbContext context,
         string tenantIdentifier
     )
     {
-        ClubTenantInfo? tenant = null;
+        ClubTenantInfo tenant = null!;
         try
         {
             // Check if tenant exists
@@ -185,6 +198,7 @@ public class DatabaseInitializationService
             else
             {
                 _logger.LogInformation("Tenant '{Identifier}' already exists", tenantIdentifier);
+                tenant = await context.TenantInfo.FirstAsync(t => t.Identifier == tenantIdentifier);
             }
         }
         catch (Exception ex)
@@ -208,6 +222,14 @@ public class DatabaseInitializationService
     {
         try
         {
+            // Check if tenant exists
+            var tenantExists = await context.Tenants.AnyAsync(t => t.Id == demoTenantInfo.Id);
+            if (tenantExists)
+            {
+                _logger.LogInformation("Demo tenant already exists, skipping seeding.");
+                return;
+            }
+
             var demoTenant = new Tenant
             {
                 Id = demoTenantInfo.Id,
@@ -337,7 +359,7 @@ public class DatabaseInitializationService
             {
                 new Event
                 {
-                    Id = Guid.NewGuid().ToString(),
+                    Id = "past-workshop-001",
                     TenantId = demoTenant.Id,
                     LocationId = location.Id,
                     Name = "Past Workshop",
@@ -357,6 +379,7 @@ public class DatabaseInitializationService
                         {
                             Id = Guid.NewGuid().ToString(),
                             TenantId = demoTenant.Id,
+                            EventId = "past-workshop-001",
                             PlatformUserId = demoUsers[0].Id,
                             Status = EventRegistrationStatus.Attended,
                             SignedUpAt = todayInTz.AddDays(-12).ToUniversalTime(),
@@ -404,6 +427,7 @@ public class DatabaseInitializationService
                         {
                             Id = Guid.NewGuid().ToString(),
                             TenantId = demoTenant.Id,
+                            EventId = "12345678-aaaa-bbbb-cccc-1234567890ab",
                             PlatformUserId = demoUsers[0].Id,
                             Status = EventRegistrationStatus.Registered,
                             SignedUpAt = todayInTz.AddDays(-1).ToUniversalTime(),
@@ -413,6 +437,7 @@ public class DatabaseInitializationService
                         {
                             Id = Guid.NewGuid().ToString(),
                             TenantId = demoTenant.Id,
+                            EventId = "12345678-aaaa-bbbb-cccc-1234567890ab",
                             PlatformUserId = demoUsers[2].Id,
                             Status = EventRegistrationStatus.Registered,
                             SignedUpAt = todayInTz.AddHours(-5).ToUniversalTime(),
@@ -422,6 +447,7 @@ public class DatabaseInitializationService
                         {
                             Id = Guid.NewGuid().ToString(),
                             TenantId = demoTenant.Id,
+                            EventId = "12345678-aaaa-bbbb-cccc-1234567890ab",
                             PlatformUserId = demoUsers[3].Id,
                             Status = EventRegistrationStatus.Cancelled,
                             CancellationReason = "Can't make it",
@@ -451,6 +477,7 @@ public class DatabaseInitializationService
                         {
                             Id = Guid.NewGuid().ToString(),
                             TenantId = demoTenant.Id,
+                            EventId = "87654321-bbbb-cccc-dddd-0987654321ba",
                             PlatformUserId = demoUsers[0].Id,
                             Status = EventRegistrationStatus.Registered,
                             SignedUpAt = todayInTz.AddDays(-1).ToUniversalTime(),
@@ -460,6 +487,7 @@ public class DatabaseInitializationService
                         {
                             Id = Guid.NewGuid().ToString(),
                             TenantId = demoTenant.Id,
+                            EventId = "87654321-bbbb-cccc-dddd-0987654321ba",
                             PlatformUserId = demoUsers[1].Id,
                             Status = EventRegistrationStatus.Registered,
                             SignedUpAt = todayInTz.AddDays(-1).AddHours(1).ToUniversalTime(),
@@ -469,6 +497,7 @@ public class DatabaseInitializationService
                         {
                             Id = Guid.NewGuid().ToString(),
                             TenantId = demoTenant.Id,
+                            EventId = "87654321-bbbb-cccc-dddd-0987654321ba",
                             PlatformUserId = demoUsers[4].Id,
                             Status = EventRegistrationStatus.Waitlist,
                             SignedUpAt = todayInTz.AddDays(-1).AddHours(2).ToUniversalTime(),
@@ -534,6 +563,14 @@ public class DatabaseInitializationService
     {
         try
         {
+            // Check if tenant exists
+            var tenantExists = await context.Tenants.AnyAsync(t => t.Id == acmeTenantInfo.Id);
+            if (tenantExists)
+            {
+                _logger.LogInformation("Acme tenant already exists, skipping seeding.");
+                return;
+            }
+
             var acmeTenant = new Tenant
             {
                 Id = acmeTenantInfo.Id,
@@ -645,7 +682,7 @@ public class DatabaseInitializationService
                 },
                 new Event
                 {
-                    Id = Guid.NewGuid().ToString(),
+                    Id = "acme-skills-clinic-001",
                     TenantId = acmeTenant.Id,
                     LocationId = location.Id,
                     Name = "Skills Clinic",
@@ -664,6 +701,7 @@ public class DatabaseInitializationService
                         {
                             Id = Guid.NewGuid().ToString(),
                             TenantId = acmeTenant.Id,
+                            EventId = "acme-skills-clinic-001",
                             PlatformUserId = acmeUsers[0].Id,
                             Status = EventRegistrationStatus.Registered,
                             SignedUpAt = todayInTz.AddDays(-1).ToUniversalTime(),
@@ -697,6 +735,14 @@ public class DatabaseInitializationService
     {
         try
         {
+            // Check if tenant exists
+            var tenantExists = await context.Tenants.AnyAsync(t => t.Id == pausedTenantInfo.Id);
+            if (tenantExists)
+            {
+                _logger.LogInformation("Paused tenant already exists, skipping seeding.");
+                return;
+            }
+
             var pausedTenant = new Tenant
             {
                 Id = pausedTenantInfo.Id,
