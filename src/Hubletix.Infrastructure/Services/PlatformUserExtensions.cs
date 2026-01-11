@@ -90,7 +90,6 @@ public static class PlatformUserExtensions
     {
         return await dbContext.PlatformUsers
             .Include(pu => pu.IdentityUser)
-            .Include(pu => pu.DefaultTenant)
             .FirstOrDefaultAsync(pu => pu.IdentityUserId == identityUserId, ct);
     }
 

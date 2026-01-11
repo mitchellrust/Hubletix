@@ -679,7 +679,6 @@ public class DatabaseInitializationService
                 FirstName = firstName,
                 LastName = lastName,
                 IsActive = isActive,
-                DefaultTenantId = tenantId
             };
 
             context.PlatformUsers.Add(platformUser);

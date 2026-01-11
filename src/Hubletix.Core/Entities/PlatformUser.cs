@@ -23,24 +23,13 @@ public class PlatformUser : BaseEntity
     /// </summary>
     public bool IsActive { get; set; } = true;
     
-    /// <summary>
-    /// Optional default tenant ID for UX convenience (e.g., which tenant to show on login)
-    /// User can still belong to multiple tenants via TenantUser join table
-    /// </summary>
-    public string? DefaultTenantId { get; set; }
-    
     // Navigation Properties
     
     /// <summary>
     /// Navigation to the Identity user (authentication layer)
     /// </summary>
     public User IdentityUser { get; set; } = null!;
-    
-    /// <summary>
-    /// Navigation to the default tenant (optional)
-    /// </summary>
-    public Tenant? DefaultTenant { get; set; }
-    
+        
     /// <summary>
     /// All tenant memberships for this user
     /// </summary>
