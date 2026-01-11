@@ -45,17 +45,37 @@ public class HostnameRouteMiddleware
             return;
         }
 
-        // Check if path is a tenant route
-        var isTenantRoute = path.StartsWith("/home", StringComparison.OrdinalIgnoreCase) ||
-                           path.StartsWith("/events", StringComparison.OrdinalIgnoreCase) ||
-                           path.StartsWith("/eventdetail", StringComparison.OrdinalIgnoreCase) ||
-                           path.StartsWith("/admin", StringComparison.OrdinalIgnoreCase);
+        // Get the endpoint to determine the page path
+        var endpoint = context.GetEndpoint();
+        if (endpoint == null)
+        {
+            // No endpoint found, let it continue (will likely 404)
+            await _next(context);
+            return;
+        }
 
-        // Check if path is a platform route
-        var isPlatformRoute = path.StartsWith("/login", StringComparison.OrdinalIgnoreCase) ||
-                             path.StartsWith("/tenantselector", StringComparison.OrdinalIgnoreCase) ||
-                             path.StartsWith("/signup", StringComparison.OrdinalIgnoreCase) ||
-                             path.StartsWith("/index", StringComparison.OrdinalIgnoreCase);
+        // Check if this is a Razor Page by looking at the endpoint metadata
+        var routeEndpoint = endpoint as Microsoft.AspNetCore.Routing.RouteEndpoint;
+        if (routeEndpoint == null)
+        {
+            // Not a route endpoint (could be a controller), let it continue
+            await _next(context);
+            return;
+        }
+
+        // Get the page path from the endpoint metadata
+        var pageMetadata = endpoint.Metadata.GetMetadata<Microsoft.AspNetCore.Mvc.RazorPages.PageActionDescriptor>();
+        if (pageMetadata == null)
+        {
+            // Not a Razor Page, let it continue
+            await _next(context);
+            return;
+        }
+
+        // Determine if this is a tenant or platform route based on the page file location
+        var relativePath = pageMetadata.RelativePath;
+        var isTenantRoute = relativePath.StartsWith("/Pages/Tenant/", StringComparison.OrdinalIgnoreCase);
+        var isPlatformRoute = relativePath.StartsWith("/Pages/Platform/", StringComparison.OrdinalIgnoreCase);
 
         // Root domain accessing tenant route - redirect to tenant selector
         if (isRootDomain && isTenantRoute)

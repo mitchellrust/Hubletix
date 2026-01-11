@@ -68,8 +68,8 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.SameSite = SameSiteMode.Strict;
     options.ExpireTimeSpan = TimeSpan.FromMinutes(15);
     options.SlidingExpiration = true;
-    options.LoginPath = "/Platform/Login";
-    options.LogoutPath = "/Platform/Logout";
+    options.LoginPath = "/login";
+    options.LogoutPath = "/logout";
     options.AccessDeniedPath = "/AccessDenied";
 });
 
@@ -177,14 +177,15 @@ app.UseHttpsRedirection();
 // Serve static files from wwwroot, required for Bootstrap CSS/JS
 app.UseStaticFiles();
 
+app.UseRouting();
+
 // Hostname-based route enforcement middleware
-// This must be before the MultiTenant middleware to ensure correct routing
+// Placed after UseRouting to access endpoint metadata for determining page paths
 app.UseMiddleware<HostnameRouteMiddleware>();
 
 // Finbuckle MultiTenant middleware - resolves tenant from subdomain or query param
 app.UseMultiTenant();
 
-app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
