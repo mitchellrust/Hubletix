@@ -96,7 +96,7 @@ SET "ConfigJson" = '{
         "Description": "Choose from monthly, quarterly, or annual memberships to fit your needs.",
         "Icon": "bi bi-card-checklist",
         "BackgroundColor": "#10B981",
-        "LinkUrl": "/membership-plans",
+        "LinkUrl": "/membershipplans",
         "LinkText": "View Plans",
         "DisplayOrder": 1
       },
@@ -230,7 +230,7 @@ This ensures the homepage always displays content even if configuration is not s
 2. **Icons** - Use Bootstrap Icons (https://icons.getbootstrap.com/)
 3. **Colors** - Use hex format with # prefix (e.g., "#3B82F6")
 4. **Images** - For ImageUrl, use relative paths (/images/...) or full URLs
-5. **Links** - Use relative paths for internal links (/events, /membership-plans)
+5. **Links** - Use relative paths for internal links (/events, /membershipplans)
 
 ## Cache Invalidation
 

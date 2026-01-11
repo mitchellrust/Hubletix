@@ -91,7 +91,7 @@ public class PublicPageModel : PageModel
         // Conditionally add nav items based on feature flags
         if (TenantConfig.Features.EnableMemberships)
         {
-            navItems.Add(new() { Text = "Memberships", Url = "/membership-plans", IsActive = false });
+            navItems.Add(new() { Text = "Memberships", Url = "/membershipplans", IsActive = false });
         }
         if (TenantConfig.Features.EnableEventRegistration)
         {

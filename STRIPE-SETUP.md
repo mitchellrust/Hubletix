@@ -190,7 +190,7 @@ public class CheckoutController : Controller
             plan.Tenant.StripeAccountId,
             plan.StripePriceId,
             successUrl: $"https://yourdomain.com/checkout/success?session_id={{CHECKOUT_SESSION_ID}}",
-            cancelUrl: "https://yourdomain.com/membership-plans",
+            cancelUrl: "https://yourdomain.com/membershipplans",
             customerEmail: User.Identity.Name,
             metadata: new Dictionary<string, string>
             {
