@@ -4,6 +4,7 @@ using Hubletix.Infrastructure.Services;
 using Hubletix.Core.Models;
 using Hubletix.Api.Validators;
 using Hubletix.Api.Conventions;
+using Hubletix.Api.Middleware;
 using Finbuckle.MultiTenant.Extensions;
 using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
@@ -171,6 +172,10 @@ app.UseHttpsRedirection();
 
 // Serve static files from wwwroot, required for Bootstrap CSS/JS
 app.UseStaticFiles();
+
+// Hostname-based route enforcement middleware
+// This must be before the MultiTenant middleware to ensure correct routing
+app.UseMiddleware<HostnameRouteMiddleware>();
 
 // Finbuckle MultiTenant middleware - resolves tenant from subdomain or query param
 app.UseMultiTenant();
