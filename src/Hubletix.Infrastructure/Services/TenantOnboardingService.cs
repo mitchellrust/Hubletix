@@ -224,7 +224,6 @@ public class TenantOnboardingService : ITenantOnboardingService
             FirstName = firstName,
             LastName = lastName,
             IsActive = true,
-            DefaultTenantId = null // Will be set when tenant is created
         };
 
         _dbContext.PlatformUsers.Add(platformUser);
@@ -292,9 +291,6 @@ public class TenantOnboardingService : ITenantOnboardingService
         {
             throw new InvalidOperationException("PlatformUser not found for signup session.");
         }
-
-        // Set default tenant for UX convenience
-        platformUser.DefaultTenantId = tenant.Id;
 
         // Create TenantUser membership with Admin role and IsOwner flag
         var tenantUser = new TenantUser

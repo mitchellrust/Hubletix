@@ -85,12 +85,6 @@ public class AppDbContext : IdentityDbContext<User>
             .HasForeignKey<PlatformUser>(pu => pu.IdentityUserId)
             .OnDelete(DeleteBehavior.Cascade);
         builder.Entity<PlatformUser>()
-            .HasOne(pu => pu.DefaultTenant)
-            .WithMany()
-            .HasForeignKey(pu => pu.DefaultTenantId)
-            .OnDelete(DeleteBehavior.SetNull)
-            .IsRequired(false);
-        builder.Entity<PlatformUser>()
             .HasIndex(pu => pu.IdentityUserId)
             .IsUnique();
 

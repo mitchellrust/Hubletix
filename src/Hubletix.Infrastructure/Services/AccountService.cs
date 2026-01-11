@@ -114,7 +114,6 @@ public class AccountService : IAccountService
                 FirstName = firstName,
                 LastName = lastName,
                 IsActive = true,
-                DefaultTenantId = tenantId
             };
 
             _db.PlatformUsers.Add(platformUser);
