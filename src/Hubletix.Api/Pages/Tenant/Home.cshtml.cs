@@ -24,20 +24,6 @@ public class HomeModel : TenantPageModel
 
     public async Task<IActionResult> OnGetAsync()
     {
-        // If no tenant context (root domain), redirect based on authentication
-        if (!HasTenantContext)
-        {
-            // Unauthenticated users see the platform landing page
-            if (!User.Identity?.IsAuthenticated ?? true)
-            {
-                return RedirectToPage("/Platform/Index");
-            }
-
-            // Authenticated users go to tenant selector
-            return RedirectToPage("/Platform/TenantSelector");
-        }
-
-        // We have tenant context, show tenant home page
         var primaryColor = TenantConfig.Theme?.PrimaryColor;
         var secondaryColor = TenantConfig.Theme?.SecondaryColor;
 

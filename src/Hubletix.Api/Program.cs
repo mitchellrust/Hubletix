@@ -198,6 +198,10 @@ app.UseMiddleware<HostnameRouteMiddleware>();
 app.UseMultiTenant();
 
 app.UseAuthentication();
+
+// Enrich user claims with tenant-specific information when accessing tenant subdomains
+app.UseMiddleware<TenantClaimsMiddleware>();
+
 app.UseAuthorization();
 
 app.MapRazorPages();
