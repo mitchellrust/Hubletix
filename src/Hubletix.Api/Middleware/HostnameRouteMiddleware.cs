@@ -60,7 +60,7 @@ public class HostnameRouteMiddleware
         }
 
         // Check if this is a Razor Page by looking at the endpoint metadata
-        var routeEndpoint = endpoint as Microsoft.AspNetCore.Routing.RouteEndpoint;
+        var routeEndpoint = endpoint as RouteEndpoint;
         if (routeEndpoint == null)
         {
             // Not a route endpoint (could be a controller), let it continue
@@ -126,8 +126,8 @@ public class HostnameRouteMiddleware
         var rootWithoutPort = _rootDomain.Split(':')[0];
 
         // Check if it's the root domain without subdomain
-        // For localhost, must be exact match (localhost or localhost:port)
-        if (rootWithoutPort.Equals("localhost", StringComparison.OrdinalIgnoreCase) ||
+        // For localhost, must be exact match (hubletix.local or hubletix.local:port)
+        if (rootWithoutPort.Equals("hubletix.local", StringComparison.OrdinalIgnoreCase) ||
             rootWithoutPort.Equals("127.0.0.1", StringComparison.OrdinalIgnoreCase))
         {
             return hostWithoutPort.Equals(rootWithoutPort, StringComparison.OrdinalIgnoreCase);

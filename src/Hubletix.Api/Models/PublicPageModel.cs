@@ -14,8 +14,9 @@ namespace Hubletix.Api.Pages;
 /// <summary>
 /// Tenant page model that provides tenant context to all inheriting pages.
 /// Automatically injects and caches the current tenant information.
+/// Requires authentication and validates active tenant membership.
 /// </summary>
-[Authorize(Policy = "TenantMember")]
+[Authorize]
 public class TenantPageModel : PageModel
 {
     private IMultiTenantContextAccessor<ClubTenantInfo> _multiTenantContextAccessor { get; }

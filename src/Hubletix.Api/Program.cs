@@ -41,17 +41,28 @@ builder.Services.AddIdentity<Hubletix.Core.Entities.User, Microsoft.AspNetCore.I
 // Configure Cookie Authentication (used by Identity)
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.Cookie.Name = "Hubletix.Auth";
+    options.Cookie.Name = ".Hubletix.Auth";
     options.Cookie.HttpOnly = true;
     options.Cookie.SecurePolicy = builder.Environment.IsDevelopment() 
         ? CookieSecurePolicy.SameAsRequest 
         : CookieSecurePolicy.Always;
     options.Cookie.SameSite = SameSiteMode.Strict;
+    
+    // Set cookie domain to share across subdomains
+    var rootDomain = builder.Configuration["AppSettings:RootDomain"];
+    if (!string.IsNullOrEmpty(rootDomain))
+    {
+        // Extract domain without port when local (e.g., "hubletix.local" from "hubletix.local:5000")
+        var domain = rootDomain.Split(':')[0];
+        // Set with leading dot to share across subdomains
+        options.Cookie.Domain = $".{domain}";
+    }
+    
     options.ExpireTimeSpan = TimeSpan.FromMinutes(15);
     options.SlidingExpiration = true;
     options.LoginPath = "/login";
     options.LogoutPath = "/logout";
-    options.AccessDeniedPath = "/AccessDenied";
+    options.AccessDeniedPath = "/accessdenied";
 });
 
 // Authorization policies

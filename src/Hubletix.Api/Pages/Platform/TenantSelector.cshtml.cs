@@ -95,7 +95,7 @@ public class TenantSelectorModel : PlatformPageModel
         var host = request.Host;
 
         // Development environment (localhost)
-        if (host.Host == "localhost" || host.Host == "127.0.0.1")
+        if (host.Host == "hubletix.local" || host.Host == "127.0.0.1")
         {
             var port = host.Port.HasValue ? $":{host.Port}" : "";
             return $"{scheme}://{tenantIdentifier}.{host.Host}{port}/";

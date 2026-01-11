@@ -170,7 +170,7 @@
     <script>
         function selectTenant(identifier, name) {
             // Redirect to tenant subdomain
-            // In development: tenant.localhost:5000
+            // In development: tenant.hubletix.local:5000
             // In production: tenant.hubletix.com
             const protocol = window.location.protocol;
             const port = window.location.port ? ':' + window.location.port : '';
@@ -178,7 +178,7 @@
             
             // Determine base domain
             let baseDomain = hostname;
-            if (hostname === 'localhost' || hostname === '127.0.0.1') {
+            if (hostname === 'hubletix.local' || hostname === '127.0.0.1') {
                 // Development environment
                 window.location.href = `${protocol}//${identifier}.${hostname}${port}/`;
             } else {
