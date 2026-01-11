@@ -104,7 +104,10 @@ public class TenantAdminPageModel : PageModel
             LogoUrl = TenantConfig?.Theme?.LogoUrl,
             PrimaryColor = TenantConfig?.Theme?.PrimaryColor,
             NavItems = navItems,
-            ShowLogInButton = TenantConfig?.Features?.EnableUserSignup ?? false
+            ShowLogInButton = TenantConfig?.Features?.EnableUserSignup ?? false,
+            UserEmail = User?.Identity?.Name,
+            IsUserAuthenticated = User?.Identity?.IsAuthenticated ?? false,
+            IsUserTenantAdmin = User?.HasClaim("tenant_role", "Admin") ?? false
         };
     }
 }

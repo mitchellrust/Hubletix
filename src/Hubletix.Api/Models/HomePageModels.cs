@@ -11,6 +11,9 @@ public class NavbarViewModel
     public List<NavItem> NavItems { get; set; } = new();
     public bool ShowLogInButton { get; set; } = false;
     public bool ShowMenuButton => NavItems.Count > 0 && ShowLogInButton;
+    public string? UserEmail { get; set; }
+    public bool IsUserAuthenticated { get; set; }
+    public bool IsUserTenantAdmin { get; set; }
 }
 
 public class NavItem
