@@ -1,0 +1,132 @@
+@page
+@model PlansModel
+@{
+    ViewData["Title"] = "Membership Plans";
+    ViewData["TenantName"] = Model.CurrentTenantInfo.Name;
+    Layout = "_AdminLayout";
+}
+
+<div class="container-fluid py-4">
+    @if (!string.IsNullOrEmpty(Model.StatusMessage))
+    {
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            @Model.StatusMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="mb-0">Membership Plans</h3>
+                <a class="btn btn-sm btn-primary" href="/admin/plans/create">Create Plan</a>
+            </div>
+            <div class="btn-group btn-group-sm" role="group" aria-label="Status filter">
+                <a asp-page="/Admin/Plans" asp-route-status="all" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
+                   class="btn @(Model.StatusFilter == "all" ? "btn-primary" : "btn-outline-primary")">All</a>
+                <a asp-page="/Admin/Plans" asp-route-status="active" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
+                   class="btn @(Model.StatusFilter == "active" ? "btn-primary" : "btn-outline-primary")">Active</a>
+                <a asp-page="/Admin/Plans" asp-route-status="inactive" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
+                   class="btn @(Model.StatusFilter == "inactive" ? "btn-primary" : "btn-outline-primary")">Inactive</a>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>
+                            <a asp-page="/Admin/Plans" asp-route-sort="name" asp-route-dir="@(Model.SortField == "name" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" class="text-decoration-none">
+                                Plan Name
+                                @if (Model.SortField == "name")
+                                {
+                                    <i class="bi bi-arrow-@(Model.SortDirection == "asc" ? "down" : "up")"></i>
+                                }
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-page="/Admin/Plans" asp-route-sort="price" asp-route-dir="@(Model.SortField == "price" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" class="text-decoration-none">
+                                Price
+                                @if (Model.SortField == "price")
+                                {
+                                    <i class="bi bi-arrow-@(Model.SortDirection == "asc" ? "down" : "up")"></i>
+                                }
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-page="/Admin/Plans" asp-route-sort="interval" asp-route-dir="@(Model.SortField == "interval" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" class="text-decoration-none">
+                                Billing
+                                @if (Model.SortField == "interval")
+                                {
+                                    <i class="bi bi-arrow-@(Model.SortDirection == "asc" ? "down" : "up")"></i>
+                                }
+                            </a>
+                        </th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Plans.Any())
+                    {
+                        @foreach (PlanDto plan in Model.Plans)
+                        {
+                            <tr class="@(plan.IsActive ? "" : "table-secondary")">
+                                <td>
+                                    <div class="fw-semibold">
+                                        @plan.Name
+                                        @if (!plan.IsActive)
+                                        {
+                                            <span class="badge bg-secondary ms-1">Inactive</span>
+                                        }
+                                    </div>
+                                    @if (!string.IsNullOrEmpty(plan.Description))
+                                    {
+                                        <div class="text-muted small">@plan.Description</div>
+                                    }
+                                </td>
+                                <td class="fw-semibold">@plan.Price</td>
+                                <td>
+                                    <span class="badge bg-info">
+                                        @(plan.BillingInterval == "month" ? "Monthly" : plan.BillingInterval == "year" ? "Yearly" : plan.BillingInterval)
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (plan.IsActive)
+                                    {
+                                        <span class="badge bg-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    <a href="/admin/plans/@plan.Id" class="btn btn-sm btn-outline-secondary">Manage</a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                No membership plans found. Create your first plan to get started.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+            <div class="text-muted small">
+                Page @Model.PageNum of @Model.TotalPages
+            </div>
+            <div>
+                <a class="btn btn-sm btn-outline-secondary me-2 @(Model.PageNum <= 1 ? "disabled" : string.Empty)" asp-page="/Admin/Plans" asp-route-pageNum="@(Model.PageNum - 1)" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" asp-route-status="@Model.StatusFilter">Previous</a>
+                <a class="btn btn-sm btn-outline-secondary @(Model.PageNum >= Model.TotalPages ? "disabled" : string.Empty)" asp-page="/Admin/Plans" asp-route-pageNum="@(Model.PageNum + 1)" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" asp-route-status="@Model.StatusFilter">Next</a>
+            </div>
+        </div>
+    </div>
+</div>
