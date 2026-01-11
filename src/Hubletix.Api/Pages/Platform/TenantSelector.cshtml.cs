@@ -52,16 +52,18 @@ public class TenantSelectorModel : PlatformPageModel
                 PlatformUserId, UserTenants.Count);
 
             // Auto-redirect if user has exactly one tenant
-            if (UserTenants.Count == 1)
-            {
-                var tenant = UserTenants.First().Tenant;
-                _logger.LogInformation("Auto-redirecting user {UserId} to their only tenant: {TenantId}",
-                    PlatformUserId, tenant.Id);
+            // TODO: Might add this back later, but for now
+            // Want to always show selector for testing purposes
+            // if (UserTenants.Count == 1)
+            // {
+            //     var tenant = UserTenants.First().Tenant;
+            //     _logger.LogInformation("Auto-redirecting user {UserId} to their only tenant: {TenantId}",
+            //         PlatformUserId, tenant.Id);
 
-                // Build tenant URL
-                var tenantUrl = BuildTenantUrl(tenant.Subdomain);
-                return Redirect(tenantUrl);
-            }
+            //     // Build tenant URL
+            //     var tenantUrl = BuildTenantUrl(tenant.Subdomain);
+            //     return Redirect(tenantUrl);
+            // }
 
             // Show selector if user has 0 or 2+ tenants
             return Page();
