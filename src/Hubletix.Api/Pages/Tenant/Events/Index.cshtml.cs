@@ -6,7 +6,7 @@ using Finbuckle.MultiTenant.Abstractions;
 using Hubletix.Api.Utils;
 using System.Reflection;
 
-namespace Hubletix.Api.Pages.Tenant;
+namespace Hubletix.Api.Pages.Tenant.Events;
 
 public class EventsModel : TenantPageModel
 {

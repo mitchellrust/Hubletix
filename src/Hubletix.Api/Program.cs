@@ -124,6 +124,10 @@ if (builder.Environment.IsDevelopment())
             options.Conventions.Add(new StripFolderPrefixConvention());
             // Add route for root path
             options.Conventions.AddPageRoute("/Platform/Index", "");
+            // Add routes for pages that have custom paths that differ from file names
+            options.Conventions.AddPageRoute("/Tenant/Events/Detail", "events/{id}");
+            options.Conventions.AddPageRoute("/Tenant/Admin/Events/Detail", "admin/events/{id}");
+            options.Conventions.AddPageRoute("/Tenant/Admin/Plans/Detail", "admin/plans/{id}");
         })
         .AddRazorRuntimeCompilation()
         .AddRazorOptions(options =>
@@ -141,6 +145,10 @@ else
             options.Conventions.Add(new StripFolderPrefixConvention());
             // Add route for root path
             options.Conventions.AddPageRoute("/Platform/Index", "");
+            // Add routes for pages that have custom paths that differ from file names
+            options.Conventions.AddPageRoute("/Tenant/Events/Detail", "events/{id}");
+            options.Conventions.AddPageRoute("/Tenant/Admin/Events/Detail", "admin/events/{id}");
+            options.Conventions.AddPageRoute("/Tenant/Admin/Plans/Detail", "admin/plans/{id}");
         })
         .AddRazorOptions(options =>
         {

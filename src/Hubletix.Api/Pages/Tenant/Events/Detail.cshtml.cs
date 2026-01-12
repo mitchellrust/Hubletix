@@ -5,7 +5,7 @@ using Hubletix.Infrastructure.Services;
 using Finbuckle.MultiTenant.Abstractions;
 using Hubletix.Api.Utils;
 
-namespace Hubletix.Api.Pages.Tenant;
+namespace Hubletix.Api.Pages.Tenant.Events;
 
 public class EventDetailModel : TenantPageModel
 {
