@@ -179,7 +179,7 @@ public class EventRegistrationsModel : TenantAdminPageModel
             ShowEventColumn = true,
             ShowFilterFacets = true,
             HasActiveFilters = (!string.IsNullOrEmpty(StatusFilter) && StatusFilter != "all") || TimeFilter != "all",
-            PageName = "/admin/event-registrations",
+            PageName = "/admin/events/registrations",
             RouteValues = new Dictionary<string, string>
             {
                 ["time"] = TimeFilter ?? "all"
