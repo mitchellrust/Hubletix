@@ -48,7 +48,7 @@ public class SuccessModel : PageModel
             if (IsActivated && session.Tenant != null)
             {
                 OrganizationName = session.Tenant.Name;
-                TenantUrl = $"http://{session.Tenant.Subdomain}.hubletix.local";
+                TenantUrl = $"http://{session.Tenant.Subdomain}.hubletix.home";
                 PlanName = session.PlatformPlanId.ToUpper(); // TODO: Get from database
             }
 
