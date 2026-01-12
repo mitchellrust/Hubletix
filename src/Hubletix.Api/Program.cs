@@ -52,7 +52,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     var rootDomain = builder.Configuration["AppSettings:RootDomain"];
     if (!string.IsNullOrEmpty(rootDomain))
     {
-        // Extract domain without port when local (e.g., "hubletix.local" from "hubletix.local:5000")
+        // Extract domain without port when local (e.g., "hubletix.home" from "hubletix.home:5000")
         var domain = rootDomain.Split(':')[0];
         // Set with leading dot to share across subdomains
         options.Cookie.Domain = $".{domain}";

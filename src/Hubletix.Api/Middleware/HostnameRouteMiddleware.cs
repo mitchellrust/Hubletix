@@ -126,8 +126,8 @@ public class HostnameRouteMiddleware
         var rootWithoutPort = _rootDomain.Split(':')[0];
 
         // Check if it's the root domain without subdomain
-        // For localhost, must be exact match (hubletix.local or hubletix.local:port)
-        if (rootWithoutPort.Equals("hubletix.local", StringComparison.OrdinalIgnoreCase) ||
+        // For localhost, must be exact match (hubletix.home or hubletix.home:port)
+        if (rootWithoutPort.Equals("hubletix.home", StringComparison.OrdinalIgnoreCase) ||
             rootWithoutPort.Equals("127.0.0.1", StringComparison.OrdinalIgnoreCase))
         {
             return hostWithoutPort.Equals(rootWithoutPort, StringComparison.OrdinalIgnoreCase);
