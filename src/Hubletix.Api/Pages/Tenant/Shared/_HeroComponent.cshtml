@@ -1,0 +1,23 @@
+@model Tuple<HeroComponentViewModel, string?, string?>
+@{
+    HeroComponentViewModel? hero = Model.Item1;
+    string? primaryColor = Model.Item2;
+    string? secondaryColor = Model.Item3;
+}
+
+<section class="hero-section py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; min-height: 400px; display: flex; align-items: center;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-3 fw-bold mb-4">@hero.Heading</h1>
+                <p class="lead mb-4" style="font-size: 1.5rem;">@hero.Subheading</p>
+                @if (!string.IsNullOrEmpty(hero.CtaText))
+                {
+                    <a href="@(hero.CtaUrl ?? "#")" class="btn btn-light btn-lg px-5 py-3" style="@(primaryColor != null ? $"background-color: {primaryColor}; color: white; border: none;" : "")">
+                        @hero.CtaText
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</section>

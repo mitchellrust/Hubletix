@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Hubletix.Core.Models;
 
@@ -110,81 +111,55 @@ public class FeatureFlags
 public class HomePageConfig
 {
     /// <summary>
-    /// Hero section configuration
+    /// Ordered list of homepage components (max 5)
     /// </summary>
-    public HeroConfig? Hero { get; set; }
-
-    /// <summary>
-    /// About section configuration
-    /// </summary>
-    public AboutConfig? About { get; set; }
-
-    /// <summary>
-    /// Services section configuration
-    /// </summary>
-    public ServicesConfig? Services { get; set; }
-
-    /// <summary>
-    /// Section visibility controls
-    /// </summary>
-    public SectionVisibility Visibility { get; set; } = new();
+    public List<HomePageComponentConfig> Components { get; set; } = new();
 }
 
-public class HeroConfig
+/// <summary>
+/// Base class for homepage components with discriminator pattern
+/// </summary>
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
+[JsonDerivedType(typeof(HeroComponentConfig), "Hero")]
+[JsonDerivedType(typeof(CardsComponentConfig), "Cards")]
+public abstract class HomePageComponentConfig
 {
-    public string? ImageUrl { get; set; }
+    /// <summary>
+    /// Display order of the component
+    /// </summary>
+    public int Order { get; set; }
+}
+
+/// <summary>
+/// Hero component configuration (must be first if present)
+/// </summary>
+public class HeroComponentConfig : HomePageComponentConfig
+{
     public string Heading { get; set; } = string.Empty;
     public string Subheading { get; set; } = string.Empty;
     public string? CtaText { get; set; }
     public string? CtaUrl { get; set; }
 }
 
-public class AboutConfig
+/// <summary>
+/// Cards component configuration (reusable up to 3 times)
+/// </summary>
+public class CardsComponentConfig : HomePageComponentConfig
+{
+    public string? Heading { get; set; }
+    public string? Subheading { get; set; }
+    
+    /// <summary>
+    /// Up to 3 cards per component
+    /// </summary>
+    public List<CardConfig> Cards { get; set; } = new();
+}
+
+/// <summary>
+/// Individual card configuration
+/// </summary>
+public class CardConfig
 {
     public string Heading { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
-
-    /// <summary>
-    /// About section feature cards
-    /// </summary>
-    public List<FeatureCardConfig>? FeatureCards { get; set; }
-}
-
-public class FeatureCardConfig
-{
-    public string Title { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
-    public string? ImageUrl { get; set; }
-    public string? Icon { get; set; }
-    public int DisplayOrder { get; set; }
-}
-
-public class ServicesConfig
-{
-    public string Heading { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Services section service cards
-    /// </summary>
-    public List<ServiceCardConfig>? ServiceCards { get; set; }
-}
-
-public class ServiceCardConfig
-{
-    public string Title { get; set; } = string.Empty;
-    public string Subtitle { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
-    public string? ImageUrl { get; set; }
-    public string? Icon { get; set; }
-    public string? LinkUrl { get; set; }
-    public string? LinkText { get; set; }
-    public int DisplayOrder { get; set; }
-}
-
-public class SectionVisibility
-{
-    public bool ShowHero { get; set; } = true;
-    public bool ShowAbout { get; set; } = true;
-    public bool ShowServices { get; set; } = true;
+    public string Subheading { get; set; } = string.Empty;
 }

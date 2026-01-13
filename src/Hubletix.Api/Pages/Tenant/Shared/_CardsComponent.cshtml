@@ -1,0 +1,51 @@
+@model Tuple<CardsComponentViewModel, string?, string?>
+@{
+    CardsComponentViewModel? cards = Model.Item1;
+    string? primaryColor = Model.Item2;
+    string? secondaryColor = Model.Item3;
+}
+
+<section class="cards-section py-5" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+    <div class="container">
+        @if (!string.IsNullOrEmpty(cards.Heading) || !string.IsNullOrEmpty(cards.Subheading))
+        {
+            <div class="text-center mb-5">
+                @if (!string.IsNullOrEmpty(cards.Heading))
+                {
+                    <h2 class="display-5 fw-bold mb-3">@cards.Heading</h2>
+                }
+                @if (!string.IsNullOrEmpty(cards.Subheading))
+                {
+                    <p class="lead">@cards.Subheading</p>
+                }
+            </div>
+        }
+        
+        @if (cards.Cards != null && cards.Cards.Count > 0)
+        {
+            <div class="row g-4">
+                @foreach (var card in cards.Cards)
+                {
+                    <div class="@(cards.Cards.Count == 1 ? "col-lg-6 mx-auto" : cards.Cards.Count == 2 ? "col-md-6" : "col-md-4")">
+                        <div class="card h-100 shadow-lg border-0" style="transition: transform 0.3s;">
+                            <div class="card-body p-4">
+                                <h5 class="card-title fw-bold mb-3" style="color: @(primaryColor ?? "#333"); font-size: 1.5rem;">
+                                    @card.Heading
+                                </h5>
+                                <p class="card-text text-muted" style="font-size: 1.1rem;">
+                                    @card.Subheading
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+<style>
+    .cards-section .card:hover {
+        transform: translateY(-5px);
+    }
+</style>

@@ -84,12 +84,49 @@ public class ServiceCard
 public class HomePageViewModel
 {
     public NavbarViewModel Navbar { get; set; } = new();
-    public HeroViewModel Hero { get; set; } = new();
-    public AboutSectionViewModel About { get; set; } = new();
-    public ServicesSectionViewModel Services { get; set; } = new();
-    
-    // Page sections visibility
-    public bool ShowHero { get; set; } = true;
-    public bool ShowAbout { get; set; } = true;
-    public bool ShowServices { get; set; } = true;
+    public List<HomePageComponentViewModel> Components { get; set; } = new();
+    public string? PrimaryColor { get; set; }
+    public string? SecondaryColor { get; set; }
 }
+
+/// <summary>
+/// Base class for homepage component view models
+/// </summary>
+public abstract class HomePageComponentViewModel
+{
+    public abstract string Type { get; }
+    public int Order { get; set; }
+}
+
+/// <summary>
+/// View model for hero component
+/// </summary>
+public class HeroComponentViewModel : HomePageComponentViewModel
+{
+    public override string Type => "Hero";
+    public string Heading { get; set; } = string.Empty;
+    public string Subheading { get; set; } = string.Empty;
+    public string? CtaText { get; set; }
+    public string? CtaUrl { get; set; }
+}
+
+/// <summary>
+/// View model for cards component
+/// </summary>
+public class CardsComponentViewModel : HomePageComponentViewModel
+{
+    public override string Type => "Cards";
+    public string? Heading { get; set; }
+    public string? Subheading { get; set; }
+    public List<CardViewModel> Cards { get; set; } = new();
+}
+
+/// <summary>
+/// View model for individual card
+/// </summary>
+public class CardViewModel
+{
+    public string Heading { get; set; } = string.Empty;
+    public string Subheading { get; set; } = string.Empty;
+}
+
