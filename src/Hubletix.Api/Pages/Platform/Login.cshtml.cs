@@ -24,10 +24,7 @@ public class LoginModel : PlatformPageModel
     public bool RememberMe { get; set; }
 
     [TempData]
-    public string? ErrorMessage { get; set; }
-    
-    [TempData]
-    public string? SuccessMessage { get; set; }
+    public string? PlatformLoginErrorMessage { get; set; }
 
     public LoginModel(
         IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
@@ -43,6 +40,9 @@ public class LoginModel : PlatformPageModel
 
     public IActionResult OnGet()
     {
+        // When navigating on GET, we can clear temp data since we don't have any form submission errors
+        TempData.Clear();
+        
         // If already authenticated, redirect to tenant selector
         if (IsAuthenticated)
         {
@@ -59,7 +59,7 @@ public class LoginModel : PlatformPageModel
     {
         if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
         {
-            ErrorMessage = "Please enter both email and password.";
+            PlatformLoginErrorMessage = "Please enter both email and password.";
             return Page();
         }
 
@@ -74,7 +74,7 @@ public class LoginModel : PlatformPageModel
 
             if (!success || identityUser == null || platformUser == null)
             {
-                ErrorMessage = error ?? "Login failed. Please check your credentials and try again.";
+                PlatformLoginErrorMessage = error ?? "Login failed. Please check your credentials and try again.";
                 return Page();
             }
 
@@ -105,7 +105,7 @@ public class LoginModel : PlatformPageModel
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error during platform login for {Email}", Email);
-            ErrorMessage = "An error occurred during login. Please try again.";
+            PlatformLoginErrorMessage = "An error occurred during login. Please try again.";
             return Page();
         }
     }

@@ -77,8 +77,8 @@ Update your `appsettings.Development.json`:
       "PlatformPublishableKey": "pk_test_YOUR_ACTUAL_PUBLISHABLE_KEY",
       "WebhookSecret": "whsec_YOUR_CONNECT_WEBHOOK_SECRET",
       "ApplicationFeePercent": 0.0,
-      "OnboardingSuccessUrl": "http://localhost:5000/admin/stripe/onboarding/success",
-      "OnboardingFailureUrl": "http://localhost:5000/admin/stripe/onboarding/failure"
+      "OnboardingSuccessUrl": "http://localhost:9000/admin/stripe/onboarding/success",
+      "OnboardingFailureUrl": "http://localhost:9000/admin/stripe/onboarding/failure"
     }
   }
 }
@@ -283,7 +283,7 @@ To handle Stripe webhook events:
 
 1. Install Stripe CLI: `brew install stripe/stripe-cli/stripe`
 2. Login: `stripe login`
-3. Forward webhooks: `stripe listen --forward-to localhost:5000/api/webhooks/stripe`
+3. Forward webhooks: `stripe listen --forward-to localhost:9000/api/webhooks/stripe`
 4. Copy the webhook signing secret and add to `appsettings.Development.json`
 
 Create a webhook controller:

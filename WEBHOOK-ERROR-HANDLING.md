@@ -257,7 +257,7 @@ _logger.LogError(
 ### Stripe CLI Commands
 ```bash
 # Listen to webhooks
-stripe listen --forward-to localhost:5000/api/webhooks/stripe/platform
+stripe listen --forward-to localhost:9000/api/webhooks/stripe/platform
 
 # Trigger test events
 stripe trigger checkout.session.completed

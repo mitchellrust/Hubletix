@@ -99,7 +99,7 @@ Implement tenant suspension when subscription is deleted/cancelled.
 - Test complete flow end-to-end
 - Test webhook handling with Stripe CLI:
   ```bash
-  stripe listen --forward-to localhost:5000/api/webhooks/stripe/platform
+  stripe listen --forward-to localhost:9000/api/webhooks/stripe/platform
   ```
 - Test abandoned session resumption
 - Test billing failure scenarios

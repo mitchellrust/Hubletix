@@ -23,7 +23,7 @@ src/
 ## Multi-Tenancy Architecture
 
 - **Single shared codebase + database**: All tenants share the same database with TenantId column
-- **Tenant resolution**: Via **Finbuckle.MultiTenant** library handling subdomain routing (e.g., `clubname.localhost:5000`)
+- **Tenant resolution**: Via **Finbuckle.MultiTenant** library handling subdomain routing (e.g., `clubname.localhost:9000`)
 - **Global query filters**: EF Core automatically filters data by TenantId using Finbuckle's tenant context
 - **TenantStore**: Custom `IMultiTenantStore` implementation queries tenants from PostgreSQL by subdomain
 - **JSONB storage**: Tenant theme and configuration stored as JSONB in PostgreSQL
@@ -91,13 +91,13 @@ dotnet run
 The application will:
 - Apply pending migrations automatically
 - Seed a demo tenant if the database is empty
-- Start on `https://localhost:5001` (or `http://localhost:5000`)
+- Start on `https://localhost:5001` (or `http://localhost:9000`)
 
 ### 4. Access the Application
 
-- **Home**: `http://localhost:5000`
-- **API Health Check**: `http://localhost:5000/api/tenants/health`
-- **Current Tenant**: `http://localhost:5000/api/tenants/current?tenant=demo`
+- **Home**: `http://localhost:9000`
+- **API Health Check**: `http://localhost:9000/api/tenants/health`
+- **Current Tenant**: `http://localhost:9000/api/tenants/current?tenant=demo`
 
 ### Demo Tenant Credentials
 
@@ -113,7 +113,7 @@ When the app first starts, it creates a demo tenant:
 For localhost development, use query parameters:
 
 ```
-http://localhost:5000?tenant=demo
+http://localhost:9000?tenant=demo
 ```
 
 For production with subdomains:

@@ -59,11 +59,11 @@
                     <p class="lead text-muted">Choose an organization to access its dashboard and features</p>
                 </div>
 
-                @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                @if (!string.IsNullOrEmpty(Model.TenantSelectorErrorMessage))
                 {
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
                         <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                        @Model.ErrorMessage
+                        @Model.TenantSelectorErrorMessage
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 }
@@ -154,7 +154,7 @@
     <script>
         function selectTenant(identifier, name) {
             // Redirect to tenant subdomain
-            // In development: tenant.hubletix.home:5000
+            // In development: tenant.hubletix.home:9000
             // In production: tenant.hubletix.com
             const protocol = window.location.protocol;
             const port = window.location.port ? ':' + window.location.port : '';

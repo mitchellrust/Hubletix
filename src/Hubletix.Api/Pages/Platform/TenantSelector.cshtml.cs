@@ -4,8 +4,6 @@ using Hubletix.Core.Entities;
 using Hubletix.Core.Enums;
 using Hubletix.Infrastructure.Persistence;
 using Hubletix.Infrastructure.Services;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
@@ -20,7 +18,7 @@ public class TenantSelectorModel : PlatformPageModel
     public List<TenantUser>? UserTenants { get; set; }
 
     [TempData]
-    public string? ErrorMessage { get; set; }
+    public string? TenantSelectorErrorMessage { get; set; }
 
     public TenantSelectorModel(
         IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
@@ -71,7 +69,7 @@ public class TenantSelectorModel : PlatformPageModel
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error fetching tenants for user {UserId}", PlatformUserId);
-            ErrorMessage = "An error occurred while loading your organizations.";
+            TenantSelectorErrorMessage = "An error occurred while loading your organizations.";
             UserTenants = new List<TenantUser>();
             return Page();
         }

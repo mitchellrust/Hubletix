@@ -15,6 +15,9 @@ public class DashboardModel : TenantAdminPageModel
     public List<UpcomingEventDto> UpcomingEvents { get; set; } = new();
     public TenantStatsDto TenantStats { get; set; } = new();
 
+    [TempData]
+    public string? TenantAdminDashboardErrorMessage { get; set; }
+
     public DashboardModel(
         AppDbContext dbContext,
         ITenantConfigService tenantConfigService,
@@ -99,13 +102,13 @@ public class DashboardModel : TenantAdminPageModel
         catch (InvalidOperationException ex)
         {
             // Handle business logic errors (duplicate account, tenant not found, etc.)
-            TempData["ErrorMessage"] = ex.Message;
+            TenantAdminDashboardErrorMessage = ex.Message;
             return RedirectToPage();
         }
         catch (Exception ex)
         {
             // Log error and show generic message
-            TempData["ErrorMessage"] = $"Failed to set up Stripe Connect: {ex.Message}";
+            TenantAdminDashboardErrorMessage = $"Failed to set up Stripe Connect: {ex.Message}";
             return RedirectToPage();
         }
     }

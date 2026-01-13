@@ -50,20 +50,11 @@
                         <h3 class="text-center mb-4">Welcome Back</h3>
 
                         <!-- Alert messages -->
-                        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                        @if (!string.IsNullOrEmpty(Model.PlatformLoginErrorMessage))
                         {
                             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                                 <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                                @Model.ErrorMessage
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        }
-                        
-                        @if (!string.IsNullOrEmpty(Model.SuccessMessage))
-                        {
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                <i class="bi bi-check-circle-fill me-2"></i>
-                                @Model.SuccessMessage
+                                @Model.PlatformLoginErrorMessage
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
                         }
