@@ -60,7 +60,7 @@ public class SetupOrganizationModel : PageModel
     {
         if (string.IsNullOrEmpty(SessionId))
         {
-            return RedirectToPage("/signup/SelectPlan");
+            return RedirectToPage("/Platform/Signup/SelectPlan");
         }
 
         try
@@ -69,14 +69,14 @@ public class SetupOrganizationModel : PageModel
             if (session == null)
             {
                 _logger.LogWarning("Signup session not found: {SessionId}", SessionId);
-                return RedirectToPage("/signup/SelectPlan");
+                return RedirectToPage("/Platform/Signup/SelectPlan");
             }
 
             // Check that user has been created
             if (string.IsNullOrEmpty(session.UserId))
             {
                 _logger.LogWarning("Admin user not created yet: {SessionId}", SessionId);
-                return RedirectToPage("/signup/CreateAccount", new { sessionId = SessionId });
+                return RedirectToPage("/Platform/Signup/CreateAccount", new { sessionId = SessionId });
             }
 
             return Page();
@@ -84,7 +84,7 @@ public class SetupOrganizationModel : PageModel
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error loading signup session: {SessionId}", SessionId);
-            return RedirectToPage("/signup/SelectPlan");
+            return RedirectToPage("/Platform/Signup/SelectPlan");
         }
     }
 
@@ -113,8 +113,8 @@ public class SetupOrganizationModel : PageModel
             // Initialize billing (creates Stripe checkout session)
             var checkoutUrl = await _onboardingService.InitializeBillingAsync(
                 SessionId,
-                $"http://{Request.Host}/Signup/Success?sessionId={SessionId}",
-                $"http://{Request.Host}/Signup/CreateAccount?sessionId={SessionId}"
+                $"http://{Request.Host}/Platform/Signup/Success?sessionId={SessionId}",
+                $"http://{Request.Host}/Platform/Signup/CreateAccount?sessionId={SessionId}"
             );
 
             _logger.LogInformation(

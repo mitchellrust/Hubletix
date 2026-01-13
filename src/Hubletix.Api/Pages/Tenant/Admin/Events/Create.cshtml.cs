@@ -140,7 +140,7 @@ public class CreateEventModel : TenantAdminPageModel
         {
             DbContext.Events.Add(Event);
             await DbContext.SaveChangesAsync();
-            return RedirectToPage("/Admin/Events", new { id = Event.Id });
+            return RedirectToPage("/Tenant/Admin/Events/Index", new { id = Event.Id });
         }
         catch (Exception ex)
         {

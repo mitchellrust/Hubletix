@@ -58,7 +58,7 @@ public class CreateAccountModel : PageModel
     {
         if (string.IsNullOrEmpty(SessionId))
         {
-            return RedirectToPage("/signup/SelectPlan");
+            return RedirectToPage("/Platform/Signup/SelectPlan");
         }
 
         try
@@ -67,18 +67,17 @@ public class CreateAccountModel : PageModel
             if (session == null)
             {
                 _logger.LogWarning("Signup session not found: {SessionId}", SessionId);
-                return RedirectToPage("/signup/SelectPlan");
+                return RedirectToPage("/Platform/Signup/SelectPlan");
             }
 
-            // TODO: Get plan name from database
-            PlanName = session.PlatformPlanId.ToUpper();
+            PlanName = session.PlatformPlan.Name;
 
             return Page();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error loading signup session: {SessionId}", SessionId);
-            return RedirectToPage("/signup/SelectPlan");
+            return RedirectToPage("/Platform/Signup/SelectPlan");
         }
     }
 
@@ -108,7 +107,7 @@ public class CreateAccountModel : PageModel
             );
 
             // Redirect to organization setup
-            return RedirectToPage("/signup/SetupOrganization", new { sessionId = SessionId });
+            return RedirectToPage("/Platform/Signup/SetupOrganization", new { sessionId = SessionId });
         }
         catch (InvalidOperationException ex)
         {

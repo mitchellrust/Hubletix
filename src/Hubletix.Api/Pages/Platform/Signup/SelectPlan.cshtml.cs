@@ -133,7 +133,7 @@ public class SelectPlanModel : PageModel
             );
 
             // Redirect to account creation
-            return RedirectToPage("/signup/CreateAccount", new { sessionId = session.Id });
+            return RedirectToPage("/Platform/Signup/CreateAccount", new { sessionId = session.Id });
         }
         catch (Exception ex)
         {

@@ -72,7 +72,7 @@ public class CreatePlanModel : TenantAdminPageModel
         {
             DbContext.MembershipPlans.Add(Plan);
             await DbContext.SaveChangesAsync();
-            return RedirectToPage("/Admin/Plans", new { message = "Plan created successfully." });
+            return RedirectToPage("/Tenant/Admin/Plans/Index", new { message = "Plan created successfully." });
         }
         catch (Exception)
         {

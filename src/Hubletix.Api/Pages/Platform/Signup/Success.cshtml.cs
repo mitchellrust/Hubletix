@@ -30,7 +30,7 @@ public class SuccessModel : PageModel
     {
         if (string.IsNullOrEmpty(SessionId))
         {
-            return RedirectToPage("/signup/SelectPlan");
+            return RedirectToPage("/Platform/Signup/SelectPlan");
         }
 
         try
@@ -39,7 +39,7 @@ public class SuccessModel : PageModel
             if (session == null)
             {
                 _logger.LogWarning("Signup session not found: {SessionId}", SessionId);
-                return RedirectToPage("/signup/SelectPlan");
+                return RedirectToPage("/Platform/Signup/SelectPlan");
             }
 
             // Check if tenant is activated
@@ -57,7 +57,7 @@ public class SuccessModel : PageModel
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error loading success page: {SessionId}", SessionId);
-            return RedirectToPage("/signup/SelectPlan");
+            return RedirectToPage("/Platform/Signup/SelectPlan");
         }
     }
 }

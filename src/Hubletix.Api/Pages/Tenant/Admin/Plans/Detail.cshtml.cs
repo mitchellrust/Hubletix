@@ -164,14 +164,14 @@ public class PlanDetailModel : TenantAdminPageModel
         // If plan was not found, must have already been deleted.
         if (planToDelete == null)
         {
-            return RedirectToPage("/Admin/Plans", new { message = "Plan had already been deleted." });
+            return RedirectToPage("/Tenant/Admin/Plans/Index", new { message = "Plan had already been deleted." });
         }
 
         try
         {
             DbContext.MembershipPlans.Remove(planToDelete);
             await DbContext.SaveChangesAsync();
-            return RedirectToPage("/Admin/Plans", new { message = "Plan deleted successfully." });
+            return RedirectToPage("/Tenant/Admin/Plans/Index", new { message = "Plan deleted successfully." });
         }
         catch (Exception ex)
         {

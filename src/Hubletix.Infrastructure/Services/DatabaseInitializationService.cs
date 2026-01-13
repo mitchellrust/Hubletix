@@ -116,8 +116,8 @@ public class DatabaseInitializationService
                     Name = "Starter",
                     Description = "Basic features for small clubs.",
                     PriceInCents = 2900, // $ 29.00,
-                    StripeProductId = "prod_TlQitMVQTItdGh",
-                    StripePriceId = "price_1SntqmIRfoYJ66ha4mdc7GMo",
+                    StripeProductId = "starter_plan",
+                    StripePriceId = "price_1SowDqIRfoYJ66hatg5QAJcz",
                 },
                 new PlatformPlan
                 {
@@ -125,8 +125,8 @@ public class DatabaseInitializationService
                     Name = "Growth",
                     Description = "Advanced features for growing clubs.",
                     PriceInCents = 11900, // $119.00,
-                    StripeProductId = "prod_TlQikV4h2hysiY",
-                    StripePriceId = "price_1SntqyIRfoYJ66hacitOlh9O",
+                    StripeProductId = "growth_plan",
+                    StripePriceId = "price_1SowDrIRfoYJ66haCmuTGoTA",
                 },
                 new PlatformPlan
                 {
@@ -134,8 +134,8 @@ public class DatabaseInitializationService
                     Name = "Professional",
                     Description = "All features for large clubs.",
                     PriceInCents = 39900, // $399.00
-                    StripeProductId = "prod_TlQi4bCt3pG6wK",
-                    StripePriceId = "price_1Sntr8IRfoYJ66haF8r2v88s",
+                    StripeProductId = "professional_plan",
+                    StripePriceId = "price_1SowDrIRfoYJ66haOq4Skv3Z",
                 }
             };
 

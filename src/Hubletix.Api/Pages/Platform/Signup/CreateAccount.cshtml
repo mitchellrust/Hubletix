@@ -47,7 +47,7 @@
                                 <label asp-for="FirstName" class="form-label fw-semibold">
                                     First Name <span class="text-danger">*</span>
                                 </label>
-                                <input asp-for="FirstName" class="form-control form-control-lg" placeholder="John" />
+                                <input asp-for="FirstName" class="form-control form-control-lg" />
                                 <span asp-validation-for="FirstName" class="text-danger small"></span>
                             </div>
 
@@ -55,7 +55,7 @@
                                 <label asp-for="LastName" class="form-label fw-semibold">
                                     Last Name <span class="text-danger">*</span>
                                 </label>
-                                <input asp-for="LastName" class="form-control form-control-lg" placeholder="Doe" />
+                                <input asp-for="LastName" class="form-control form-control-lg" />
                                 <span asp-validation-for="LastName" class="text-danger small"></span>
                             </div>
 
@@ -63,7 +63,7 @@
                                 <label asp-for="Email" class="form-label fw-semibold">
                                     Email Address <span class="text-danger">*</span>
                                 </label>
-                                <input asp-for="Email" type="email" class="form-control form-control-lg" placeholder="john@example.com" />
+                                <input asp-for="Email" type="email" class="form-control form-control-lg" />
                                 <span asp-validation-for="Email" class="text-danger small"></span>
                             </div>
 
@@ -71,7 +71,7 @@
                                 <label asp-for="Password" class="form-label fw-semibold">
                                     Password <span class="text-danger">*</span>
                                 </label>
-                                <input asp-for="Password" type="password" class="form-control form-control-lg" placeholder="••••••••" />
+                                <input asp-for="Password" type="password" class="form-control form-control-lg" />
                                 <div class="form-text">Minimum 8 characters, including uppercase, lowercase, and number</div>
                                 <span asp-validation-for="Password" class="text-danger small"></span>
                             </div>
@@ -80,7 +80,7 @@
                                 <label asp-for="ConfirmPassword" class="form-label fw-semibold">
                                     Confirm Password <span class="text-danger">*</span>
                                 </label>
-                                <input asp-for="ConfirmPassword" type="password" class="form-control form-control-lg" placeholder="••••••••" />
+                                <input asp-for="ConfirmPassword" type="password" class="form-control form-control-lg" />
                                 <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
                             </div>
 
@@ -96,7 +96,7 @@
                             </div>
 
                             <div class="d-grid gap-2 d-md-flex">
-                                <a href="/signup/SelectPlan" class="btn btn-outline-secondary btn-lg flex-fill">
+                                <a href="/signup/selectplan" class="btn btn-outline-secondary btn-lg flex-fill">
                                     <i class="bi bi-arrow-left me-1"></i> Back
                                 </a>
                                 <button type="submit" class="btn btn-primary btn-lg flex-fill">

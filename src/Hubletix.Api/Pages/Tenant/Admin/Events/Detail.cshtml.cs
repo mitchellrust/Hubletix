@@ -335,7 +335,7 @@ public class EventDetailModel : TenantAdminPageModel
 
         if (eventToDelete == null)
         {
-            return RedirectToPage("/Admin/Events", new { message = "Event had already been deleted." });
+            return RedirectToPage("/Tenant/Admin/Events/Index", new { message = "Event had already been deleted." });
         }
 
         // Check for active registrations (Registered or Waitlist status)
@@ -391,7 +391,7 @@ public class EventDetailModel : TenantAdminPageModel
         {
             DbContext.Events.Remove(eventToDelete);
             await DbContext.SaveChangesAsync();
-            return RedirectToPage("/Admin/Events", new { message = "Event deleted successfully." });
+            return RedirectToPage("/Tenant/Admin/Events/Index", new { message = "Event deleted successfully." });
         }
         catch (Exception ex)
         {
