@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication;
 using Hubletix.Infrastructure.Services;
 using Hubletix.Api.Models;
 using Finbuckle.MultiTenant.Abstractions;
@@ -10,15 +12,18 @@ namespace Hubletix.Api.Pages.Platform.Signup;
 public class CreateAccountModel : PlatformPageModel
 {
     private readonly ITenantOnboardingService _onboardingService;
+    private readonly IClaimsPrincipalFactory _authService;
     private readonly ILogger<CreateAccountModel> _logger;
 
     public CreateAccountModel(
         ITenantOnboardingService onboardingService,
+        IClaimsPrincipalFactory authService,
         ILogger<CreateAccountModel> logger,
         IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor)
         : base(multiTenantContextAccessor)
     {
         _onboardingService = onboardingService;
+        _authService = authService;
         _logger = logger;
     }
 
@@ -113,6 +118,31 @@ public class CreateAccountModel : PlatformPageModel
 
             _logger.LogInformation(
                 "Created admin user: SessionId={SessionId}, UserId={UserId}",
+                SessionId,
+                platformUser.Id
+            );
+
+            // Create claims principal and sign in
+            var principal = await _authService.CreateClaimsPrincipalAsync(
+                identityUser,
+                platformUser.Id,
+                tenantId: null  // Platform-level auth during signup, no tenant context yet
+            );
+
+            var authProperties = new AuthenticationProperties
+            {
+                IsPersistent = false,
+                ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(60) // Longer session for signup flow
+            };
+
+            await HttpContext.SignInAsync(
+                IdentityConstants.ApplicationScheme,
+                principal,
+                authProperties
+            );
+            
+            _logger.LogInformation(
+                "Signed in admin user: SessionId={SessionId}, UserId={UserId}",
                 SessionId,
                 platformUser.Id
             );

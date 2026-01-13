@@ -31,7 +31,7 @@
                                         <div class="col-6 text-muted">Organization:</div>
                                         <div class="col-6 fw-semibold">@Model.OrganizationName</div>
                                         <div class="col-6 text-muted">Your URL:</div>
-                                        <div class="col-6 fw-semibold text-primary">@Model.TenantUrl</div>
+                                        <div class="col-6 fw-semibold text-primary">@Model.TenantBaseUrl</div>
                                         <div class="col-6 text-muted">Plan:</div>
                                         <div class="col-6 fw-semibold">@Model.PlanName</div>
                                     </div>
@@ -49,7 +49,7 @@
                             </div>
 
                             <div class="d-grid gap-2">
-                                <a asp-page="/Tenant/Admin/Dashboard" class="btn btn-primary btn-lg">
+                                <a href="@(Model.TenantBaseUrl)/admin/dashboard" class="btn btn-primary btn-lg">
                                     <i class="bi bi-speedometer2 me-2"></i>Go to Admin Dashboard
                                 </a>
                             </div>

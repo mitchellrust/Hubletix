@@ -30,7 +30,7 @@ public class SuccessModel : PlatformPageModel
 
     public bool IsActivated { get; set; }
     public string OrganizationName { get; set; } = string.Empty;
-    public string TenantUrl { get; set; } = string.Empty;
+    public string TenantBaseUrl { get; set; } = string.Empty;
     public string PlanName { get; set; } = string.Empty;
 
     public async Task<IActionResult> OnGetAsync()
@@ -56,7 +56,7 @@ public class SuccessModel : PlatformPageModel
             {
                 OrganizationName = session.Tenant.Name;
 
-                TenantUrl = $"http://{session.Tenant.Subdomain}.{_configuration["AppSettings:RootDomain"] ?? "hubletix.com"}";
+                TenantBaseUrl = $"http://{session.Tenant.Subdomain}.{_configuration["AppSettings:RootDomain"] ?? "hubletix.com"}";
                 PlanName = session.PlatformPlan.Name;
             }
 
