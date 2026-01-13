@@ -343,6 +343,19 @@ public class TenantOnboardingService : ITenantOnboardingService
             throw new InvalidOperationException("Tenant and platform plan price must be set.");
         }
 
+        // If there's an existing checkout session, return its URL
+        if (!string.IsNullOrEmpty(session.StripeCheckoutSessionId))
+        {
+            var existingStripeSession = await _stripePlatformService.GetCheckoutSessionAsync(
+                session.StripeCheckoutSessionId,
+                cancellationToken
+            );
+            if (existingStripeSession != null)
+            {
+                return existingStripeSession.Url;
+            }
+        }
+
         // Create Stripe checkout session
         var checkoutSession = await _stripePlatformService.CreateCheckoutSessionAsync(
             session.PlatformPlan.StripePriceId,
@@ -501,6 +514,11 @@ public class TenantOnboardingService : ITenantOnboardingService
         string sessionId,
         CancellationToken cancellationToken = default)
     {
+        if (string.IsNullOrEmpty(sessionId))
+        {
+            return null;
+        }
+        
         return await _dbContext.SignupSessions
             .Include(s => s.PlatformPlan)
             .Include(s => s.User)

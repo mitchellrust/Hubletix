@@ -1,18 +1,22 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Hubletix.Infrastructure.Services;
+using Hubletix.Api.Models;
+using Finbuckle.MultiTenant.Abstractions;
+using Hubletix.Infrastructure.Persistence;
 
 namespace Hubletix.Api.Pages.Platform.Signup;
 
-public class CreateAccountModel : PageModel
+public class CreateAccountModel : PlatformPageModel
 {
     private readonly ITenantOnboardingService _onboardingService;
     private readonly ILogger<CreateAccountModel> _logger;
 
     public CreateAccountModel(
         ITenantOnboardingService onboardingService,
-        ILogger<CreateAccountModel> logger)
+        ILogger<CreateAccountModel> logger,
+        IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor)
+        : base(multiTenantContextAccessor)
     {
         _onboardingService = onboardingService;
         _logger = logger;
@@ -24,7 +28,7 @@ public class CreateAccountModel : PageModel
     [BindProperty]
     [Required(ErrorMessage = "First name is required")]
     [StringLength(50, ErrorMessage = "First name cannot exceed 50 characters")]
-    public string FirstName { get; set; } = string.Empty;
+    public string FormFirstName { get; set; } = string.Empty;
 
     [BindProperty]
     [Required(ErrorMessage = "Last name is required")]
@@ -34,7 +38,7 @@ public class CreateAccountModel : PageModel
     [BindProperty]
     [Required(ErrorMessage = "Email is required")]
     [EmailAddress(ErrorMessage = "Invalid email address")]
-    public string Email { get; set; } = string.Empty;
+    public string FormEmail { get; set; } = string.Empty;
 
     [BindProperty]
     [Required(ErrorMessage = "Password is required")]
@@ -101,8 +105,8 @@ public class CreateAccountModel : PageModel
             // Create admin user
             var (identityUser, platformUser) = await _onboardingService.CreateAdminUserAsync(
                 SessionId,
-                Email,
-                FirstName,
+                FormEmail,
+                FormFirstName,
                 LastName,
                 Password
             );

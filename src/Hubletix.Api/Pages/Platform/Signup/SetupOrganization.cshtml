@@ -24,6 +24,16 @@
                         <h1 class="card-title h2 fw-bold mb-2">Setup Your Organization</h1>
                         <p class="text-muted mb-4">Tell us about your organization.</p>
 
+                        @if (Model.Resumed == "true")
+                        {
+                            <div class="alert alert-info d-flex align-items-start mb-4" role="alert">
+                                <i class="bi bi-info-circle-fill me-2 mt-1"></i>
+                                <div>
+                                    Welcome back, @Model.FirstName! Continue setting up your organization below.
+                                </div>
+                            </div>
+                        }
+
                         @if (!ModelState.IsValid)
                         {
                             <div class="alert alert-danger d-flex align-items-start" role="alert">
@@ -57,7 +67,7 @@
                                 </label>
                                 <div class="input-group input-group-lg">
                                     <input asp-for="Subdomain" class="form-control" />
-                                    <span class="input-group-text">.clubmanager.com</span>
+                                    <span class="input-group-text">@($".{Model.RootDomain}")</span>
                                 </div>
                                 <div class="form-text">This will be your unique URL (only lowercase letters, numbers, and hyphens)</div>
                                 <span asp-validation-for="Subdomain" class="text-danger small"></span>

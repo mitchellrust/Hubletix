@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Hubletix.Infrastructure.Services;
 using Hubletix.Infrastructure.Persistence;
 using Hubletix.Core.Constants;
+using Hubletix.Api.Models;
+using Finbuckle.MultiTenant.Abstractions;
 
 namespace Hubletix.Api.Pages.Platform.Signup;
 
@@ -11,7 +12,7 @@ namespace Hubletix.Api.Pages.Platform.Signup;
 /// TODO: This page and all the platform signup pages need some review and probably rewrite, didn't check copilot here.
 /// </summary>
 
-public class SelectPlanModel : PageModel
+public class SelectPlanModel : PlatformPageModel
 {
     private readonly ITenantOnboardingService _onboardingService;
     private readonly ILogger<SelectPlanModel> _logger;
@@ -20,7 +21,9 @@ public class SelectPlanModel : PageModel
     public SelectPlanModel(
         ITenantOnboardingService onboardingService,
         ILogger<SelectPlanModel> logger,
-        AppDbContext dbContext)
+        AppDbContext dbContext,
+        IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor)
+        : base(multiTenantContextAccessor)
     {
         _onboardingService = onboardingService;
         _logger = logger;
@@ -52,9 +55,7 @@ public class SelectPlanModel : PageModel
         }
         else
         {
-            // Fallback to hardcoded plans if database is empty
-            _logger.LogWarning("No platform plans found in database, using fallback plans");
-            Plans = GetFallbackPlans();
+            _logger.LogWarning("No platform plans found in database");
         }
     }
 
@@ -73,40 +74,6 @@ public class SelectPlanModel : PageModel
         }
         
         return 0;
-    }
-
-    private List<PlanViewModel> GetFallbackPlans()
-    {
-        return new List<PlanViewModel>
-        {
-            new PlanViewModel
-            {
-                Id = "starter",
-                Name = "Starter",
-                Description = "Perfect for small gyms and studios getting started",
-                MonthlyPrice = 29,
-                AnnualPrice = 290,
-                IsPopular = false
-            },
-            new PlanViewModel
-            {
-                Id = "professional",
-                Name = "Professional",
-                Description = "For growing businesses with advanced needs",
-                MonthlyPrice = 79,
-                AnnualPrice = 790,
-                IsPopular = true
-            },
-            new PlanViewModel
-            {
-                Id = "enterprise",
-                Name = "Enterprise",
-                Description = "For large organizations with custom requirements",
-                MonthlyPrice = 199,
-                AnnualPrice = 1990,
-                IsPopular = false
-            }
-        };
     }
 
     public async Task<IActionResult> OnPostAsync(string planId)

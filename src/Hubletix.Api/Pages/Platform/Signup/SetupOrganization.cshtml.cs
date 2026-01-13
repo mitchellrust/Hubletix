@@ -1,34 +1,45 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Hubletix.Infrastructure.Services;
+using Finbuckle.MultiTenant.Abstractions;
+using Hubletix.Infrastructure.Persistence;
+using Hubletix.Api.Models;
 
 namespace Hubletix.Api.Pages.Platform.Signup;
 
-public class SetupOrganizationModel : PageModel
+public class SetupOrganizationModel : PlatformPageModel
 {
     private readonly ITenantOnboardingService _onboardingService;
     private readonly ILogger<SetupOrganizationModel> _logger;
+    private readonly IConfiguration _configuration;
 
     public SetupOrganizationModel(
         ITenantOnboardingService onboardingService,
-        ILogger<SetupOrganizationModel> logger)
+        ILogger<SetupOrganizationModel> logger,
+        IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
+        IConfiguration configuration)
+        : base(multiTenantContextAccessor)
     {
         _onboardingService = onboardingService;
         _logger = logger;
+        _configuration = configuration;
     }
 
     [BindProperty(SupportsGet = true)]
     public string SessionId { get; set; } = string.Empty;
+
+    [BindProperty(SupportsGet = true)]
+    public string? Resumed { get; set; }
 
     [BindProperty]
     [Required(ErrorMessage = "Organization name is required")]
     [StringLength(100, ErrorMessage = "Organization name cannot exceed 100 characters")]
     public string OrganizationName { get; set; } = string.Empty;
 
+    // TODO: Filter out reserved, banned, and existing subdomains
     [BindProperty]
     [Required(ErrorMessage = "Subdomain is required")]
-    [StringLength(50, ErrorMessage = "Subdomain cannot exceed 50 characters")]
+    [StringLength(50, MinimumLength = 3, ErrorMessage = "Subdomain must be between 3 and 50 characters")]
     [RegularExpression(@"^[a-z0-9-]+$", ErrorMessage = "Subdomain can only contain lowercase letters, numbers, and hyphens")]
     public string Subdomain { get; set; } = string.Empty;
 
@@ -56,8 +67,12 @@ public class SetupOrganizationModel : PageModel
     [StringLength(100, ErrorMessage = "Country cannot exceed 100 characters")]
     public string? Country { get; set; }
 
+    public string RootDomain { get; set; } = string.Empty;
+
     public async Task<IActionResult> OnGetAsync()
     {
+        RootDomain = _configuration["AppSettings:RootDomain"] ?? "hubletix.com";
+
         if (string.IsNullOrEmpty(SessionId))
         {
             return RedirectToPage("/Platform/Signup/SelectPlan");
@@ -80,11 +95,19 @@ public class SetupOrganizationModel : PageModel
             }
 
             // Verify user is authenticated
-            if (!User.Identity?.IsAuthenticated ?? true)
+            if (!IsAuthenticated)
             {
                 _logger.LogWarning("User not authenticated for session: {SessionId}", SessionId);
-                var returnUrl = $"/signup/setuporganization?sessionId={SessionId}";
+                // Add resumed=true to return URL to indicate returning user, for better UX after login
+                var returnUrl = $"/signup/setuporganization?sessionId={SessionId}&resumed=true";
                 return RedirectToPage("/Platform/Login", new { returnUrl });
+            }
+
+            // Verify Organization setup not already completed
+            if (!string.IsNullOrEmpty(session.TenantId))
+            {
+                _logger.LogInformation("Organization setup already completed: {SessionId}", SessionId);
+                return await InitializeBillingAsync();
             }
 
             return Page();
@@ -118,21 +141,7 @@ public class SetupOrganizationModel : PageModel
                 tenant.Id
             );
 
-            // Initialize billing (creates Stripe checkout session)
-            var checkoutUrl = await _onboardingService.InitializeBillingAsync(
-                SessionId,
-                $"http://{Request.Host}/Platform/Signup/Success?sessionId={SessionId}",
-                $"http://{Request.Host}/Platform/Signup/CreateAccount?sessionId={SessionId}"
-            );
-
-            _logger.LogInformation(
-                "Billing initialized: SessionId={SessionId}, CheckoutUrl={CheckoutUrl}",
-                SessionId,
-                checkoutUrl
-            );
-
-            // Redirect to Stripe checkout
-            return Redirect(checkoutUrl);
+            return await InitializeBillingAsync();
         }
         catch (InvalidOperationException ex)
         {
@@ -146,5 +155,25 @@ public class SetupOrganizationModel : PageModel
             ModelState.AddModelError("", "An error occurred. Please try again.");
             return Page();
         }
+    }
+
+    private async Task<IActionResult> InitializeBillingAsync()
+    {
+        // Initialize billing (creates Stripe checkout session)
+        // If checkout session already exists, returns existing session URL
+        var checkoutUrl = await _onboardingService.InitializeBillingAsync(
+            SessionId,
+            $"http://{Request.Host}/signup/success?sessionId={SessionId}",
+            $"http://{Request.Host}/signup/createaccount?sessionId={SessionId}"
+        );
+
+        _logger.LogInformation(
+            "Billing initialized: SessionId={SessionId}, CheckoutUrl={CheckoutUrl}",
+            SessionId,
+            checkoutUrl
+        );
+
+        // Redirect to Stripe checkout
+        return Redirect(checkoutUrl);
     }
 }

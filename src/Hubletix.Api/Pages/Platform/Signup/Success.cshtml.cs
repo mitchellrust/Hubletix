@@ -1,21 +1,28 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Hubletix.Infrastructure.Services;
 using Hubletix.Core.Constants;
+using Hubletix.Api.Models;
+using Finbuckle.MultiTenant.Abstractions;
+using Hubletix.Infrastructure.Persistence;
 
 namespace Hubletix.Api.Pages.Platform.Signup;
 
-public class SuccessModel : PageModel
+public class SuccessModel : PlatformPageModel
 {
     private readonly ITenantOnboardingService _onboardingService;
     private readonly ILogger<SuccessModel> _logger;
+    private readonly IConfiguration _configuration;
 
     public SuccessModel(
         ITenantOnboardingService onboardingService,
-        ILogger<SuccessModel> logger)
+        ILogger<SuccessModel> logger,
+        IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
+        IConfiguration configuration)
+        : base(multiTenantContextAccessor)
     {
         _onboardingService = onboardingService;
         _logger = logger;
+        _configuration = configuration;
     }
 
     [BindProperty(SupportsGet = true)]
@@ -48,8 +55,9 @@ public class SuccessModel : PageModel
             if (IsActivated && session.Tenant != null)
             {
                 OrganizationName = session.Tenant.Name;
-                TenantUrl = $"http://{session.Tenant.Subdomain}.hubletix.home";
-                PlanName = session.PlatformPlanId.ToUpper(); // TODO: Get from database
+
+                TenantUrl = $"http://{session.Tenant.Subdomain}.{_configuration["AppSettings:RootDomain"] ?? "hubletix.com"}";
+                PlanName = session.PlatformPlan.Name;
             }
 
             return Page();

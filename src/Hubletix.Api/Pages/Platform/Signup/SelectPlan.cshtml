@@ -13,45 +13,61 @@
         </div>
 
         <!-- Plans Grid -->
-        <div class="row g-4 mb-5">
-            @foreach (var plan in Model.Plans)
-            {
-                <div class="col-12 col-lg-4">
-                    <div class="card h-100 shadow-lg border-0 @(plan.IsPopular ? "border border-primary border-3" : "")">
-                        @if (plan.IsPopular)
-                        {
-                            <div class="position-absolute top-0 end-0">
-                                <span class="badge bg-primary rounded-start rounded-0 px-3 py-2">Most Popular</span>
-                            </div>
-                        }
-                        
-                        <div class="card-body p-4 d-flex flex-column">
-                            <h3 class="card-title h2 fw-bold mb-2">@plan.Name</h3>
-                            <p class="text-muted mb-4">@plan.Description</p>
+        @if (Model.Plans != null && Model.Plans.Any())
+        {
+            <div class="row g-4 mb-5">
+                @foreach (var plan in Model.Plans)
+                {
+                    <div class="col-12 col-lg-4">
+                        <div class="card h-100 shadow-lg border-0 @(plan.IsPopular ? "border border-primary border-3" : "")">
+                            @if (plan.IsPopular)
+                            {
+                                <div class="position-absolute top-0 end-0">
+                                    <span class="badge bg-primary rounded-start rounded-0 px-3 py-2">Most Popular</span>
+                                </div>
+                            }
                             
-                            <div class="mb-4">
-                                <span class="display-4 fw-bold">$@plan.MonthlyPrice</span>
-                                <span class="text-muted">/month</span>
-                                @if (plan.AnnualPrice > 0)
-                                {
-                                    <p class="text-success small mt-2">
-                                        <i class="bi bi-tag-fill"></i> Save $@((plan.MonthlyPrice * 12) - plan.AnnualPrice) with annual billing
-                                    </p>
-                                }
-                            </div>
+                            <div class="card-body p-4 d-flex flex-column">
+                                <h3 class="card-title h2 fw-bold mb-2">@plan.Name</h3>
+                                <p class="text-muted mb-4">@plan.Description</p>
+                                
+                                <div class="mb-4">
+                                    <span class="display-4 fw-bold">$@plan.MonthlyPrice</span>
+                                    <span class="text-muted">/month</span>
+                                    @if (plan.AnnualPrice > 0)
+                                    {
+                                        <p class="text-success small mt-2">
+                                            <i class="bi bi-tag-fill"></i> Save $@((plan.MonthlyPrice * 12) - plan.AnnualPrice) with annual billing
+                                        </p>
+                                    }
+                                </div>
 
-                            <form method="post">
-                                <input type="hidden" name="planId" value="@plan.Id" />
-                                <button type="submit" 
-                                        class="btn @(plan.IsPopular ? "btn-primary" : "btn-outline-secondary") btn-lg w-100">
-                                    Get Started
-                                </button>
-                            </form>
+                                <form method="post">
+                                    <input type="hidden" name="planId" value="@plan.Id" />
+                                    <button type="submit" 
+                                            class="btn @(plan.IsPopular ? "btn-primary" : "btn-outline-secondary") btn-lg w-100">
+                                        Get Started
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="row mb-5">
+                <div class="col-12 col-lg-8 mx-auto">
+                    <div class="card shadow-lg border-0">
+                        <div class="card-body p-5 text-center">
+                            <h2 class="h3 fw-bold mb-3">No plans available</h2>
+                            <p class="text-muted mb-0">There are currently no subscription plans to choose from. Please check back later.</p>
                         </div>
                     </div>
                 </div>
-            }
-        </div>
+            </div>
+        }
 
         <!-- FAQ Section -->
         <div class="row justify-content-center">
