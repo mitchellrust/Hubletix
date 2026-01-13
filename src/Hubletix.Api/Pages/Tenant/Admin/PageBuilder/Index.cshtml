@@ -114,11 +114,32 @@
     </div>
 </div>
 
+<!-- Unsaved Changes Warning Modal -->
+<div class="modal fade" id="unsavedChangesModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Unsaved Changes</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0">You have unsaved changes that will be lost if you leave this page.</p>
+                <p class="mb-0 mt-2"><strong>Are you sure you want to leave?</strong></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Stay on Page</button>
+                <button type="button" class="btn btn-danger" id="confirm-leave-btn">Leave Page</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
         let componentIndex = @(Model.ComponentDtos?.Count ?? 0);
         let isDirty = false;
         let deleteTargetIndex = null;
+        let pendingNavigationUrl = null;
         const maxComponents = @Model.MaxComponents;
         const maxCards = @Model.MaxCardsPerComponent;
 
@@ -488,6 +509,13 @@
         document.getElementById('homepage-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            const saveBtn = document.getElementById('save-btn');
+            const originalContent = saveBtn.innerHTML;
+            
+            // Show saving indicator
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+            
             const formData = new FormData(e.target);
             
             try {
@@ -501,10 +529,55 @@
                     window.location.reload();
                 } else {
                     alert('Failed to save homepage. Please check your inputs and try again.');
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = originalContent;
                 }
             } catch (error) {
                 console.error('Save error:', error);
                 alert('An error occurred while saving. Please try again.');
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = originalContent;
+            }
+        });
+
+        // Global navigation interceptor
+        document.addEventListener('click', (e) => {
+            const link = e.target.closest('a');
+            
+            // If it's a link and we have unsaved changes
+            if (link && link.href && isDirty) {
+                // Don't intercept if it's a hash link or javascript: link
+                if (link.href.startsWith('#') || link.href.startsWith('javascript:')) {
+                    return;
+                }
+                
+                // Prevent default navigation
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Store the target URL
+                pendingNavigationUrl = link.href;
+                
+                // Show unsaved changes modal
+                const modal = new bootstrap.Modal(document.getElementById('unsavedChangesModal'));
+                modal.show();
+            }
+        }, true); // Use capture phase to intercept before other handlers
+
+        // Handle confirmed navigation from unsaved changes modal
+        document.getElementById('confirm-leave-btn').addEventListener('click', () => {
+            if (pendingNavigationUrl) {
+                // Mark as clean to bypass beforeunload warning
+                isDirty = false;
+                
+                // Hide modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('unsavedChangesModal'));
+                if (modal) {
+                    modal.hide();
+                }
+                
+                // Navigate to the stored URL
+                window.location.href = pendingNavigationUrl;
             }
         });
 
