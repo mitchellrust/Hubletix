@@ -23,6 +23,9 @@ public class LoginModel : PlatformPageModel
     [BindProperty]
     public bool RememberMe { get; set; }
 
+    [BindProperty(SupportsGet = true)]
+    public string? ReturnUrl { get; set; }
+
     [TempData]
     public string? PlatformLoginErrorMessage { get; set; }
 
@@ -43,9 +46,13 @@ public class LoginModel : PlatformPageModel
         // When navigating on GET, we can clear temp data since we don't have any form submission errors
         TempData.Clear();
         
-        // If already authenticated, redirect to tenant selector
+        // If already authenticated, redirect to return URL or tenant selector
         if (IsAuthenticated)
         {
+            if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
+            {
+                return Redirect(ReturnUrl);
+            }
             return RedirectToPage("/Platform/TenantSelector");
         }
 
@@ -98,6 +105,12 @@ public class LoginModel : PlatformPageModel
             );
 
             _logger.LogInformation("User {Email} logged in successfully at platform level", Email);
+
+            // Redirect to return URL if provided, otherwise to tenant selector
+            if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
+            {
+                return Redirect(ReturnUrl);
+            }
 
             // Redirect to tenant selector where user can choose their organization
             return RedirectToPage("/Platform/TenantSelector");

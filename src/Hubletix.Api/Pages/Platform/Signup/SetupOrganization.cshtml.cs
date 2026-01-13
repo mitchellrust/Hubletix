@@ -79,6 +79,14 @@ public class SetupOrganizationModel : PageModel
                 return RedirectToPage("/Platform/Signup/CreateAccount", new { sessionId = SessionId });
             }
 
+            // Verify user is authenticated
+            if (!User.Identity?.IsAuthenticated ?? true)
+            {
+                _logger.LogWarning("User not authenticated for session: {SessionId}", SessionId);
+                var returnUrl = $"/signup/setuporganization?sessionId={SessionId}";
+                return RedirectToPage("/Platform/Login", new { returnUrl });
+            }
+
             return Page();
         }
         catch (Exception ex)
@@ -88,7 +96,7 @@ public class SetupOrganizationModel : PageModel
         }
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostCreateOrganizationAsync()
     {
         if (!ModelState.IsValid)
         {

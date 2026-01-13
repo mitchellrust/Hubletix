@@ -70,6 +70,13 @@ public class CreateAccountModel : PageModel
                 return RedirectToPage("/Platform/Signup/SelectPlan");
             }
 
+            // Check if user has already been created, redirect to setup organization
+            if (!string.IsNullOrEmpty(session.UserId))
+            {
+                _logger.LogWarning("Admin user already created: {SessionId}", SessionId);
+                return RedirectToPage("/Platform/Signup/SetupOrganization", new { sessionId = SessionId });
+            }
+
             PlanName = session.PlatformPlan.Name;
 
             return Page();

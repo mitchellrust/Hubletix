@@ -85,8 +85,8 @@ public class DashboardModel : TenantAdminPageModel
         try
         {
             // Generate URLs for redirect
-            var refreshUrl = Url.PageLink("/Admin/Dashboard") ?? "/admin/dashboard";
-            var returnUrl = Url.PageLink("/Admin/Dashboard") ?? "/admin/dashboard";
+            var refreshUrl = Url.PageLink("/Tenant/Admin/Dashboard") ?? "/admin/dashboard";
+            var returnUrl = Url.PageLink("/Tenant/Admin/Dashboard") ?? "/admin/dashboard";
             
             // Use onboarding service to set up Stripe Connect
             var onboardingUrl = await _tenantOnboardingService.SetupStripeConnectAsync(
