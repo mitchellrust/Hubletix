@@ -163,3 +163,16 @@ public class CardConfig
     public string Heading { get; set; } = string.Empty;
     public string Subheading { get; set; } = string.Empty;
 }
+
+/// <summary>
+/// Unified render context for homepage components, supporting both Config and ViewModel types.
+/// Used for rendering components with theme colors in both preview and production modes.
+/// </summary>
+/// <typeparam name="T">The component type (HomePageComponentConfig or HomePageComponentViewModel from Api.Models)</typeparam>
+public class ComponentRenderContext<T>
+{
+    public T Component { get; set; } = default!;
+    public string PrimaryColor { get; set; } = string.Empty;
+    public string SecondaryColor { get; set; } = string.Empty;
+    public bool IsPreviewMode { get; set; }
+}

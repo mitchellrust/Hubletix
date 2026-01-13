@@ -21,6 +21,8 @@
         <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
     </environment>
     
+    @await RenderSectionAsync("Styles", required: false)
+    
     <script>
         // Check localStorage and set initial classes before page renders to prevent flicker
         (function() {

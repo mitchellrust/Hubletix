@@ -1,4 +1,6 @@
-@model List<Hubletix.Core.Models.HomePageComponentConfig>
+@model List<object>
+@inject Hubletix.Infrastructure.Services.IHomePageComponentRegistry ComponentRegistry
+@using Hubletix.Core.Models
 
 @if (Model == null || Model.Count == 0)
 {
@@ -12,63 +14,32 @@
 }
 else
 {
-    @foreach (var component in Model.OrderBy(c => c.Order))
+    @foreach (var contextObj in Model)
     {
-        @if (component is Hubletix.Core.Models.HeroComponentConfig hero)
+        @if (contextObj is ComponentRenderContext<HomePageComponentConfig> context)
         {
-            <div class="preview-hero-section py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-                <div class="container text-center">
-                    <h1 class="display-4 fw-bold mb-3">@(!string.IsNullOrEmpty(hero.Heading) ? hero.Heading : "Hero Heading")</h1>
-                    <p class="lead mb-4">@(!string.IsNullOrEmpty(hero.Subheading) ? hero.Subheading : "Hero subheading goes here")</p>
-                    @if (!string.IsNullOrEmpty(hero.CtaText))
-                    {
-                        <a href="@(hero.CtaUrl ?? "#")" class="btn btn-light btn-lg">@hero.CtaText</a>
-                    }
+            var component = context.Component;
+            var partialPath = ComponentRegistry.GetPartialViewPath(component.GetType());
+            
+            @if (!string.IsNullOrEmpty(partialPath))
+            {
+                <partial name="@partialPath" model="contextObj" />
+            }
+            else
+            {
+                <div class="alert alert-warning m-3">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    Unknown component type: @component.GetType().Name
                 </div>
-            </div>
+            }
         }
-        else if (component is Hubletix.Core.Models.CardsComponentConfig cards)
+        else
         {
-            <div class="preview-cards-section py-5" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
-                <div class="container">
-                    @if (!string.IsNullOrEmpty(cards.Heading) || !string.IsNullOrEmpty(cards.Subheading))
-                    {
-                        <div class="text-center mb-4">
-                            @if (!string.IsNullOrEmpty(cards.Heading))
-                            {
-                                <h2 class="fw-bold">@cards.Heading</h2>
-                            }
-                            @if (!string.IsNullOrEmpty(cards.Subheading))
-                            {
-                                <p class="lead">@cards.Subheading</p>
-                            }
-                        </div>
-                    }
-                    
-                    @if (cards.Cards != null && cards.Cards.Count > 0)
-                    {
-                        <div class="row g-4">
-                            @foreach (var card in cards.Cards)
-                            {
-                                <div class="col-md-4">
-                                    <div class="card h-100 shadow-sm">
-                                        <div class="card-body">
-                                            <h5 class="card-title text-dark">@(!string.IsNullOrEmpty(card.Heading) ? card.Heading : "Card Heading")</h5>
-                                            <p class="card-text text-muted">@(!string.IsNullOrEmpty(card.Subheading) ? card.Subheading : "Card subheading")</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="text-center text-muted py-3">
-                            <small>No cards added to this component yet</small>
-                        </div>
-                    }
-                </div>
+            <div class="alert alert-danger m-3">
+                <i class="bi bi-x-circle"></i>
+                Invalid render context type
             </div>
         }
     }
 }
+

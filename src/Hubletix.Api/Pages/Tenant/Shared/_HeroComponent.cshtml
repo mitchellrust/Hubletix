@@ -1,26 +1,110 @@
-@model Tuple<HeroComponentViewModel, string?, string?>
+@using Hubletix.Core.Models
+@using Hubletix.Api.Models
+
+@* This partial accepts ComponentRenderContext<T> where T can be HeroComponentConfig or HeroComponentViewModel *@
+
 @{
-    HeroComponentViewModel? hero = Model.Item1;
-    string? primaryColor = Model.Item2;
-    string? secondaryColor = Model.Item3;
+    // Defensive null check and type validation
+    if (Model == null)
+    {
+        <div class="alert alert-danger m-3">
+            <i class="bi bi-x-circle"></i> Error: Hero component model is null
+        </div>
+        return;
+    }
+
+    // Extract hero component and theme colors
+    object? heroComponent = null;
+    string? primaryColor = null;
+    string? secondaryColor = null;
+    bool isPreviewMode = false;
+
+    // Try to extract from ComponentRenderContext<HeroComponentConfig>
+    if (Model is ComponentRenderContext<HeroComponentConfig> configContext)
+    {
+        heroComponent = configContext.Component;
+        primaryColor = configContext.PrimaryColor;
+        secondaryColor = configContext.SecondaryColor;
+        isPreviewMode = configContext.IsPreviewMode;
+    }
+    // Try to extract from ComponentRenderContext<HomePageComponentConfig>
+    else if (Model is ComponentRenderContext<HomePageComponentConfig> baseConfigContext && 
+             baseConfigContext.Component is HeroComponentConfig heroConfig)
+    {
+        heroComponent = heroConfig;
+        primaryColor = baseConfigContext.PrimaryColor;
+        secondaryColor = baseConfigContext.SecondaryColor;
+        isPreviewMode = baseConfigContext.IsPreviewMode;
+    }
+    // Try to extract from ComponentRenderContext<HeroComponentViewModel>
+    else if (Model is ComponentRenderContext<HeroComponentViewModel> viewModelContext)
+    {
+        heroComponent = viewModelContext.Component;
+        primaryColor = viewModelContext.PrimaryColor;
+        secondaryColor = viewModelContext.SecondaryColor;
+        isPreviewMode = viewModelContext.IsPreviewMode;
+    }
+    else
+    {
+        <div class="alert alert-danger m-3">
+            <i class="bi bi-x-circle"></i> Error: Invalid model type for Hero component. Expected ComponentRenderContext.
+        </div>
+        return;
+    }
+
+    if (heroComponent == null)
+    {
+        <div class="alert alert-danger m-3">
+            <i class="bi bi-x-circle"></i> Error: Hero component data is null
+        </div>
+        return;
+    }
+
+    // Extract properties based on type
+    string heading = "";
+    string subheading = "";
+    string? ctaText = null;
+    string? ctaUrl = null;
+
+    if (heroComponent is HeroComponentConfig config)
+    {
+        heading = config.Heading ?? "";
+        subheading = config.Subheading ?? "";
+        ctaText = config.CtaText;
+        ctaUrl = config.CtaUrl;
+    }
+    else if (heroComponent is HeroComponentViewModel viewModel)
+    {
+        heading = viewModel.Heading ?? "";
+        subheading = viewModel.Subheading ?? "";
+        ctaText = viewModel.CtaText;
+        ctaUrl = viewModel.CtaUrl;
+    }
+
+    var sectionClass = isPreviewMode ? "hero-section preview-mode" : "hero-section";
 }
 
-<section class="hero-section position-relative overflow-hidden" style="min-height: 500px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); background-size: cover; background-position: center;">
+<section class="@sectionClass position-relative overflow-hidden" style="min-height: 500px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); background-size: cover; background-position: center;">
     <div class="container">
         <div class="row min-vh-50 align-items-center py-5">
             <div class="col-lg-8 col-xl-7 text-white">
-                <h1 class="display-3 fw-bold mb-4" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
-                    @hero.Heading
-                </h1>
-                <p class="lead mb-4 fs-4" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">
-                    @hero.Subheading
-                </p>
-                @{if (!string.IsNullOrEmpty(hero.CtaUrl))
+                @if (!string.IsNullOrEmpty(heading))
                 {
-                    <a href="@hero.CtaUrl" class="btn btn-lg btn-light px-5 py-3 rounded-pill shadow-lg">
-                        @hero.CtaText <i class="bi bi-arrow-right ms-2"></i>
-                    </a>
+                    <h1 class="display-3 fw-bold mb-4" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
+                        @heading
+                    </h1>
                 }
+                @if (!string.IsNullOrEmpty(subheading))
+                {
+                    <p class="lead mb-4 fs-4" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">
+                        @subheading
+                    </p>
+                }
+                @if (!string.IsNullOrEmpty(ctaUrl) && !string.IsNullOrEmpty(ctaText))
+                {
+                    <a href="@ctaUrl" class="btn btn-lg btn-light px-5 py-3 rounded-pill shadow-lg">
+                        @ctaText <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
                 }
             </div>
         </div>
