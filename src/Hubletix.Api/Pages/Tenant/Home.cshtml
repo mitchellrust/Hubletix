@@ -5,24 +5,29 @@
     Layout = "_PublicLayout";
 }
 
-<!-- Hero Section -->
-@if (Model.HomePage.ShowHero)
+@if (Model.HomePage.Components != null && Model.HomePage.Components.Count > 0)
 {
-    <partial name="_Hero" model="Model.HomePage.Hero" />
+    @foreach (HomePageComponentViewModel component in Model.HomePage.Components.OrderBy(c => c.Order))
+    {
+        @if (component is HeroComponentViewModel hero)
+        {
+            <partial name="_HeroComponent" model="new Tuple<HeroComponentViewModel, string?, string?>(hero, Model.HomePage.PrimaryColor, Model.HomePage.SecondaryColor)" />
+        }
+        else if (component is CardsComponentViewModel cards)
+        {
+            <partial name="_CardsComponent" model="new Tuple<CardsComponentViewModel, string?, string?>(cards, Model.HomePage.PrimaryColor, Model.HomePage.SecondaryColor)" />
+        }
+    }
 }
-
-<!-- About Section -->
-@if (Model.HomePage.ShowAbout)
+else
 {
-    <section id="about">
-        <partial name="_AboutSection" model="Model.HomePage.About" />
-    </section>
-}
-
-<!-- Services Section -->
-@if (Model.HomePage.ShowServices)
-{
-    <section id="services">
-        <partial name="_ServicesSection" model="Model.HomePage.Services" />
+    <!-- Default empty state -->
+    <section class="py-5">
+        <div class="container text-center">
+            <div class="py-5">
+                <h1 class="display-4 mb-3">Welcome to @Model.CurrentTenantInfo?.Name</h1>
+                <p class="lead text-muted">Your homepage is being configured. Check back soon!</p>
+            </div>
+        </div>
     </section>
 }

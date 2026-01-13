@@ -1,0 +1,47 @@
+@* This partial is not used in the current implementation as components are dynamically created via JavaScript *@
+@* Keeping for potential future use or server-side rendering *@
+@using Hubletix.Api.Pages.Tenant.Admin.Homepage
+@model Tuple<int, ComponentDto>
+
+@{
+    var index = Model.Item1;
+    var hero = Model.Item2;
+}
+
+<div class="card mb-3 component-card" data-index="@index">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-image"></i> Hero Component</span>
+        <div class="btn-group btn-group-sm">
+            <button type="button" class="btn btn-outline-secondary move-up-btn" @(index == 0 ? "disabled" : "")>
+                <i class="bi bi-arrow-up"></i>
+            </button>
+            <button type="button" class="btn btn-outline-secondary move-down-btn">
+                <i class="bi bi-arrow-down"></i>
+            </button>
+            <button type="button" class="btn btn-outline-danger delete-btn">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <input type="hidden" name="ComponentDtos[@index].Type" value="Hero" />
+        <input type="hidden" name="ComponentDtos[@index].Order" value="@index" />
+        
+        <div class="mb-3">
+            <label class="form-label">Heading</label>
+            <input type="text" class="form-control component-input" name="ComponentDtos[@index].Heading" value="@hero.Heading" placeholder="Enter hero heading" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Subheading</label>
+            <input type="text" class="form-control component-input" name="ComponentDtos[@index].Subheading" value="@hero.Subheading" placeholder="Enter hero subheading" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">CTA Button Text</label>
+            <input type="text" class="form-control component-input" name="ComponentDtos[@index].CtaText" value="@hero.CtaText" placeholder="Learn More" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">CTA Button URL</label>
+            <input type="text" class="form-control component-input" name="ComponentDtos[@index].CtaUrl" value="@hero.CtaUrl" placeholder="/about" />
+        </div>
+    </div>
+</div>

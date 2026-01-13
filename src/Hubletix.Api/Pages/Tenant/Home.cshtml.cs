@@ -27,95 +27,48 @@ public class HomeModel : TenantPageModel
         var primaryColor = TenantConfig.Theme?.PrimaryColor;
         var secondaryColor = TenantConfig.Theme?.SecondaryColor;
 
-        // Build hero section
-        if (TenantConfig.HomePage.Visibility.ShowHero)
-        {
-            HomePage.Hero = new HeroViewModel
-            {
-                Heading = TenantConfig.HomePage.Hero?.Heading,
-                Subheading = TenantConfig.HomePage.Hero?.Subheading,
-                BackgroundImageUrl = TenantConfig.HomePage.Hero?.ImageUrl,
-                CtaText = TenantConfig.HomePage.Hero?.CtaText,
-                CtaUrl =  TenantConfig.HomePage.Hero?.CtaUrl,
-                PrimaryColor = primaryColor,
-                SecondaryColor = secondaryColor
-            };
-        }
+        HomePage.PrimaryColor = primaryColor;
+        HomePage.SecondaryColor = secondaryColor;
 
-        // Build about section
-        if (TenantConfig.HomePage.Visibility.ShowAbout)
+        // Build components from config
+        if (TenantConfig.HomePage?.Components != null)
         {
-            HomePage.About = new AboutSectionViewModel
-            {
-                Heading = TenantConfig.HomePage.About?.Heading ?? string.Empty,
-                Description = TenantConfig.HomePage.About?.Description ?? string.Empty,
-                AccentColor = primaryColor,
-                Features = GetFeatureCards(TenantConfig.HomePage.About?.FeatureCards, primaryColor),
-            };
+            HomePage.Components = TenantConfig.HomePage.Components
+                .OrderBy(c => c.Order)
+                .Select(MapComponentToViewModel)
+                .Where(vm => vm != null)
+                .Cast<HomePageComponentViewModel>()
+                .ToList();
         }
-
-        // Build services section
-        if (TenantConfig.HomePage.Visibility.ShowServices)
-        {
-            HomePage.Services = new ServicesSectionViewModel
-            {
-                Heading = TenantConfig.HomePage.Services?.Heading ?? string.Empty,
-                Description = TenantConfig.HomePage.Services?.Description ?? string.Empty,
-                AccentColor = secondaryColor,
-                Services = GetServiceCards(TenantConfig.HomePage?.Services?.ServiceCards, primaryColor)
-            };
-        }
-
-        // Section visibility
-        HomePage.ShowHero = TenantConfig.HomePage?.Visibility.ShowHero ?? true;
-        HomePage.ShowAbout = TenantConfig.HomePage?.Visibility.ShowAbout ?? true;
-        HomePage.ShowServices = TenantConfig.HomePage?.Visibility.ShowServices ?? true;
 
         return Page();
     }
 
-    private List<FeatureCard> GetFeatureCards(List<FeatureCardConfig>? configs, string? primaryColor)
+    private HomePageComponentViewModel? MapComponentToViewModel(HomePageComponentConfig config)
     {
-        // If config exists, use it
-        if (configs != null && configs.Any())
+        return config switch
         {
-            return configs
-                .OrderBy(c => c.DisplayOrder)
-                .Select(c => new FeatureCard
+            HeroComponentConfig hero => new HeroComponentViewModel
+            {
+                Order = hero.Order,
+                Heading = hero.Heading,
+                Subheading = hero.Subheading,
+                CtaText = hero.CtaText,
+                CtaUrl = hero.CtaUrl
+            },
+            CardsComponentConfig cards => new CardsComponentViewModel
+            {
+                Order = cards.Order,
+                Heading = cards.Heading,
+                Subheading = cards.Subheading,
+                Cards = cards.Cards?.Select(c => new CardViewModel
                 {
-                    Title = c.Title,
-                    Description = c.Description,
-                    ImageUrl = c.ImageUrl,
-                    Icon = c.Icon,
-                })
-                .ToList();
-        }
-
-        // Otherwise, empty list
-        return [];
-    }
-
-    private List<ServiceCard> GetServiceCards(List<ServiceCardConfig>? configs, string? primaryColor)
-    {
-        // If config exists, use it
-        if (configs != null && configs.Any())
-        {
-            return configs
-                .OrderBy(c => c.DisplayOrder)
-                .Select(c => new ServiceCard
-                {
-                    Title = c.Title,
-                    Subtitle = c.Subtitle,
-                    Description = c.Description,
-                    ImageUrl = c.ImageUrl,
-                    Icon = c.Icon,
-                    LinkUrl = c.LinkUrl,
-                    LinkText = c.LinkText
-                })
-                .ToList();
-        }
-
-        // Otherwise use empty list
-        return [];
+                    Heading = c.Heading,
+                    Subheading = c.Subheading
+                }).ToList() ?? new()
+            },
+            _ => null
+        };
     }
 }
+

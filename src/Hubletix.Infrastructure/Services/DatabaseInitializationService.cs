@@ -1034,84 +1034,64 @@ public class DatabaseInitializationService
             },
             HomePage = new HomePageConfig
             {
-                Hero = new HeroConfig
+                Components = new List<HomePageComponentConfig>
                 {
-                    Heading = "Welcome to the Demo VB Club",
-                    Subheading = "Join us for fun and competitive volleyball events!",
-                    ImageUrl = "https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=800&q=80",
-                    CtaText = "View Events",
-                    CtaUrl = "/events"
-                },
-                About = new AboutConfig
-                {
-                    Heading = "About Demo VB Club",
-                    Description = "Demo VB Club is dedicated to promoting volleyball in a fun and inclusive environment. Whether you're a beginner or a seasoned player, we have something for everyone.",
-                    FeatureCards = new List<FeatureCardConfig>
+                    new HeroComponentConfig
                     {
-                        new FeatureCardConfig
+                        Order = 0,
+                        Heading = "Welcome to the Demo VB Club",
+                        Subheading = "Join us for fun and competitive volleyball events!",
+                        CtaText = "View Events",
+                        CtaUrl = "/events"
+                    },
+                    new CardsComponentConfig
+                    {
+                        Order = 1,
+                        Heading = "About Demo VB Club",
+                        Subheading = "Demo VB Club is dedicated to promoting volleyball in a fun and inclusive environment. Whether you're a beginner or a seasoned player, we have something for everyone.",
+                        Cards = new List<CardConfig>
                         {
-                            Title = "Competitive Play",
-                            Description = "Join our competitive leagues and tournaments to test your skills.",
-                            Icon = "balloon-fill",
-                            DisplayOrder = 0
-                        },
-                        new FeatureCardConfig
+                            new CardConfig
+                            {
+                                Heading = "Competitive Play",
+                                Subheading = "Join our competitive leagues and tournaments to test your skills."
+                            },
+                            new CardConfig
+                            {
+                                Heading = "Social Events",
+                                Subheading = "Participate in fun social events and meet fellow volleyball enthusiasts."
+                            },
+                            new CardConfig
+                            {
+                                Heading = "Training Programs",
+                                Subheading = "Improve your skills with our expert-led training sessions."
+                            }
+                        }
+                    },
+                    new CardsComponentConfig
+                    {
+                        Order = 2,
+                        Heading = "Our Services",
+                        Subheading = "Explore our full range of coaching, training, and sports experiences.",
+                        Cards = new List<CardConfig>
                         {
-                            Title = "Social Events",
-                            Description = "Participate in fun social events and meet fellow volleyball enthusiasts.",
-                            ImageUrl = "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80",
-                            Icon = "balloon-fill",
-                            DisplayOrder = 1
-                        },
-                        new FeatureCardConfig
-                        {
-                            Title = "Training Programs",
-                            Description = "Improve your skills with our expert-led training sessions.",
-                            ImageUrl = "https://images.unsplash.com/photo-1521412644187-c49fa049e84d?auto=format&fit=crop&w=800&q=80",
-                            Icon = "balloon-fill",
-                            DisplayOrder = 2
+                            new CardConfig
+                            {
+                                Heading = "Private Coaching",
+                                Subheading = "One-on-one coaching sessions tailored to your skill level."
+                            },
+                            new CardConfig
+                            {
+                                Heading = "Group Clinics",
+                                Subheading = "Join group clinics to learn and practice with others."
+                            },
+                            new CardConfig
+                            {
+                                Heading = "Fitness Training",
+                                Subheading = "Specialized fitness training to improve your game."
+                            }
                         }
                     }
-                },
-                Services = new ServicesConfig
-                {
-                    Heading = "Our Services",
-                    Description = "Explore our full range of coaching, training, and sports experiences. From first serve to match point — we've got the right program for you.",
-                    ServiceCards = new List<ServiceCardConfig>
-                    {
-                        new ServiceCardConfig
-                        {
-                            Title = "Private Coaching",
-                            Description = "One-on-one coaching sessions tailored to your skill level.",
-                            ImageUrl = "https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=800&q=80",
-                            Icon = "balloon-fill",
-                            DisplayOrder = 0
-                        },
-                        new ServiceCardConfig
-                        {
-                            Title = "Group Clinics",
-                            Subtitle = "Improve together!",
-                            Description = "Join group clinics to learn and practice with others.",
-                            ImageUrl = "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80",
-                            Icon = "balloon-fill",
-                            LinkText = "Learn More",
-                            LinkUrl = "/events",
-                            DisplayOrder = 1
-                        },
-                        new ServiceCardConfig
-                        {
-                            Title = "Fitness Training",
-                            Description = "This is a description.",
-                            Icon = "balloon-fill",
-                            DisplayOrder = 2
-                        }
-                    }
-                },
-                Visibility = new SectionVisibility
-                {
-                    ShowHero = true,
-                    ShowAbout = true,
-                    ShowServices = true
                 }
             }
         };

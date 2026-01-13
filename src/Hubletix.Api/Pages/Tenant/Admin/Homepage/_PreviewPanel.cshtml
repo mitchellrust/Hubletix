@@ -1,0 +1,74 @@
+@model List<Hubletix.Core.Models.HomePageComponentConfig>
+
+@if (Model == null || Model.Count == 0)
+{
+    <div class="d-flex align-items-center justify-content-center" style="min-height: 400px;">
+        <div class="text-center text-muted">
+            <i class="bi bi-layout-text-window-reverse" style="font-size: 3rem;"></i>
+            <p class="mt-3">Your homepage preview will appear here</p>
+            <small>Add components to see the preview</small>
+        </div>
+    </div>
+}
+else
+{
+    @foreach (var component in Model.OrderBy(c => c.Order))
+    {
+        @if (component is Hubletix.Core.Models.HeroComponentConfig hero)
+        {
+            <div class="preview-hero-section py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <div class="container text-center">
+                    <h1 class="display-4 fw-bold mb-3">@(!string.IsNullOrEmpty(hero.Heading) ? hero.Heading : "Hero Heading")</h1>
+                    <p class="lead mb-4">@(!string.IsNullOrEmpty(hero.Subheading) ? hero.Subheading : "Hero subheading goes here")</p>
+                    @if (!string.IsNullOrEmpty(hero.CtaText))
+                    {
+                        <a href="@(hero.CtaUrl ?? "#")" class="btn btn-light btn-lg">@hero.CtaText</a>
+                    }
+                </div>
+            </div>
+        }
+        else if (component is Hubletix.Core.Models.CardsComponentConfig cards)
+        {
+            <div class="preview-cards-section py-5" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+                <div class="container">
+                    @if (!string.IsNullOrEmpty(cards.Heading) || !string.IsNullOrEmpty(cards.Subheading))
+                    {
+                        <div class="text-center mb-4">
+                            @if (!string.IsNullOrEmpty(cards.Heading))
+                            {
+                                <h2 class="fw-bold">@cards.Heading</h2>
+                            }
+                            @if (!string.IsNullOrEmpty(cards.Subheading))
+                            {
+                                <p class="lead">@cards.Subheading</p>
+                            }
+                        </div>
+                    }
+                    
+                    @if (cards.Cards != null && cards.Cards.Count > 0)
+                    {
+                        <div class="row g-4">
+                            @foreach (var card in cards.Cards)
+                            {
+                                <div class="col-md-4">
+                                    <div class="card h-100 shadow-sm">
+                                        <div class="card-body">
+                                            <h5 class="card-title text-dark">@(!string.IsNullOrEmpty(card.Heading) ? card.Heading : "Card Heading")</h5>
+                                            <p class="card-text text-muted">@(!string.IsNullOrEmpty(card.Subheading) ? card.Subheading : "Card subheading")</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted py-3">
+                            <small>No cards added to this component yet</small>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    }
+}
