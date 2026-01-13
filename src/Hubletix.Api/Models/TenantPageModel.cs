@@ -67,7 +67,7 @@ public class TenantPageModel : PageModel
                 // Check if user is an active member of this tenant
                 if (tenantUser == null || tenantUser.Status != TenantUserStatus.Active)
                 {
-                    context.Result = new RedirectToPageResult("/Tenant/AccessDenied");
+                    context.Result = new RedirectToPageResult("/Platform/Unauthorized");
                     return;
                 }
             }
