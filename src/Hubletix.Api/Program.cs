@@ -113,49 +113,31 @@ builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Str
 builder.Services.AddScoped<IStripeConnectService, StripeConnectService>();
 builder.Services.AddScoped<IStripePlatformService, StripePlatformService>();
 
+// Configure Razor Pages
+var razorPagesBuilder = builder.Services.AddRazorPages(options =>
+{
+    options.RootDirectory = "/Pages";
+    options.Conventions.ConfigureFilter(new Microsoft.AspNetCore.Mvc.AutoValidateAntiforgeryTokenAttribute());
+    options.Conventions.Add(new StripFolderPrefixConvention());
+    // Add route for root path
+    options.Conventions.AddPageRoute("/Platform/Index", "");
+    // Add routes for pages that have custom paths that differ from file names
+    options.Conventions.AddPageRoute("/Tenant/Events/Detail", "events/{id}");
+    options.Conventions.AddPageRoute("/Tenant/Admin/Events/Detail", "admin/events/{id}");
+    options.Conventions.AddPageRoute("/Tenant/Admin/Plans/Detail", "admin/plans/{id}");
+});
+
 // Enable hot reload of razor pages in development
 if (builder.Environment.IsDevelopment())
 {
-    builder.Services
-        .AddRazorPages(options =>
-        {
-            options.RootDirectory = "/Pages";
-            options.Conventions.ConfigureFilter(new Microsoft.AspNetCore.Mvc.AutoValidateAntiforgeryTokenAttribute());
-            options.Conventions.Add(new StripFolderPrefixConvention());
-            // Add route for root path
-            options.Conventions.AddPageRoute("/Platform/Index", "");
-            // Add routes for pages that have custom paths that differ from file names
-            options.Conventions.AddPageRoute("/Tenant/Events/Detail", "events/{id}");
-            options.Conventions.AddPageRoute("/Tenant/Admin/Events/Detail", "admin/events/{id}");
-            options.Conventions.AddPageRoute("/Tenant/Admin/Plans/Detail", "admin/plans/{id}");
-        })
-        .AddRazorRuntimeCompilation()
-        .AddRazorOptions(options =>
-        {
-            options.PageViewLocationFormats.Add("/Pages/Tenant/Admin/Shared/{0}.cshtml");
-            options.PageViewLocationFormats.Add("/Pages/Tenant/Shared/{0}.cshtml");
-        });
+    razorPagesBuilder.AddRazorRuntimeCompilation();
 }
-else
+
+razorPagesBuilder.AddRazorOptions(options =>
 {
-    builder.Services.AddRazorPages(options =>
-        {
-            options.RootDirectory = "/Pages";
-            options.Conventions.ConfigureFilter(new Microsoft.AspNetCore.Mvc.AutoValidateAntiforgeryTokenAttribute());
-            options.Conventions.Add(new StripFolderPrefixConvention());
-            // Add route for root path
-            options.Conventions.AddPageRoute("/Platform/Index", "");
-            // Add routes for pages that have custom paths that differ from file names
-            options.Conventions.AddPageRoute("/Tenant/Events/Detail", "events/{id}");
-            options.Conventions.AddPageRoute("/Tenant/Admin/Events/Detail", "admin/events/{id}");
-            options.Conventions.AddPageRoute("/Tenant/Admin/Plans/Detail", "admin/plans/{id}");
-        })
-        .AddRazorOptions(options =>
-        {
-            options.PageViewLocationFormats.Add("/Pages/Tenant/Admin/Shared/{0}.cshtml");
-            options.PageViewLocationFormats.Add("/Pages/Tenant/Shared/{0}.cshtml");
-        });
-}
+    options.PageViewLocationFormats.Add("/Pages/Tenant/Admin/Shared/{0}.cshtml");
+    options.PageViewLocationFormats.Add("/Pages/Tenant/Shared/{0}.cshtml");
+});
 
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();

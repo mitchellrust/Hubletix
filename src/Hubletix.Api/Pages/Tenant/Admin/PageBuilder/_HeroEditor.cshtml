@@ -1,11 +1,9 @@
-@* This partial is not used in the current implementation as components are dynamically created via JavaScript *@
-@* Keeping for potential future use or server-side rendering *@
 @using Hubletix.Api.Pages.Tenant.Admin.Homepage
 @model Tuple<int, ComponentDto>
 
 @{
-    var index = Model.Item1;
-    var hero = Model.Item2;
+    int index = Model.Item1;
+    ComponentDto? hero = Model.Item2;
 }
 
 <div class="card mb-3 component-card" data-index="@index">
