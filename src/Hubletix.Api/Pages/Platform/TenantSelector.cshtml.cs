@@ -20,6 +20,9 @@ public class TenantSelectorModel : PlatformPageModel
     [TempData]
     public string? TenantSelectorErrorMessage { get; set; }
 
+    [BindProperty(SupportsGet = true)]
+    public string? ReturnUrl { get; set; }
+
     public TenantSelectorModel(
         IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
         AppDbContext dbContext,

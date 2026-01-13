@@ -164,7 +164,7 @@
             let baseDomain = hostname;
             if (hostname === 'hubletix.home' || hostname === '127.0.0.1') {
                 // Development environment
-                window.location.href = `${protocol}//${identifier}.${hostname}${port}/`;
+                window.location.href = `${protocol}//${identifier}.${hostname}${port}@(Model.ReturnUrl ?? "/")`;
             } else {
                 // Production environment - extract base domain
                 // Remove any existing subdomain
@@ -172,7 +172,7 @@
                 if (parts.length > 2) {
                     baseDomain = parts.slice(-2).join('.');
                 }
-                window.location.href = `${protocol}//${identifier}.${baseDomain}${port}/`;
+                window.location.href = `${protocol}//${identifier}.${baseDomain}${port}@(Model.ReturnUrl ?? "/")`;
             }
         }
     </script>
