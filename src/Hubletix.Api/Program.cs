@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Hubletix.Infrastructure.Persistence;
 using Hubletix.Infrastructure.Services;
+using Hubletix.Infrastructure.Extensions;
 using Hubletix.Core.Models;
 using Hubletix.Api.Validators;
 using Hubletix.Api.Conventions;
@@ -105,6 +106,9 @@ builder.Services.AddScoped<DatabaseInitializationService>();
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<ICacheService, CacheService>();
 builder.Services.AddScoped<ITenantConfigService, TenantConfigService>();
+
+// Register homepage services
+builder.Services.AddHomePageServices();
 
 // Configure Stripe settings
 builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));

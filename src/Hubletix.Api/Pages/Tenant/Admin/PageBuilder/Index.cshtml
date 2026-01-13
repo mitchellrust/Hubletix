@@ -31,6 +31,10 @@
                 </div>
                 <div class="card-body">
                     <form id="homepage-form" method="post">
+                        <!-- Hidden inputs for theme colors (posted to preview handler) -->
+                        <input type="hidden" name="PrimaryColor" value="@Model.PrimaryColor" />
+                        <input type="hidden" name="SecondaryColor" value="@Model.SecondaryColor" />
+                        
                         <div id="components-container">
                             @if (Model.ComponentDtos != null && Model.ComponentDtos.Count > 0)
                             {
@@ -85,9 +89,9 @@
                 <div class="card-header bg-white">
                     <h5 class="mb-0">Live Preview</h5>
                 </div>
-                <div class="card-body p-0" style="min-height: 400px;">
+                <div class="card-body p-0">
                     <div id="preview-container">
-                        <partial name="_PreviewPanel" model="Model.Components" />
+                        <partial name="_PreviewPanel" model="Model.ComponentRenderContexts" />
                     </div>
                 </div>
             </div>
@@ -133,6 +137,51 @@
         </div>
     </div>
 </div>
+
+@section Styles {
+    <style>
+        /* Preview mode styling - scales components to fit preview panel */
+        .preview-mode {
+            transform: scale(0.9);
+            transform-origin: top center;
+        }
+        
+        .preview-mode .display-3 {
+            font-size: 2.5rem !important;
+        }
+        
+        .preview-mode .display-4 {
+            font-size: 2rem !important;
+        }
+        
+        .preview-mode .display-5 {
+            font-size: 1.75rem !important;
+        }
+        
+        .preview-mode .lead {
+            font-size: 1rem !important;
+        }
+        
+        .preview-mode section {
+            min-height: auto !important;
+        }
+        
+        .preview-mode .hero-section {
+            min-height: 350px !important;
+        }
+        
+        .preview-mode .py-5 {
+            padding-top: 2rem !important;
+            padding-bottom: 2rem !important;
+        }
+        
+        /* Ensure preview container allows expansion */
+        #preview-container {
+            overflow-y: auto;
+            max-height: 80vh;
+        }
+    </style>
+}
 
 @section Scripts {
     <script>

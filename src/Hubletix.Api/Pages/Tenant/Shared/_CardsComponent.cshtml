@@ -1,40 +1,136 @@
-@model Tuple<CardsComponentViewModel, string?, string?>
+@using Hubletix.Core.Models
+@using Hubletix.Api.Models
+
+@* This partial accepts ComponentRenderContext<T> where T can be CardsComponentConfig or CardsComponentViewModel *@
+
 @{
-    CardsComponentViewModel? cards = Model.Item1;
-    string? primaryColor = Model.Item2;
-    string? secondaryColor = Model.Item3;
+    // Defensive null check and type validation
+    if (Model == null)
+    {
+        <div class="alert alert-danger m-3">
+            <i class="bi bi-x-circle"></i> Error: Cards component model is null
+        </div>
+        return;
+    }
+
+    // Extract cards component and theme colors
+    object? cardsComponent = null;
+    string? primaryColor = null;
+    string? secondaryColor = null;
+    bool isPreviewMode = false;
+
+    // Try to extract from ComponentRenderContext<CardsComponentConfig>
+    if (Model is ComponentRenderContext<CardsComponentConfig> configContext)
+    {
+        cardsComponent = configContext.Component;
+        primaryColor = configContext.PrimaryColor;
+        secondaryColor = configContext.SecondaryColor;
+        isPreviewMode = configContext.IsPreviewMode;
+    }
+    // Try to extract from ComponentRenderContext<HomePageComponentConfig>
+    else if (Model is ComponentRenderContext<HomePageComponentConfig> baseConfigContext && 
+             baseConfigContext.Component is CardsComponentConfig cardsConfig)
+    {
+        cardsComponent = cardsConfig;
+        primaryColor = baseConfigContext.PrimaryColor;
+        secondaryColor = baseConfigContext.SecondaryColor;
+        isPreviewMode = baseConfigContext.IsPreviewMode;
+    }
+    // Try to extract from ComponentRenderContext<CardsComponentViewModel>
+    else if (Model is ComponentRenderContext<CardsComponentViewModel> viewModelContext)
+    {
+        cardsComponent = viewModelContext.Component;
+        primaryColor = viewModelContext.PrimaryColor;
+        secondaryColor = viewModelContext.SecondaryColor;
+        isPreviewMode = viewModelContext.IsPreviewMode;
+    }
+    else
+    {
+        <div class="alert alert-danger m-3">
+            <i class="bi bi-x-circle"></i> Error: Invalid model type for Cards component. Expected ComponentRenderContext.
+        </div>
+        return;
+    }
+
+    if (cardsComponent == null)
+    {
+        <div class="alert alert-danger m-3">
+            <i class="bi bi-x-circle"></i> Error: Cards component data is null
+        </div>
+        return;
+    }
+
+    // Extract properties based on type
+    string? heading = null;
+    string? subheading = null;
+    List<object> cards = new();
+
+    if (cardsComponent is CardsComponentConfig config)
+    {
+        heading = config.Heading;
+        subheading = config.Subheading;
+        cards = config.Cards?.Cast<object>().ToList() ?? new();
+    }
+    else if (cardsComponent is CardsComponentViewModel viewModel)
+    {
+        heading = viewModel.Heading;
+        subheading = viewModel.Subheading;
+        cards = viewModel.Cards?.Cast<object>().ToList() ?? new();
+    }
+
+    var sectionClass = isPreviewMode ? "cards-section preview-mode" : "cards-section";
 }
 
-<section class="cards-section py-5" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+<section class="@sectionClass py-5" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
     <div class="container">
-        @if (!string.IsNullOrEmpty(cards.Heading) || !string.IsNullOrEmpty(cards.Subheading))
+        @if (!string.IsNullOrEmpty(heading) || !string.IsNullOrEmpty(subheading))
         {
             <div class="text-center mb-5">
-                @if (!string.IsNullOrEmpty(cards.Heading))
+                @if (!string.IsNullOrEmpty(heading))
                 {
-                    <h2 class="display-5 fw-bold mb-3">@cards.Heading</h2>
+                    <h2 class="display-5 fw-bold mb-3">@heading</h2>
                 }
-                @if (!string.IsNullOrEmpty(cards.Subheading))
+                @if (!string.IsNullOrEmpty(subheading))
                 {
-                    <p class="lead">@cards.Subheading</p>
+                    <p class="lead">@subheading</p>
                 }
             </div>
         }
         
-        @if (cards.Cards != null && cards.Cards.Count > 0)
+        @if (cards != null && cards.Count > 0)
         {
             <div class="row g-4">
-                @foreach (var card in cards.Cards)
+                @foreach (var cardObj in cards)
                 {
-                    <div class="@(cards.Cards.Count == 1 ? "col-lg-6 mx-auto" : cards.Cards.Count == 2 ? "col-md-6" : "col-md-4")">
+                    string cardHeading = "";
+                    string cardSubheading = "";
+
+                    if (cardObj is CardConfig cardConfig)
+                    {
+                        cardHeading = cardConfig.Heading ?? "";
+                        cardSubheading = cardConfig.Subheading ?? "";
+                    }
+                    else if (cardObj is CardViewModel cardViewModel)
+                    {
+                        cardHeading = cardViewModel.Heading ?? "";
+                        cardSubheading = cardViewModel.Subheading ?? "";
+                    }
+
+                    <div class="@(cards.Count == 1 ? "col-lg-6 mx-auto" : cards.Count == 2 ? "col-md-6" : "col-md-4")">
                         <div class="card h-100 shadow-lg border-0" style="transition: transform 0.3s;">
                             <div class="card-body p-4">
-                                <h5 class="card-title fw-bold mb-3" style="color: @(primaryColor ?? "#333"); font-size: 1.5rem;">
-                                    @card.Heading
-                                </h5>
-                                <p class="card-text text-muted" style="font-size: 1.1rem;">
-                                    @card.Subheading
-                                </p>
+                                @if (!string.IsNullOrEmpty(cardHeading))
+                                {
+                                    <h5 class="card-title fw-bold mb-3" style="color: @(primaryColor ?? "#333"); font-size: 1.5rem;">
+                                        @cardHeading
+                                    </h5>
+                                }
+                                @if (!string.IsNullOrEmpty(cardSubheading))
+                                {
+                                    <p class="card-text text-muted" style="font-size: 1.1rem;">
+                                        @cardSubheading
+                                    </p>
+                                }
                             </div>
                         </div>
                     </div>
@@ -49,3 +145,4 @@
         transform: translateY(-5px);
     }
 </style>
+

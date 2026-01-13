@@ -1,5 +1,9 @@
 @page
 @model HomeModel
+@inject Hubletix.Infrastructure.Services.IHomePageComponentRegistry ComponentRegistry
+@using Hubletix.Core.Models
+@using Hubletix.Api.Models
+@using Hubletix.Core.Constants
 @{
     ViewData["Title"] = $"{Model.CurrentTenantInfo?.Name ?? "Home"} - Home";
     Layout = "_PublicLayout";
@@ -7,15 +11,47 @@
 
 @if (Model.HomePage.Components != null && Model.HomePage.Components.Count > 0)
 {
-    @foreach (HomePageComponentViewModel component in Model.HomePage.Components.OrderBy(c => c.Order))
+    var primaryColor = !string.IsNullOrEmpty(Model.HomePage.PrimaryColor) 
+        ? Model.HomePage.PrimaryColor 
+        : ThemeDefaults.PrimaryColor;
+    var secondaryColor = !string.IsNullOrEmpty(Model.HomePage.SecondaryColor) 
+        ? Model.HomePage.SecondaryColor 
+        : ThemeDefaults.SecondaryColor;
+    
+    foreach (HomePageComponentViewModel component in Model.HomePage.Components.OrderBy(c => c.Order))
     {
-        @if (component is HeroComponentViewModel hero)
+        var partialPath = ComponentRegistry.GetPartialViewPath(component.GetType());
+        
+        if (!string.IsNullOrEmpty(partialPath))
         {
-            <partial name="_HeroComponent" model="new Tuple<HeroComponentViewModel, string?, string?>(hero, Model.HomePage.PrimaryColor, Model.HomePage.SecondaryColor)" />
-        }
-        else if (component is CardsComponentViewModel cards)
-        {
-            <partial name="_CardsComponent" model="new Tuple<CardsComponentViewModel, string?, string?>(cards, Model.HomePage.PrimaryColor, Model.HomePage.SecondaryColor)" />
+            // Create render context for this component
+            object? renderContext = null;
+            
+            if (component is HeroComponentViewModel hero)
+            {
+                renderContext = new ComponentRenderContext<HeroComponentViewModel>
+                {
+                    Component = hero,
+                    PrimaryColor = primaryColor,
+                    SecondaryColor = secondaryColor,
+                    IsPreviewMode = false
+                };
+            }
+            else if (component is CardsComponentViewModel cards)
+            {
+                renderContext = new ComponentRenderContext<CardsComponentViewModel>
+                {
+                    Component = cards,
+                    PrimaryColor = primaryColor,
+                    SecondaryColor = secondaryColor,
+                    IsPreviewMode = false
+                };
+            }
+            
+            if (renderContext != null)
+            {
+                <partial name="@partialPath" model="renderContext" />
+            }
         }
     }
 }

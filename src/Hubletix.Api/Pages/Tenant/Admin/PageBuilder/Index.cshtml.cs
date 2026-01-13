@@ -3,6 +3,7 @@ using Finbuckle.MultiTenant.Abstractions;
 using Hubletix.Infrastructure.Persistence;
 using Hubletix.Infrastructure.Services;
 using Hubletix.Core.Models;
+using Hubletix.Core.Constants;
 using Hubletix.Api.Utils;
 
 namespace Hubletix.Api.Pages.Tenant.Admin.Homepage;
@@ -30,6 +31,11 @@ public class IndexModel : TenantAdminPageModel
     public List<ComponentDto> ComponentDtos { get; set; } = new();
     
     public List<HomePageComponentConfig> Components { get; set; } = new();
+    
+    public List<object> ComponentRenderContexts { get; set; } = new();
+    
+    public string PrimaryColor { get; set; } = ThemeDefaults.PrimaryColor;
+    public string SecondaryColor { get; set; } = ThemeDefaults.SecondaryColor;
 
     public int MaxComponents => 5;
     public int MaxCardsPerComponent => 3;
@@ -49,6 +55,26 @@ public class IndexModel : TenantAdminPageModel
         {
             TenantConfig = tenant.GetConfig();
             Components = TenantConfig.HomePage?.Components ?? new();
+            
+            // Load theme colors from tenant config with defaults
+            PrimaryColor = !string.IsNullOrEmpty(TenantConfig.Theme?.PrimaryColor) 
+                ? TenantConfig.Theme.PrimaryColor 
+                : ThemeDefaults.PrimaryColor;
+            SecondaryColor = !string.IsNullOrEmpty(TenantConfig.Theme?.SecondaryColor) 
+                ? TenantConfig.Theme.SecondaryColor 
+                : ThemeDefaults.SecondaryColor;
+            
+            // Create render contexts for initial preview
+            ComponentRenderContexts = Components.Select(component => 
+                (object)new ComponentRenderContext<HomePageComponentConfig>
+                {
+                    Component = component,
+                    PrimaryColor = PrimaryColor,
+                    SecondaryColor = SecondaryColor,
+                    IsPreviewMode = true
+                }
+            ).ToList();
+            
             // Convert to DTOs for display
             ComponentDtos = Components.Select(ToDto).ToList();
         }
@@ -56,8 +82,12 @@ public class IndexModel : TenantAdminPageModel
         return Page();
     }
 
-    public async Task<IActionResult> OnPostPreviewAsync()
+    public async Task<IActionResult> OnPostPreviewAsync([FromForm] string? PrimaryColor, [FromForm] string? SecondaryColor)
     {
+        // Use provided theme colors or defaults
+        var primaryColor = !string.IsNullOrEmpty(PrimaryColor) ? PrimaryColor : ThemeDefaults.PrimaryColor;
+        var secondaryColor = !string.IsNullOrEmpty(SecondaryColor) ? SecondaryColor : ThemeDefaults.SecondaryColor;
+        
         // Convert DTOs to components
         Components = ComponentDtos.Select(FromDto).Where(c => c != null).Cast<HomePageComponentConfig>().ToList();
         
@@ -68,8 +98,19 @@ public class IndexModel : TenantAdminPageModel
             return BadRequest(validationResult);
         }
 
+        // Wrap components in render context for preview
+        var renderContexts = Components.Select(component => 
+            (object)new ComponentRenderContext<HomePageComponentConfig>
+            {
+                Component = component,
+                PrimaryColor = primaryColor,
+                SecondaryColor = secondaryColor,
+                IsPreviewMode = true
+            }
+        ).ToList();
+
         // Return partial view for preview
-        return Partial("_PreviewPanel", Components);
+        return Partial("_PreviewPanel", renderContexts);
     }
 
     public async Task<IActionResult> OnPostAsync()
