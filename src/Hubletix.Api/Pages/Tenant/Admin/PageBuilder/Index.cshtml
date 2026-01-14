@@ -21,9 +21,23 @@
         </div>
     }
 
+    <!-- Mobile Tabs (visible only on small screens) -->
+    <ul class="nav nav-tabs d-lg-none mb-3" id="mobile-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="components-tab" data-bs-toggle="tab" data-bs-target="#components-panel" type="button" role="tab" aria-controls="components-panel" aria-selected="true">
+                <i class="bi bi-puzzle"></i> Components
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="preview-tab" data-bs-toggle="tab" data-bs-target="#preview-panel" type="button" role="tab" aria-controls="preview-panel" aria-selected="false">
+                <i class="bi bi-eye"></i> Preview
+            </button>
+        </li>
+    </ul>
+
     <div class="row">
         <!-- Editor Panel (Left) -->
-        <div class="col-lg-6">
+        <div class="col-lg-6 tab-pane fade show active d-lg-block" id="components-panel" role="tabpanel" aria-labelledby="components-tab">
             <div class="card shadow-sm">
                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Components</h5>
@@ -84,7 +98,7 @@
         </div>
 
         <!-- Preview Panel (Right) -->
-        <div class="col-lg-6" id="preview-panel-wrapper">
+        <div class="col-lg-6 tab-pane fade show d-lg-block" id="preview-panel" role="tabpanel" aria-labelledby="preview-tab">
             <div class="card shadow-sm" id="preview-card">
                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Live Preview</h5>
@@ -148,6 +162,23 @@
 
 @section Styles {
     <style>
+        /* Mobile tab handling - show active tab panel only on small screens */
+        @@media (max-width: 991.98px) {
+            .tab-pane:not(.active) {
+                display: none !important;
+            }
+            .tab-pane.active {
+                display: block !important;
+            }
+        }
+        
+        /* Desktop - always show both panels side by side, override Bootstrap tab behavior */
+        @@media (min-width: 992px) {
+            .tab-pane {
+                display: block !important;
+                opacity: 1 !important;
+            }
+        }
         /* Preview mode styling - adjusts components to fit preview panel */
         .preview-mode .display-3 {
             font-size: 2.5rem !important;
@@ -699,19 +730,23 @@
         updateComponentCount();
 
         // Fullscreen preview toggle
-        const previewWrapper = document.getElementById('preview-panel-wrapper');
+        const previewPanel = document.getElementById('preview-panel');
         const expandBtn = document.getElementById('expand-preview-btn');
         const minimizeBtn = document.getElementById('minimize-preview-btn');
         
+        if (!previewPanel || !expandBtn || !minimizeBtn) {
+            console.error('Preview elements not found');
+        }
+        
         expandBtn.addEventListener('click', () => {
-            previewWrapper.classList.add('preview-fullscreen');
+            previewPanel.classList.add('preview-fullscreen');
             expandBtn.style.display = 'none';
             minimizeBtn.style.display = 'block';
             document.body.style.overflow = 'hidden';
         });
         
         minimizeBtn.addEventListener('click', () => {
-            previewWrapper.classList.remove('preview-fullscreen');
+            previewPanel.classList.remove('preview-fullscreen');
             expandBtn.style.display = 'block';
             minimizeBtn.style.display = 'none';
             document.body.style.overflow = '';
@@ -719,7 +754,7 @@
         
         // ESC key to exit fullscreen
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && previewWrapper.classList.contains('preview-fullscreen')) {
+            if (e.key === 'Escape' && previewPanel.classList.contains('preview-fullscreen')) {
                 minimizeBtn.click();
             }
         });
