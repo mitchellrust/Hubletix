@@ -14,7 +14,26 @@
 }
 else
 {
-    @foreach (var contextObj in Model)
+    // Show minimal navbar for preview
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand d-flex align-items-center">
+                <span class="fw-bold fs-5">Organization</span>
+            </a>
+            <div id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle">
+                            <i class="bi bi-person-circle"></i>
+                            <span class="ms-1">User</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    @foreach (object contextObj in Model)
     {
         @if (contextObj is ComponentRenderContext<HomePageComponentConfig> context)
         {
@@ -41,5 +60,21 @@ else
             </div>
         }
     }
+
+    <footer class="bg-dark text-white py-5 mt-auto">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5 class="fw-bold mb-3">Organization</h5>
+                </div>
+            </div>
+            <hr class="my-4 border-secondary">
+            <div class="row">
+                <div class="col-12 text-center text-white">
+                    <small>&copy; @DateTime.Now.Year RustyLabs, LLC. All rights reserved.</small>
+                </div>
+            </div>
+        </div>
+    </footer>
 }
 
