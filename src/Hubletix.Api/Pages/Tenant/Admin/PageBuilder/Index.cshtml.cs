@@ -6,7 +6,13 @@ using Hubletix.Core.Models;
 using Hubletix.Core.Constants;
 using Hubletix.Api.Utils;
 
-namespace Hubletix.Api.Pages.Tenant.Admin.Homepage;
+namespace Hubletix.Api.Pages.Tenant.Admin.PageBuilder;
+
+public class PreviewPanelModel
+{
+    public List<object> ComponentRenderContexts { get; set; } = new();
+    public string TenantName { get; set; } = string.Empty;
+}
 
 public class ComponentDto
 {
@@ -64,8 +70,11 @@ public class IndexModel : TenantAdminPageModel
                 ? TenantConfig.Theme.SecondaryColor 
                 : ThemeDefaults.SecondaryColor;
             
+            // Pass tenant name to view for preview panel
+            ViewData["TenantName"] = CurrentTenantInfo?.Name ?? "Organization";
+            
             // Create render contexts for initial preview
-            ComponentRenderContexts = Components.Select(component => 
+            var renderContexts = Components.Select(component => 
                 (object)new ComponentRenderContext<HomePageComponentConfig>
                 {
                     Component = component,
@@ -74,6 +83,16 @@ public class IndexModel : TenantAdminPageModel
                     IsPreviewMode = true
                 }
             ).ToList();
+
+            // Create preview model for initial load
+            ComponentRenderContexts = new List<object> 
+            { 
+                new PreviewPanelModel
+                {
+                    ComponentRenderContexts = renderContexts,
+                    TenantName = CurrentTenantInfo?.Name ?? "Organization"
+                }
+            };
             
             // Convert to DTOs for display
             ComponentDtos = Components.Select(ToDto).ToList();
@@ -109,8 +128,15 @@ public class IndexModel : TenantAdminPageModel
             }
         ).ToList();
 
+        // Create preview model with tenant name
+        var previewModel = new PreviewPanelModel
+        {
+            ComponentRenderContexts = renderContexts,
+            TenantName = CurrentTenantInfo?.Name ?? "Organization"
+        };
+
         // Return partial view for preview
-        return Partial("_PreviewPanel", renderContexts);
+        return Partial("_PreviewPanel", previewModel);
     }
 
     public async Task<IActionResult> OnPostAsync()

@@ -1,5 +1,5 @@
 @page
-@model Hubletix.Api.Pages.Tenant.Admin.Homepage.IndexModel
+@model Hubletix.Api.Pages.Tenant.Admin.PageBuilder.IndexModel
 @{
     ViewData["Title"] = "Homepage Builder";
     Layout = "_AdminLayout";
@@ -140,12 +140,7 @@
 
 @section Styles {
     <style>
-        /* Preview mode styling - scales components to fit preview panel */
-        .preview-mode {
-            transform: scale(0.9);
-            transform-origin: top center;
-        }
-        
+        /* Preview mode styling - adjusts components to fit preview panel */
         .preview-mode .display-3 {
             font-size: 2.5rem !important;
         }
@@ -162,17 +157,39 @@
             font-size: 1rem !important;
         }
         
+        .preview-mode .fs-4 {
+            font-size: 1rem !important;
+        }
+        
         .preview-mode section {
             min-height: auto !important;
         }
         
         .preview-mode .hero-section {
-            min-height: 350px !important;
+            min-height: 300px !important;
         }
         
         .preview-mode .py-5 {
             padding-top: 2rem !important;
             padding-bottom: 2rem !important;
+        }
+        
+        .preview-mode .px-5 {
+            padding-left: 2rem !important;
+            padding-right: 2rem !important;
+        }
+        
+        .preview-mode .py-3 {
+            padding-top: 1.5rem !important;
+            padding-bottom: 1.5rem !important;
+        }
+        
+        .preview-mode .mb-4 {
+            margin-bottom: 1rem !important;
+        }
+        
+        .preview-mode .mb-5 {
+            margin-bottom: 1.5rem !important;
         }
         
         /* Ensure preview container allows expansion */
@@ -218,6 +235,21 @@
                         'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
                     }
                 });
+
+                // Check for authentication/authorization failures
+                if (response.status === 401 || response.status === 403) {
+                    // Session expired or unauthorized
+                    alert('Your session has expired. You will be redirected to sign in again.');
+                    window.location.href = '/login';
+                    return;
+                }
+
+                // Check for redirects (typically to login page)
+                if (response.redirected) {
+                    alert('Your session has expired. Please sign in again.');
+                    window.location.href = response.url;
+                    return;
+                }
 
                 if (response.ok) {
                     const html = await response.text();

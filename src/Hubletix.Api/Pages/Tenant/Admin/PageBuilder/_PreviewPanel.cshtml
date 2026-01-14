@@ -1,8 +1,26 @@
-@model List<object>
+@model dynamic
 @inject Hubletix.Infrastructure.Services.IHomePageComponentRegistry ComponentRegistry
 @using Hubletix.Core.Models
+@using Hubletix.Api.Pages.Tenant.Admin.PageBuilder
 
-@if (Model == null || Model.Count == 0)
+@{
+    // Handle both PreviewPanelModel (from AJAX) and List<object> (from initial load)
+    List<object>? components = null;
+    string tenantName = "Organization";
+
+    if (Model is PreviewPanelModel previewModel)
+    {
+        components = previewModel.ComponentRenderContexts;
+        tenantName = previewModel.TenantName;
+    }
+    else if (Model is List<object> list && list.Count > 0 && list[0] is PreviewPanelModel firstModel)
+    {
+        components = firstModel.ComponentRenderContexts;
+        tenantName = firstModel.TenantName;
+    }
+}
+
+@if (components == null || components.Count == 0)
 {
     <div class="d-flex align-items-center justify-content-center" style="min-height: 400px;">
         <div class="text-center text-muted">
@@ -18,7 +36,7 @@ else
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
         <div class="container-fluid px-4">
             <a class="navbar-brand d-flex align-items-center">
-                <span class="fw-bold fs-5">Organization</span>
+                <span class="fw-bold fs-5">@tenantName</span>
             </a>
             <div id="navbarNav">
                 <ul class="navbar-nav ms-auto">
@@ -33,7 +51,7 @@ else
         </div>
     </nav>
     
-    @foreach (object contextObj in Model)
+    @foreach (object contextObj in components)
     {
         @if (contextObj is ComponentRenderContext<HomePageComponentConfig> context)
         {
@@ -65,7 +83,7 @@ else
         <div class="container">
             <div class="row">
                 <div class="col-md-4 mb-4 mb-md-0">
-                    <h5 class="fw-bold mb-3">Organization</h5>
+                    <h5 class="fw-bold mb-3">@tenantName</h5>
                 </div>
             </div>
             <hr class="my-4 border-secondary">
