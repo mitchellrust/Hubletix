@@ -6,10 +6,18 @@
 }
 
 <div class="container-fluid py-4">
-    <div class="row mb-4">
-        <div class="col">
+    <div class="row mb-4 align-items-center">
+        <div class="col-12 col-lg mb-3 mb-lg-0">
             <h1 class="h3 mb-0">Homepage Builder</h1>
-            <p class="text-muted">Customize your tenant's homepage with preset components.</p>
+            <p class="text-muted mb-0">Customize your tenant's homepage with preset components.</p>
+        </div>
+        <div class="col-12 col-lg-auto text-center text-lg-end">
+            <span id="unsaved-badge" class="badge bg-warning text-dark me-2" style="display: none;">
+                <i class="bi bi-exclamation-circle"></i> Unsaved changes
+            </span>
+            <button type="button" class="btn btn-success" id="save-btn" disabled>
+                <i class="bi bi-check-circle"></i> Publish Changes
+            </button>
         </div>
     </div>
 
@@ -82,15 +90,9 @@
                                     <i class="bi bi-plus-circle"></i> Add Cards Section
                                 </button>
                             </div>
-                            <small class="text-muted d-block mt-2">
+                            <small class="text-muted d-block mt-2" id="component-count">
                                 @(Model.ComponentDtos?.Count ?? 0) / @Model.MaxComponents components used
                             </small>
-                        </div>
-
-                        <div class="mt-4">
-                            <button type="submit" class="btn btn-success w-100" id="save-btn" disabled>
-                                <i class="bi bi-check-circle"></i> Save Homepage
-                            </button>
                         </div>
                     </form>
                 </div>
@@ -155,6 +157,28 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Stay on Page</button>
                 <button type="button" class="btn btn-danger" id="confirm-leave-btn">Leave Page</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Save Confirmation Modal -->
+<div class="modal fade" id="saveConfirmModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Publish Changes</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0"><i class="bi bi-exclamation-triangle text-warning"></i> <strong>This will update the live homepage for all members.</strong></p>
+                <p class="mb-0 mt-3">Are you sure you want to publish these changes?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" id="confirm-save-btn">
+                    <i class="bi bi-check-circle"></i> Publish
+                </button>
             </div>
         </div>
     </div>
@@ -623,6 +647,12 @@
             const count = document.querySelectorAll('.component-card').length;
             const addHeroBtn = document.getElementById('add-hero-btn');
             const addCardsBtn = document.getElementById('add-cards-btn');
+            const countDisplay = document.getElementById('component-count');
+            
+            // Update the displayed count
+            if (countDisplay) {
+                countDisplay.textContent = `${count} / ${maxComponents} components used`;
+            }
             
             if (count >= maxComponents) {
                 addHeroBtn.disabled = true;
@@ -648,9 +678,16 @@
             }
         }
 
-        // Form submit handler
-        document.getElementById('homepage-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        // Save button click handler - show confirmation modal
+        document.getElementById('save-btn').addEventListener('click', () => {
+            const modal = new bootstrap.Modal(document.getElementById('saveConfirmModal'));
+            modal.show();
+        });
+
+        // Handle confirmed save from modal
+        document.getElementById('confirm-save-btn').addEventListener('click', async () => {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('saveConfirmModal'));
+            modal.hide();
             
             const saveBtn = document.getElementById('save-btn');
             const originalContent = saveBtn.innerHTML;
@@ -659,7 +696,8 @@
             saveBtn.disabled = true;
             saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
             
-            const formData = new FormData(e.target);
+            const form = document.getElementById('homepage-form');
+            const formData = new FormData(form);
             
             try {
                 const response = await fetch('', {
