@@ -84,10 +84,13 @@
         </div>
 
         <!-- Preview Panel (Right) -->
-        <div class="col-lg-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-white">
+        <div class="col-lg-6" id="preview-panel-wrapper">
+            <div class="card shadow-sm" id="preview-card">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Live Preview</h5>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="expand-preview-btn" title="Expand to fullscreen">
+                        <i class="bi bi-arrows-fullscreen"></i>
+                    </button>
                 </div>
                 <div class="card-body p-0">
                     <div id="preview-container">
@@ -98,6 +101,11 @@
         </div>
     </div>
 </div>
+
+<!-- Floating minimize button (shown in fullscreen mode) -->
+<button type="button" class="btn btn-secondary" id="minimize-preview-btn" style="display: none; position: fixed; top: 20px; right: 20px; z-index: 1060; box-shadow: 0 4px 6px rgba(0,0,0,0.3);" title="Exit fullscreen">
+    <i class="bi bi-fullscreen-exit"></i> Exit Fullscreen
+</button>
 
 <!-- Confirmation Dialog Modal -->
 <div class="modal fade" id="deleteConfirmModal" tabindex="-1">
@@ -196,6 +204,29 @@
         #preview-container {
             overflow-y: auto;
             max-height: 80vh;
+        }
+        
+        /* Fullscreen preview mode */
+        .preview-fullscreen {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 1050 !important;
+            margin: 0 !important;
+            max-width: none !important;
+        }
+        
+        .preview-fullscreen .card {
+            height: 100%;
+            border-radius: 0;
+            border: none;
+        }
+        
+        .preview-fullscreen #preview-container {
+            max-height: calc(100vh - 60px) !important;
+            height: calc(100vh - 60px);
         }
     </style>
 }
@@ -666,6 +697,32 @@
         attachEventListeners();
         reindexComponents();
         updateComponentCount();
+
+        // Fullscreen preview toggle
+        const previewWrapper = document.getElementById('preview-panel-wrapper');
+        const expandBtn = document.getElementById('expand-preview-btn');
+        const minimizeBtn = document.getElementById('minimize-preview-btn');
+        
+        expandBtn.addEventListener('click', () => {
+            previewWrapper.classList.add('preview-fullscreen');
+            expandBtn.style.display = 'none';
+            minimizeBtn.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        });
+        
+        minimizeBtn.addEventListener('click', () => {
+            previewWrapper.classList.remove('preview-fullscreen');
+            expandBtn.style.display = 'block';
+            minimizeBtn.style.display = 'none';
+            document.body.style.overflow = '';
+        });
+        
+        // ESC key to exit fullscreen
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && previewWrapper.classList.contains('preview-fullscreen')) {
+                minimizeBtn.click();
+            }
+        });
 
         // Warn on page leave if unsaved changes
         window.addEventListener('beforeunload', (e) => {
