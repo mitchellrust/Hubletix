@@ -54,7 +54,8 @@ public class HomeModel : TenantPageModel
                 Heading = hero.Heading,
                 Subheading = hero.Subheading,
                 CtaText = hero.CtaText,
-                CtaUrl = hero.CtaUrl
+                CtaUrl = hero.CtaUrl,
+                BackgroundImageUrl = hero.BackgroundImageUrl
             },
             CardsComponentConfig cards => new CardsComponentViewModel
             {

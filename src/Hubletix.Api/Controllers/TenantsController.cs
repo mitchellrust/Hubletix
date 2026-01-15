@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Finbuckle.MultiTenant.Abstractions;
 using Hubletix.Infrastructure.Persistence;
 using Hubletix.Infrastructure.Services;
+using SixLabors.ImageSharp;
 
 namespace Hubletix.Api.Controllers;
 
@@ -12,17 +13,20 @@ public class TenantsController : ControllerBase
 {
     private readonly IMultiTenantContextAccessor<ClubTenantInfo> _multiTenantContextAccessor;
     private readonly ITenantConfigService _tenantConfigService;
+    private readonly IStorageService _storageService;
     private readonly ILogger<TenantsController> _logger;
 
     public TenantsController(
         AppDbContext dbContext,
         IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
         ITenantConfigService tenantConfigService,
+        IStorageService storageService,
         ILogger<TenantsController> logger
     )
     {
         _multiTenantContextAccessor = multiTenantContextAccessor;
         _tenantConfigService = tenantConfigService;
+        _storageService = storageService;
         _logger = logger;
     }
 
@@ -79,5 +83,79 @@ public class TenantsController : ControllerBase
     public IActionResult Health()
     {
         return Ok(new { status = "healthy", timestamp = DateTime.UtcNow });
+    }
+
+    /// <summary>
+    /// Uploads a hero background image to Cloudflare R2 storage
+    /// </summary>
+    /// <param name="file">The image file to upload</param>
+    /// <returns>JSON response with the image URL or error message</returns>
+    [HttpPost("upload-hero-image")]
+    [Authorize(Policy = "TenantAdmin")]
+    [RequestSizeLimit(10 * 1024 * 1024)] // 10 MB limit
+    public async Task<IActionResult> UploadHeroImageAsync(IFormFile file)
+    {
+        try
+        {
+            // Validate tenant context
+            if (_multiTenantContextAccessor.MultiTenantContext?.TenantInfo == null)
+            {
+                return BadRequest(new { success = false, error = "No tenant context found" });
+            }
+
+            var tenantId = _multiTenantContextAccessor.MultiTenantContext.TenantInfo.Id;
+
+            // Validate file presence
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest(new { success = false, error = "No file uploaded" });
+            }
+
+            // Validate file size (10 MB max)
+            if (file.Length > 10 * 1024 * 1024)
+            {
+                return BadRequest(new { success = false, error = "File size exceeds 10 MB limit" });
+            }
+
+            // Validate content type
+            var supportedTypes = new[] { "image/jpeg", "image/png", "image/webp" };
+            if (!supportedTypes.Contains(file.ContentType.ToLowerInvariant()))
+            {
+                return BadRequest(new 
+                { 
+                    success = false, 
+                    error = "Unsupported file type. Only JPEG, PNG, and WebP are supported" 
+                });
+            }
+
+            // Upload to R2 storage
+            using var stream = file.OpenReadStream();
+            var imageUrl = await _storageService.UploadImageAsync(
+                stream, 
+                file.FileName, 
+                file.ContentType, 
+                tenantId);
+
+            _logger.LogInformation(
+                "Successfully uploaded hero image for tenant {TenantId}: {ImageUrl}", 
+                tenantId, 
+                imageUrl);
+
+            return Ok(new { success = true, imageUrl });
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(ex, "Validation error during hero image upload");
+            return BadRequest(new { success = false, error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error uploading hero image");
+            return StatusCode(500, new 
+            { 
+                success = false, 
+                error = "An error occurred while uploading the image. Please try again." 
+            });
+        }
     }
 }

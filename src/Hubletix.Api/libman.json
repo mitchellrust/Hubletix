@@ -12,6 +12,16 @@
         "dist/js/bootstrap.min.js",
         "dist/js/bootstrap.bundle.min.js"
       ]
+    },
+    {
+      "library": "cropperjs@1.6.2",
+      "destination": "wwwroot/lib/cropperjs",
+      "files": [
+        "dist/cropper.css",
+        "dist/cropper.min.css",
+        "dist/cropper.js",
+        "dist/cropper.min.js"
+      ]
     }
   ]
 }

@@ -22,6 +22,7 @@ public class ComponentDto
     public string? Subheading { get; set; }
     public string? CtaText { get; set; }
     public string? CtaUrl { get; set; }
+    public string? BackgroundImageUrl { get; set; }
     public List<CardDto>? Cards { get; set; }
 }
 
@@ -46,12 +47,16 @@ public class IndexModel : TenantAdminPageModel
     public int MaxComponents => 5;
     public int MaxCardsPerComponent => 3;
 
+    private readonly IStorageService _storageService;
+
     public IndexModel(
         IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
         ITenantConfigService tenantConfigService,
-        AppDbContext dbContext
+        AppDbContext dbContext,
+        IStorageService storageService
     ) : base(multiTenantContextAccessor, tenantConfigService, dbContext)
     {
+        _storageService = storageService;
     }
 
     public async Task<IActionResult> OnGetAsync()
@@ -157,8 +162,39 @@ public class IndexModel : TenantAdminPageModel
             return Page();
         }
 
-        // Update tenant config
+        // Track old images for deletion
+        var oldImageUrls = new List<string>();
         var tenant = await TenantConfigService.GetTenantAsync(CurrentTenantInfo.Id!);
+        if (tenant != null)
+        {
+            var currentConfig = tenant.GetConfig();
+            if (currentConfig?.HomePage?.Components != null)
+            {
+                // Get existing hero components with background images
+                var existingHeros = currentConfig.HomePage.Components
+                    .OfType<HeroComponentConfig>()
+                    .Where(h => !string.IsNullOrEmpty(h.BackgroundImageUrl))
+                    .ToList();
+
+                // Get new hero components with background images
+                var newHeros = Components
+                    .OfType<HeroComponentConfig>()
+                    .Where(h => !string.IsNullOrEmpty(h.BackgroundImageUrl))
+                    .ToList();
+
+                // Find images that are no longer being used
+                foreach (var existingHero in existingHeros)
+                {
+                    if (!string.IsNullOrEmpty(existingHero.BackgroundImageUrl) &&
+                        !newHeros.Any(h => h.BackgroundImageUrl == existingHero.BackgroundImageUrl))
+                    {
+                        oldImageUrls.Add(existingHero.BackgroundImageUrl);
+                    }
+                }
+            }
+        }
+
+        // Update tenant config
         if (tenant != null)
         {
             tenant.UpdateConfig(config =>
@@ -171,6 +207,20 @@ public class IndexModel : TenantAdminPageModel
             
             // Invalidate cache
             TenantConfigService.InvalidateCache(CurrentTenantInfo.Id!);
+
+            // Delete old images from R2 (graceful degradation - don't fail save if delete fails)
+            foreach (var imageUrl in oldImageUrls)
+            {
+                try
+                {
+                    await _storageService.DeleteImageAsync(imageUrl);
+                }
+                catch (Exception ex)
+                {
+                    // Log error but don't fail the save operation
+                    Console.WriteLine($"Failed to delete old image {imageUrl}: {ex.Message}");
+                }
+            }
         }
 
         TempData["SuccessMessage"] = "Homepage saved successfully!";
@@ -191,6 +241,7 @@ public class IndexModel : TenantAdminPageModel
             dto.Subheading = hero.Subheading;
             dto.CtaText = hero.CtaText;
             dto.CtaUrl = hero.CtaUrl;
+            dto.BackgroundImageUrl = hero.BackgroundImageUrl;
         }
         else if (component is CardsComponentConfig cards)
         {
@@ -216,7 +267,8 @@ public class IndexModel : TenantAdminPageModel
                 Heading = dto.Heading ?? string.Empty,
                 Subheading = dto.Subheading ?? string.Empty,
                 CtaText = dto.CtaText,
-                CtaUrl = dto.CtaUrl
+                CtaUrl = dto.CtaUrl,
+                BackgroundImageUrl = dto.BackgroundImageUrl
             };
         }
         else if (dto.Type == "Cards")
