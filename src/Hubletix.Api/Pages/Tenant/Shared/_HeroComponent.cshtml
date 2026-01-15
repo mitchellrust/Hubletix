@@ -65,6 +65,7 @@
     string subheading = "";
     string? ctaText = null;
     string? ctaUrl = null;
+    string? backgroundImageUrl = null;
 
     if (heroComponent is HeroComponentConfig config)
     {
@@ -72,6 +73,7 @@
         subheading = config.Subheading ?? "";
         ctaText = config.CtaText;
         ctaUrl = config.CtaUrl;
+        backgroundImageUrl = config.BackgroundImageUrl;
     }
     else if (heroComponent is HeroComponentViewModel viewModel)
     {
@@ -79,12 +81,46 @@
         subheading = viewModel.Subheading ?? "";
         ctaText = viewModel.CtaText;
         ctaUrl = viewModel.CtaUrl;
+        backgroundImageUrl = viewModel.BackgroundImageUrl;
     }
 
     var sectionClass = isPreviewMode ? "hero-section preview-mode" : "hero-section";
+    var useAnimatedGradient = false;
+    
+    // Build background style
+    string backgroundStyle;
+    if (!string.IsNullOrEmpty(backgroundImageUrl))
+    {
+        // Use image with dark overlay for text readability
+        backgroundStyle = $"background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('{backgroundImageUrl}'); background-size: cover; background-position: center;";
+    }
+    else
+    {
+        // Modern SaaS gradient fallback with multiple color stops and subtle animation
+        useAnimatedGradient = true;
+        sectionClass += " animated-gradient-bg";
+        backgroundStyle = "";
+    }
 }
 
-<section class="@sectionClass position-relative overflow-hidden" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); background-size: cover; background-position: center;">
+@if (useAnimatedGradient)
+{
+    <style>
+        .animated-gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-size: 200% 200%;
+            animation: gradient-shift 15s ease infinite;
+        }
+        
+        @@keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+}
+
+<section class="@sectionClass position-relative overflow-hidden" style="@backgroundStyle">
     <div class="container">
         <div class="row min-vh-50 align-items-center py-5">
             <div class="col-lg-8 col-xl-7 text-white">

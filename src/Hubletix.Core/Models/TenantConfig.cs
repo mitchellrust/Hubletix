@@ -139,6 +139,7 @@ public class HeroComponentConfig : HomePageComponentConfig
     public string Subheading { get; set; } = string.Empty;
     public string? CtaText { get; set; }
     public string? CtaUrl { get; set; }
+    public string? BackgroundImageUrl { get; set; }
 }
 
 /// <summary>

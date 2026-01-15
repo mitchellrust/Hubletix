@@ -185,6 +185,7 @@
 </div>
 
 @section Styles {
+    <link rel="stylesheet" href="~/lib/cropperjs/dist/cropper.min.css" />
     <style>
         /* Mobile tab handling - show active tab panel only on small screens */
         @@media (max-width: 991.98px) {
@@ -287,6 +288,7 @@
 }
 
 @section Scripts {
+    <script src="~/lib/cropperjs/dist/cropper.min.js"></script>
     <script>
         let componentIndex = @(Model.ComponentDtos?.Count ?? 0);
         let isDirty = false;
@@ -294,6 +296,10 @@
         let pendingNavigationUrl = null;
         const maxComponents = @Model.MaxComponents;
         const maxCards = @Model.MaxCardsPerComponent;
+
+        // Cropper.js instances and pending image data
+        const cropperInstances = {};
+        const pendingImages = {}; // Store { index: { blob, oldImageUrl } }
 
         // Track dirty state
         function markDirty() {
@@ -371,6 +377,19 @@
                     <div class="card-body">
                         <input type="hidden" name="ComponentDtos[${componentIndex}].Type" value="Hero" />
                         <input type="hidden" name="ComponentDtos[${componentIndex}].Order" value="${componentIndex}" />
+                        <input type="hidden" name="ComponentDtos[${componentIndex}].BackgroundImageUrl" value="" class="hero-bg-image-url" />
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Background Image <small class="text-muted">(Optional, 16:9 recommended)</small></label>
+                            <div class="d-flex gap-2 align-items-start">
+                                <div class="flex-grow-1">
+                                    <input type="file" class="form-control hero-image-input" accept="image/jpeg,image/png,image/webp" data-index="${componentIndex}" />
+                                    <small class="form-text text-muted d-block mt-1">
+                                        Max 10 MB • JPEG, PNG, or WebP • Max 4096x4096 pixels
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
                         
                         <div class="mb-3">
                             <label class="form-label">Heading</label>
@@ -387,6 +406,35 @@
                         <div class="mb-3">
                             <label class="form-label">CTA Button URL</label>
                             <input type="text" class="form-control component-input" name="ComponentDtos[${componentIndex}].CtaUrl" placeholder="/about" />
+                        </div>
+                    </div>
+                </div>
+                <!-- Image Cropper Modal -->
+                <div class="modal fade" id="imageCropperModal-${componentIndex}" tabindex="-1" aria-labelledby="imageCropperModalLabel-${componentIndex}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="imageCropperModalLabel-${componentIndex}">
+                                    <i class="bi bi-crop"></i> Crop Hero Image
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="cropper-container-wrapper">
+                                    <img id="cropperImage-${componentIndex}" class="w-100" style="max-height: 70vh;" />
+                                </div>
+                                <div class="mt-3">
+                                    <small class="text-muted">
+                                        <i class="bi bi-info-circle"></i> Drag to reposition, scroll to zoom. The image will be cropped to 16:9 aspect ratio.
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-primary crop-save-btn" data-index="${componentIndex}">
+                                    <i class="bi bi-check-lg"></i> Crop & Save
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -499,6 +547,181 @@
                 btn.removeEventListener('click', handleRemoveCard);
                 btn.addEventListener('click', handleRemoveCard);
             });
+
+            // Hero image input handlers
+            document.querySelectorAll('.hero-image-input').forEach(input => {
+                input.removeEventListener('change', handleImageSelect);
+                input.addEventListener('change', handleImageSelect);
+            });
+
+            // Remove image buttons
+            document.querySelectorAll('.remove-image-btn').forEach(btn => {
+                btn.removeEventListener('click', handleRemoveImage);
+                btn.addEventListener('click', handleRemoveImage);
+            });
+
+            // Crop & save buttons
+            document.querySelectorAll('.crop-save-btn').forEach(btn => {
+                btn.removeEventListener('click', handleCropSave);
+                btn.addEventListener('click', handleCropSave);
+            });
+        }
+
+        // Handle image file selection
+        function handleImageSelect(e) {
+            const file = e.target.files[0];
+            const index = e.target.dataset.index;
+            
+            if (!file) return;
+
+            // Validate file type
+            const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+            if (!validTypes.includes(file.type)) {
+                alert('Please select a JPEG, PNG, or WebP image file.');
+                e.target.value = '';
+                return;
+            }
+
+            // Validate file size (10 MB)
+            if (file.size > 10 * 1024 * 1024) {
+                alert('Image file size must be less than 10 MB.');
+                e.target.value = '';
+                return;
+            }
+
+            // Read file and show cropper modal
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const imageElement = document.getElementById(`cropperImage-${index}`);
+                imageElement.src = event.target.result;
+
+                // Show modal
+                const modal = new bootstrap.Modal(document.getElementById(`imageCropperModal-${index}`));
+                modal.show();
+
+                // Initialize Cropper.js when modal is shown
+                modal._element.addEventListener('shown.bs.modal', function initCropper() {
+                    // Destroy existing cropper if any
+                    if (cropperInstances[index]) {
+                        cropperInstances[index].destroy();
+                    }
+
+                    // Create new cropper with 16:9 aspect ratio
+                    cropperInstances[index] = new Cropper(imageElement, {
+                        aspectRatio: 16 / 9,
+                        viewMode: 1,
+                        dragMode: 'move',
+                        autoCropArea: 1,
+                        restore: false,
+                        guides: true,
+                        center: true,
+                        highlight: false,
+                        cropBoxMovable: true,
+                        cropBoxResizable: true,
+                        toggleDragModeOnDblclick: false,
+                    });
+
+                    // Remove this listener after initialization
+                    modal._element.removeEventListener('shown.bs.modal', initCropper);
+                });
+
+                // Clean up cropper when modal is hidden
+                modal._element.addEventListener('hidden.bs.modal', function cleanup() {
+                    if (cropperInstances[index]) {
+                        cropperInstances[index].destroy();
+                        delete cropperInstances[index];
+                    }
+                    // Clear file input if no image was saved
+                    if (!pendingImages[index]) {
+                        e.target.value = '';
+                    }
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Handle crop & save button click
+        function handleCropSave(e) {
+            const index = e.target.dataset.index;
+            const cropper = cropperInstances[index];
+            
+            if (!cropper) return;
+
+            // Get cropped canvas
+            const canvas = cropper.getCroppedCanvas({
+                maxWidth: 4096,
+                maxHeight: 4096,
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high',
+            });
+
+            // Convert to blob
+            canvas.toBlob(async function(blob) {
+                // Store the old image URL for deletion
+                const oldImageUrl = document.querySelector(`input[name="ComponentDtos[${index}].BackgroundImageUrl"]`).value;
+
+                // Create preview URL (for both thumbnail and preview panel)
+                const previewUrl = URL.createObjectURL(blob);
+
+                // Store pending image data with preview URL
+                pendingImages[index] = {
+                    blob: blob,
+                    oldImageUrl: oldImageUrl,
+                    previewUrl: previewUrl
+                };
+
+                // Update hidden input with preview URL so it shows in the preview panel
+                document.querySelector(`input[name="ComponentDtos[${index}].BackgroundImageUrl"]`).value = previewUrl;
+
+                // Remove thumbnail preview from component list panel (we only show in preview now)
+                // TODO: Do we need this? Or can we remove?
+                const card = document.querySelector(`.component-card[data-index="${index}"]`);
+                const currentPreview = card.querySelector('.current-image-preview');
+                if (currentPreview) {
+                    currentPreview.remove();
+                }
+
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById(`imageCropperModal-${index}`));
+                if (modal) modal.hide();
+
+                // Mark as dirty
+                markDirty();
+
+                // Update preview panel to show the image
+                await updatePreview();
+            }, 'image/jpeg', 0.9);
+        }
+
+        // Handle remove image button click
+        function handleRemoveImage(e) {
+            const index = e.target.dataset.index;
+            
+            // Revoke blob URL if exists
+            if (pendingImages[index]?.previewUrl) {
+                URL.revokeObjectURL(pendingImages[index].previewUrl);
+            }
+            
+            // Clear pending image
+            delete pendingImages[index];
+            
+            // Clear hidden input
+            document.querySelector(`input[name="ComponentDtos[${index}].BackgroundImageUrl"]`).value = '';
+            
+            // Clear file input
+            const fileInput = document.querySelector(`.hero-image-input[data-index="${index}"]`);
+            if (fileInput) fileInput.value = '';
+            
+            // Remove preview thumbnail
+            // TODO: Do we need this? Or can we remove?
+            const preview = e.target.closest('.current-image-preview');
+            if (preview) preview.remove();
+            
+            // Mark as dirty
+            markDirty();
+
+            // Update preview panel to remove the image
+            updatePreview();
         }
 
         async function handleInputChange() {
@@ -696,10 +919,63 @@
             saveBtn.disabled = true;
             saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
             
-            const form = document.getElementById('homepage-form');
-            const formData = new FormData(form);
-            
             try {
+                // Upload pending images first
+                if (Object.keys(pendingImages).length > 0) {
+                    saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Uploading images...';
+                    
+                    for (const [index, imageData] of Object.entries(pendingImages)) {
+                        try {
+                            // Create form data for image upload
+                            const uploadFormData = new FormData();
+                            uploadFormData.append('file', imageData.blob, 'hero-image.jpg');
+                            
+                            // Upload to R2
+                            const uploadResponse = await fetch('/tenants/upload-hero-image', {
+                                method: 'POST',
+                                body: uploadFormData,
+                                headers: {
+                                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                                }
+                            });
+                            
+                            if (!uploadResponse.ok) {
+                                const errorData = await uploadResponse.json();
+                                throw new Error(errorData.error || 'Failed to upload image');
+                            }
+                            
+                            const result = await uploadResponse.json();
+                            
+                            if (result.success) {
+                                // Update hidden input with new image URL
+                                document.querySelector(`input[name="ComponentDtos[${index}].BackgroundImageUrl"]`).value = result.imageUrl;
+                                
+                                // Queue old image for deletion (will be handled server-side)
+                                if (imageData.oldImageUrl) {
+                                    console.log('Old image will be deleted:', imageData.oldImageUrl);
+                                }
+                            } else {
+                                throw new Error(result.error || 'Upload failed');
+                            }
+                        } catch (uploadError) {
+                            console.error('Image upload error:', uploadError);
+                            alert(`Failed to upload image: ${uploadError.message}`);
+                            saveBtn.disabled = false;
+                            saveBtn.innerHTML = originalContent;
+                            return;
+                        }
+                    }
+                    
+                    // Clear pending images after successful upload
+                    Object.keys(pendingImages).forEach(key => delete pendingImages[key]);
+                }
+                
+                // Now save the form
+                saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+                
+                const form = document.getElementById('homepage-form');
+                const formData = new FormData(form);
+                
                 const response = await fetch('', {
                     method: 'POST',
                     body: formData

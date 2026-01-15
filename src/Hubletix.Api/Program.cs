@@ -117,6 +117,25 @@ builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Str
 builder.Services.AddScoped<IStripeConnectService, StripeConnectService>();
 builder.Services.AddScoped<IStripePlatformService, StripePlatformService>();
 
+// Register Cloudflare R2 Storage service
+builder.Services.AddSingleton<Amazon.S3.IAmazonS3>(sp =>
+{
+    var config = sp.GetRequiredService<IConfiguration>();
+    var credentials = new Amazon.Runtime.BasicAWSCredentials(
+        config["CloudflareR2:AccessKeyId"],
+        config["CloudflareR2:SecretAccessKey"])
+    ;
+    var r2Config = new Amazon.S3.AmazonS3Config
+    {
+        ServiceURL = $"https://{config["CloudflareR2:AccountId"]}.r2.cloudflarestorage.com",
+    };
+    return new Amazon.S3.AmazonS3Client(
+        credentials,
+        r2Config
+    );
+});
+builder.Services.AddScoped<IStorageService, CloudflareR2StorageService>();
+
 // Configure Razor Pages
 var razorPagesBuilder = builder.Services.AddRazorPages(options =>
 {
