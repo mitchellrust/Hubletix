@@ -58,7 +58,12 @@
             <div class="card shadow-sm">
                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Components</h5>
-                    <span id="unsaved-badge" class="badge bg-warning text-dark" style="display: none;">Unsaved changes</span>
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="toggle-all-btn" title="Expand all components">
+                            <i class="bi bi-arrows-expand"></i> Expand All
+                        </button>
+                        <span id="unsaved-badge" class="badge bg-warning text-dark" style="display: none;">Unsaved changes</span>
+                    </div>
                 </div>
                 <div class="card-body">
                     <form id="homepage-form" method="post">
@@ -246,6 +251,19 @@
         .preview-mode .py-5 {
             padding-top: 2rem !important;
             padding-bottom: 2rem !important;
+        }
+        
+        /* Collapsible component cards - chevron rotation */
+        .collapse-icon {
+            transition: transform 0.2s ease-in-out;
+        }
+        
+        [aria-expanded="false"] .collapse-icon {
+            transform: rotate(-90deg);
+        }
+        
+        [aria-expanded="true"] .collapse-icon {
+            transform: rotate(0deg);
         }
         
         .preview-mode .px-5 {
@@ -1048,6 +1066,32 @@
         attachEventListeners();
         reindexComponents();
         updateComponentCount();
+
+        // Toggle all components expand/collapse
+        let allExpanded = false;
+        const toggleAllBtn = document.getElementById('toggle-all-btn');
+        
+        toggleAllBtn.addEventListener('click', () => {
+            const collapseElements = document.querySelectorAll('.component-card .collapse, .card-item .collapse');
+            
+            if (allExpanded) {
+                // Collapse all
+                collapseElements.forEach(el => {
+                    const bsCollapse = bootstrap.Collapse.getInstance(el) || new bootstrap.Collapse(el, { toggle: false });
+                    bsCollapse.hide();
+                });
+                toggleAllBtn.innerHTML = '<i class="bi bi-arrows-expand"></i> Expand All';
+                allExpanded = false;
+            } else {
+                // Expand all
+                collapseElements.forEach(el => {
+                    const bsCollapse = bootstrap.Collapse.getInstance(el) || new bootstrap.Collapse(el, { toggle: false });
+                    bsCollapse.show();
+                });
+                toggleAllBtn.innerHTML = '<i class="bi bi-arrows-collapse"></i> Collapse All';
+                allExpanded = true;
+            }
+        });
 
         // Fullscreen preview toggle
         const previewPanel = document.getElementById('preview-panel');

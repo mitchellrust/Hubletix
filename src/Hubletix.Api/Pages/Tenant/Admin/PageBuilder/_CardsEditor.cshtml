@@ -8,7 +8,12 @@
 
 <div class="card mb-3 component-card" data-index="@index">
     <div class="card-header bg-light d-flex justify-content-between align-items-center">
-        <span><i class="bi bi-grid-3x3"></i> Cards Component</span>
+        <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" data-bs-toggle="collapse" data-bs-target="#cardsCollapse-@index" aria-expanded="false">
+                <i class="bi bi-chevron-down collapse-icon"></i>
+            </button>
+            <span><i class="bi bi-grid-3x3"></i> Cards Component</span>
+        </div>
         <div class="btn-group btn-group-sm">
             <button type="button" class="btn btn-outline-secondary move-up-btn" @(index == 0 ? "disabled" : "")>
                 <i class="bi bi-arrow-up"></i>
@@ -21,7 +26,8 @@
             </button>
         </div>
     </div>
-    <div class="card-body">
+    <div id="cardsCollapse-@index" class="collapse">
+        <div class="card-body">
         <input type="hidden" name="ComponentDtos[@index].Type" value="Cards" />
         <input type="hidden" name="ComponentDtos[@index].Order" value="@index" />
         
@@ -45,11 +51,17 @@
                     <div class="card card-item mb-2">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <strong>Card @(i + 1)</strong>
+                                <div class="d-flex align-items-center gap-2">
+                                    <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" data-bs-toggle="collapse" data-bs-target="#cardCollapse-@index-@i" aria-expanded="false">
+                                        <i class="bi bi-chevron-down collapse-icon"></i>
+                                    </button>
+                                    <strong>Card @(i + 1)</strong>
+                                </div>
                                 <button type="button" class="btn btn-sm btn-outline-danger remove-card-btn">
                                     <i class="bi bi-x"></i>
                                 </button>
                             </div>
+                            <div id="cardCollapse-@index-@i" class="collapse">
                             <div class="mb-2">
                                 <label class="form-label small">Heading</label>
                                 <input type="text" class="form-control form-control-sm component-input" 
@@ -64,6 +76,7 @@
                                        value="@card.Subheading"
                                        placeholder="Card subheading" />
                             </div>
+                            </div>
                         </div>
                     </div>
                 }
@@ -71,6 +84,7 @@
             <button type="button" class="btn btn-sm btn-outline-primary add-card-btn mb-2">
                 <i class="bi bi-plus"></i> Add Card
             </button>
+        </div>
         </div>
     </div>
 </div>
