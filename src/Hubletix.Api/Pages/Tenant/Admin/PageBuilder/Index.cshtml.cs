@@ -46,6 +46,12 @@ public class IndexModel : TenantAdminPageModel
 
     public int MaxComponents => 5;
     public int MaxCardsPerComponent => 3;
+    
+    public List<(string Value, string Label)> AllowedCtaUrls { get; } = new()
+    {
+        ("/events", "Events"),
+        ("/membershipplans", "Membership Plans")
+    };
 
     private readonly IStorageService _storageService;
 
@@ -302,13 +308,24 @@ public class IndexModel : TenantAdminPageModel
             return $"Maximum of {MaxComponents} components allowed.";
         }
 
+        // Get allowed CTA URL values
+        var allowedUrls = AllowedCtaUrls.Select(u => u.Value).ToHashSet();
+
         // Validate each component
         for (int i = 0; i < Components.Count; i++)
         {
             var component = Components[i];
             component.Order = i;
 
-            if (component is CardsComponentConfig cardsComponent)
+            if (component is HeroComponentConfig heroComponent)
+            {
+                // Validate CTA URL if provided
+                if (!string.IsNullOrEmpty(heroComponent.CtaUrl) && !allowedUrls.Contains(heroComponent.CtaUrl))
+                {
+                    return $"Invalid CTA URL '{heroComponent.CtaUrl}' in Hero component. Must be one of: {string.Join(", ", allowedUrls)}.";
+                }
+            }
+            else if (component is CardsComponentConfig cardsComponent)
             {
                 if (cardsComponent.Cards.Count > MaxCardsPerComponent)
                 {

@@ -4,6 +4,7 @@
 @{
     int index = Model.Item1;
     ComponentDto? hero = Model.Item2;
+    var allowedCtaUrls = ViewData["AllowedCtaUrls"] as List<(string Value, string Label)>;
 }
 
 <div class="card mb-3 component-card" data-index="@index">
@@ -58,7 +59,16 @@
         </div>
         <div class="mb-3">
             <label class="form-label">CTA Button URL</label>
-            <input type="text" class="form-control component-input" name="ComponentDtos[@index].CtaUrl" value="@hero.CtaUrl" placeholder="/about" />
+            <select class="form-select component-input" name="ComponentDtos[@index].CtaUrl">
+                <option value="">Select a page...</option>
+                @if (allowedCtaUrls != null)
+                {
+                    @foreach ((string Value, string Label) url in allowedCtaUrls)
+                    {
+                        <option value="@url.Value" selected="@(hero.CtaUrl == url.Value)">@url.Label</option>
+                    }
+                }
+            </select>
         </div>
     </div>
 </div>

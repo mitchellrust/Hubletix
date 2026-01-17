@@ -60,9 +60,10 @@
                         <div id="components-container">
                             @if (Model.ComponentDtos != null && Model.ComponentDtos.Count > 0)
                             {
+                                ViewData["AllowedCtaUrls"] = Model.AllowedCtaUrls;
                                 @for (int i = 0; i < Model.ComponentDtos.Count; i++)
                                 {
-                                    var component = Model.ComponentDtos[i];
+                                    ComponentDto? component = Model.ComponentDtos[i];
                                     if (component.Type == "Hero")
                                     {
                                         <partial name="_HeroEditor" model="new Tuple<int, ComponentDto>(i, component)" />
@@ -405,7 +406,13 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">CTA Button URL</label>
-                            <input type="text" class="form-control component-input" name="ComponentDtos[${componentIndex}].CtaUrl" placeholder="/about" />
+                            <select class="form-select component-input" name="ComponentDtos[${componentIndex}].CtaUrl">
+                                <option value="">Select a page...</option>
+                                @foreach ((string Value, string Label) url in Model.AllowedCtaUrls)
+                                {
+                                    <option value="@url.Value">@url.Label</option>
+                                }
+                            </select>
                         </div>
                     </div>
                 </div>
