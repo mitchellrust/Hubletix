@@ -63,7 +63,7 @@
     // Extract properties based on type
     string? heading = null;
     string? subheading = null;
-    List<object> cards = new();
+    List<object> cards = new List<object>();
 
     if (cardsComponent is CardsComponentConfig config)
     {
@@ -78,10 +78,10 @@
         cards = viewModel.Cards?.Cast<object>().ToList() ?? new();
     }
 
-    var sectionClass = isPreviewMode ? "cards-section preview-mode" : "cards-section";
+    string? sectionClass = isPreviewMode ? "cards-section preview-mode" : "cards-section";
 }
 
-<section class="@sectionClass py-5" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+<section class="@sectionClass py-5 bg-light">
     <div class="container">
         @if (!string.IsNullOrEmpty(heading) || !string.IsNullOrEmpty(subheading))
         {
