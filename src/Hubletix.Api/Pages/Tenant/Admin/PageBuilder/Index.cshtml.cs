@@ -157,6 +157,7 @@ public class IndexModel : TenantAdminPageModel
         
         if (!ModelState.IsValid)
         {
+            await InitializePageDataAsync();
             return Page();
         }
 
@@ -165,6 +166,7 @@ public class IndexModel : TenantAdminPageModel
         if (!string.IsNullOrEmpty(validationResult))
         {
             ModelState.AddModelError(string.Empty, validationResult);
+            await InitializePageDataAsync();
             return Page();
         }
 
@@ -231,6 +233,47 @@ public class IndexModel : TenantAdminPageModel
 
         TempData["SuccessMessage"] = "Homepage saved successfully!";
         return RedirectToPage();
+    }
+    
+    private async Task InitializePageDataAsync()
+    {
+        var tenant = await TenantConfigService.GetTenantAsync(CurrentTenantInfo.Id!);
+        if (tenant != null)
+        {
+            TenantConfig = tenant.GetConfig();
+            
+            // Load theme colors from tenant config with defaults
+            PrimaryColor = !string.IsNullOrEmpty(TenantConfig.Theme?.PrimaryColor) 
+                ? TenantConfig.Theme.PrimaryColor 
+                : ThemeDefaults.PrimaryColor;
+            SecondaryColor = !string.IsNullOrEmpty(TenantConfig.Theme?.SecondaryColor) 
+                ? TenantConfig.Theme.SecondaryColor 
+                : ThemeDefaults.SecondaryColor;
+            
+            // Pass tenant name to view for preview panel
+            ViewData["TenantName"] = CurrentTenantInfo?.Name ?? "Organization";
+            
+            // Create render contexts for preview using current Components
+            var renderContexts = Components.Select(component => 
+                (object)new ComponentRenderContext<HomePageComponentConfig>
+                {
+                    Component = component,
+                    PrimaryColor = PrimaryColor,
+                    SecondaryColor = SecondaryColor,
+                    IsPreviewMode = true
+                }
+            ).ToList();
+
+            // Create preview model
+            ComponentRenderContexts = new List<object> 
+            { 
+                new PreviewPanelModel
+                {
+                    ComponentRenderContexts = renderContexts,
+                    TenantName = CurrentTenantInfo?.Name ?? "Organization"
+                }
+            };
+        }
     }
     
     private ComponentDto ToDto(HomePageComponentConfig component)

@@ -29,6 +29,15 @@
         </div>
     }
 
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="bi bi-exclamation-triangle"></i> Validation Error:</strong>
+            <div asp-validation-summary="All" class="mb-0 mt-2"></div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
     <!-- Mobile Tabs (visible only on small screens) -->
     <ul class="nav nav-tabs d-lg-none mb-3" id="mobile-tabs" role="tablist">
         <li class="nav-item" role="presentation">
@@ -977,25 +986,15 @@
                     Object.keys(pendingImages).forEach(key => delete pendingImages[key]);
                 }
                 
-                // Now save the form
+                // Now save the form - submit normally to let browser handle redirect
                 saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
                 
-                const form = document.getElementById('homepage-form');
-                const formData = new FormData(form);
+                // Mark as clean to prevent beforeunload warning
+                markClean();
                 
-                const response = await fetch('', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (response.ok) {
-                    markClean();
-                    window.location.reload();
-                } else {
-                    alert('Failed to save homepage. Please check your inputs and try again.');
-                    saveBtn.disabled = false;
-                    saveBtn.innerHTML = originalContent;
-                }
+                // Submit the form normally (browser will follow the redirect and show TempData)
+                const form = document.getElementById('homepage-form');
+                form.submit();
             } catch (error) {
                 console.error('Save error:', error);
                 alert('An error occurred while saving. Please try again.');
