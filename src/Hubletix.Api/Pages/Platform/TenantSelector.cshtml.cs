@@ -10,13 +10,23 @@ using Hubletix.Core.Constants;
 
 namespace Hubletix.Api.Pages.Platform;
 
+public class TenantCardDto
+{
+    public string Name { get; set; } = string.Empty;
+    public string Subdomain { get; set; } = string.Empty;
+    public string RedirectUrl { get; set; } = string.Empty;
+    public string Role { get; set; } = string.Empty;
+    public bool IsOwner { get; set; }
+}
+
 [Authorize]
 public class TenantSelectorModel : PlatformPageModel
 {
     private readonly AppDbContext _dbContext;
     private readonly ILogger<TenantSelectorModel> _logger;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public List<TenantUser>? UserTenants { get; set; }
+    public List<TenantCardDto>? TenantCards { get; set; }
 
     [TempData]
     public string? TenantSelectorErrorMessage { get; set; }
@@ -27,11 +37,13 @@ public class TenantSelectorModel : PlatformPageModel
     public TenantSelectorModel(
         IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
         AppDbContext dbContext,
-        ILogger<TenantSelectorModel> logger)
+        ILogger<TenantSelectorModel> logger,
+        IHttpContextAccessor httpContextAccessor)
         : base(multiTenantContextAccessor)
     {
         _dbContext = dbContext;
         _logger = logger;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<IActionResult> OnGetAsync()
@@ -53,12 +65,15 @@ public class TenantSelectorModel : PlatformPageModel
             // Should only display tenants that are active.
             // Also, if a tenant is not active, only display if user is owner
             // so they can resolve the outstanding action.
-            UserTenants = tenantUsers
+            var filteredTenants = tenantUsers
                 .Where(
                     tu => tu.Tenant.Status == TenantStatus.Active ||
                           tu.IsOwner
                 )
                 .ToList();
+
+            // Build redirect URLs server-side
+            TenantCards = filteredTenants.Select(tu => BuildTenantCardDto(tu)).ToList();
 
             return Page();
         }
@@ -66,8 +81,46 @@ public class TenantSelectorModel : PlatformPageModel
         {
             _logger.LogError(ex, "Error fetching tenants for user {UserId}", PlatformUserId);
             TenantSelectorErrorMessage = "An error occurred while loading your organizations.";
-            UserTenants = new List<TenantUser>();
+            TenantCards = new List<TenantCardDto>();
             return Page();
         }
+    }
+
+    private TenantCardDto BuildTenantCardDto(TenantUser tenantUser)
+    {
+        var request = _httpContextAccessor.HttpContext?.Request;
+        var protocol = request?.Scheme ?? "http";
+        var hostname = request?.Host.Host ?? "hubletix.home";
+        var port = request?.Host.Port;
+        var portString = port.HasValue && port.Value != 80 && port.Value != 443 
+            ? $":{port.Value}" 
+            : string.Empty;
+
+        string baseDomain;
+        if (hostname == "hubletix.home" || hostname == "127.0.0.1" || hostname == "localhost")
+        {
+            // Development environment
+            baseDomain = hostname;
+        }
+        else
+        {
+            // Production environment - extract base domain
+            var parts = hostname.Split('.');
+            baseDomain = parts.Length > 2 
+                ? string.Join(".", parts.Skip(parts.Length - 2)) 
+                : hostname;
+        }
+
+        var returnPath = !string.IsNullOrEmpty(ReturnUrl) ? ReturnUrl : "/";
+        var redirectUrl = $"{protocol}://{tenantUser.Tenant.Subdomain}.{baseDomain}{portString}{returnPath}";
+
+        return new TenantCardDto
+        {
+            Name = tenantUser.Tenant.Name,
+            Subdomain = tenantUser.Tenant.Subdomain,
+            RedirectUrl = redirectUrl,
+            Role = tenantUser.Role.ToString(),
+            IsOwner = tenantUser.IsOwner
+        };
     }
 }
