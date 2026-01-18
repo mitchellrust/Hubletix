@@ -14,9 +14,10 @@ public class MembershipPlansModel : TenantPageModel
 
     public MembershipPlansModel(
         IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
+        ILogger<MembershipPlansModel> logger,
         ITenantConfigService tenantConfigService,
         AppDbContext dbContext
-    ) : base(multiTenantContextAccessor, tenantConfigService, dbContext)
+    ) : base(multiTenantContextAccessor, logger, tenantConfigService, dbContext)
     {}
 
     public async Task<IActionResult> OnGetAsync()

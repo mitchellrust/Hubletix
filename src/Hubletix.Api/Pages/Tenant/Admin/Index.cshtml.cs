@@ -10,11 +10,13 @@ public class IndexModel : TenantAdminPageModel
     public IndexModel(
         AppDbContext dbContext,
         ITenantConfigService tenantConfigService,
-        IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor
+        IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
+        ILogger<IndexModel> logger
     ) : base(
         multiTenantContextAccessor,
         tenantConfigService,
-        dbContext
+        dbContext,
+        logger
     )
     {
     }

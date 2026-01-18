@@ -22,6 +22,19 @@ public interface IStripeConnectService
     Task<string> CreateConnectAccountAsync(string tenantId, string name, string email, TenantConfig tenantConfig, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Updates a Stripe Connect account for a tenant. Most often, this will be
+    /// making an existing customer into a connected account, with merchant capabilities.
+    /// </summary>
+    /// <param name="tenantId">The tenant ID</param>
+    /// <param name="stripeAccountId">The existing Stripe account ID</param>
+    /// <param name="name">Name of the tenant, for the Connect account</param>
+    /// <param name="email">Email for the Connect account</param>
+    /// <param name="tenantConfig">The tenant configuration including settings</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>The created Stripe account ID</returns>
+    Task<string> UpdateConnectAccountAsync(string tenantId, string stripeAccountId, string name, string email, TenantConfig tenantConfig, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Creates an account link for onboarding a Connect account.
     /// </summary>
     /// <param name="stripeAccountId">The Stripe Connect account ID</param>

@@ -117,7 +117,7 @@ public class DatabaseInitializationService
                     Description = "Basic features for small clubs.",
                     PriceInCents = 2900, // $ 29.00,
                     StripeProductId = "starter_plan",
-                    StripePriceId = "price_1SphJrFORaGTWCJoMY9117b8",
+                    StripePriceId = "price_1SqoiCFORaGTWCJoH42T2pn2",
                 },
                 new PlatformPlan
                 {
@@ -126,7 +126,7 @@ public class DatabaseInitializationService
                     Description = "Advanced features for growing clubs.",
                     PriceInCents = 11900, // $119.00,
                     StripeProductId = "growth_plan",
-                    StripePriceId = "price_1SphJrFORaGTWCJo13lPfXBD",
+                    StripePriceId = "price_1SqoiCFORaGTWCJoJciNiCdf",
                 },
                 new PlatformPlan
                 {
@@ -135,7 +135,7 @@ public class DatabaseInitializationService
                     Description = "All features for large clubs.",
                     PriceInCents = 39900, // $399.00
                     StripeProductId = "professional_plan",
-                    StripePriceId = "price_1SphJsFORaGTWCJoBVWSC5Ke",
+                    StripePriceId = "price_1SqoiDFORaGTWCJoPzfM1kRV",
                 }
             };
 
@@ -238,7 +238,6 @@ public class DatabaseInitializationService
                 Name = demoTenantInfo.Name!,
                 Subdomain = demoTenantInfo.Identifier,
                 Status = TenantStatus.Active,
-                StripeAccountId = "acct_demo123456789",
                 ConfigJson = GetDemoConfig(),
                 Locations = new List<Location>()
                 {
@@ -579,7 +578,6 @@ public class DatabaseInitializationService
                 Name = acmeTenantInfo.Name!,
                 Subdomain = acmeTenantInfo.Identifier,
                 Status = TenantStatus.Active,
-                StripeAccountId = "acct_acme987654321",
                 ConfigJson = GetBasicConfig(),
                 Locations = new List<Location>()
                 {
@@ -751,7 +749,6 @@ public class DatabaseInitializationService
                 Name = pausedTenantInfo.Name!,
                 Subdomain = pausedTenantInfo.Identifier,
                 Status = TenantStatus.Suspended,
-                StripeAccountId = "acct_paused111222333",
                 ConfigJson = GetBasicConfig(),
                 Locations = new List<Location>()
                 {

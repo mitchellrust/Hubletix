@@ -8,6 +8,7 @@ using Hubletix.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Hubletix.Core.Enums;
+using Hubletix.Core.Constants;
 
 namespace Hubletix.Api.Pages;
 
@@ -20,6 +21,7 @@ namespace Hubletix.Api.Pages;
 public class TenantPageModel : PageModel
 {
     private IMultiTenantContextAccessor<ClubTenantInfo> _multiTenantContextAccessor { get; }
+    private ILogger<TenantPageModel> _logger { get; }
     protected AppDbContext DbContext { get; }
     protected ITenantConfigService TenantConfigService { get; }
     protected TenantConfig TenantConfig { get; set; } = new TenantConfig();
@@ -38,6 +40,7 @@ public class TenantPageModel : PageModel
 
     public TenantPageModel(
       IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
+      ILogger<TenantPageModel> logger,
       ITenantConfigService tenantConfigService,
       AppDbContext dbContext
     )
@@ -45,6 +48,7 @@ public class TenantPageModel : PageModel
         _multiTenantContextAccessor = multiTenantContextAccessor;
         TenantConfigService = tenantConfigService;
         DbContext = dbContext;
+        _logger = logger;
     }
 
     public override async Task OnPageHandlerExecutionAsync(
@@ -52,47 +56,98 @@ public class TenantPageModel : PageModel
         Microsoft.AspNetCore.Mvc.Filters.PageHandlerExecutionDelegate next
     )
     {
-        // Verify user has active membership in current tenant
-        if (HasTenantContext && CurrentTenantInfo != null)
+        if (!HasTenantContext || CurrentTenantInfo == null)
         {
-            var platformUserId = User?.FindFirst("platform_user_id")?.Value;
-            
-            if (!string.IsNullOrEmpty(platformUserId))
-            {
-                var tenantUser = await DbContext.GetTenantUserAsync(
-                    platformUserId, 
-                    CurrentTenantInfo.Id
-                );
-
-                // Check if user is an active member of this tenant
-                if (tenantUser == null || tenantUser.Status != TenantUserStatus.Active)
-                {
-                    context.Result = new RedirectToPageResult("/Platform/Unauthorized");
-                    return;
-                }
-            }
-            
-            // Set tenant information in ViewData for use in layouts
-            ViewData["TenantName"] = CurrentTenantInfo.Name;
-
-            // Fetch tenant config before page handler executes
-            var tenant = await TenantConfigService.GetTenantAsync(CurrentTenantInfo.Id);
-            if (tenant != null)
-            {
-                TenantConfig = tenant.GetConfig();
-                // Set view data for layout usage
-                ViewData["TenantConfig"] = TenantConfig;
-                
-                // Set logo URL if available in tenant config
-                if (!string.IsNullOrEmpty(TenantConfig.Theme.LogoUrl))
-                {
-                    ViewData["TenantLogoUrl"] = TenantConfig.Theme.LogoUrl;
-                }
-                
-                // Build navbar for public layout
-                ViewData["Navbar"] = BuildNavbar();
-            }
+            // Not in a tenant context, requested Tenant does not exist (i.e. invalid subdomain)
+            _logger.LogDebug(
+                "Access attempt without tenant context. Redirecting to tenant selector."
+            );
+            context.Result = new RedirectToPageResult("/Platform/TenantSelector");
+            return;
         }
+
+        var platformUserId = User?.FindFirst("platform_user_id")?.Value;
+        if (string.IsNullOrEmpty(platformUserId))
+        {
+            _logger.LogInformation(
+                "Unauthenticated access attempt to tenant {TenantId}.",
+                CurrentTenantInfo.Id
+            );
+            // Redirect to login page
+            context.Result = new RedirectToPageResult("/Platform/Login");
+            return;
+        }
+
+        var tenantUser = await DbContext.GetTenantUserAsync(
+            platformUserId, 
+            CurrentTenantInfo.Id
+        );
+        if (tenantUser == null)
+        {
+            _logger.LogWarning(
+                "User {PlatformUserId} attempted to access tenant {TenantId} without membership.",
+                platformUserId,
+                CurrentTenantInfo.Id
+            );
+            context.Result = new RedirectToPageResult("/Platform/TenantSelector");
+            return;
+        }
+
+        // Check if user is an active member of this tenant
+        if (tenantUser.Status != TenantUserStatus.Active)
+        {
+            _logger.LogWarning(
+                "User {PlatformUserId} attempted to access tenant {TenantId} with status [{TenantUserStatus}]",
+                platformUserId,
+                CurrentTenantInfo.Id,
+                tenantUser.Status
+            );
+            context.Result = new RedirectToPageResult("/Platform/Unauthorized");
+            return;
+        }
+        
+        // Set tenant information in ViewData for use in layouts
+        ViewData["TenantName"] = CurrentTenantInfo.Name;
+
+        // Fetch tenant config before page handler executes
+        var tenant = await TenantConfigService.GetTenantAsync(CurrentTenantInfo.Id);
+
+        // Verify we have an active tenant
+        if (tenant == null)
+        {
+            _logger.LogError(
+                "Could not find tenant [{TenantId}] but tenant context exists",
+                CurrentTenantInfo.Id
+            );
+            // Just show an error for the end user.
+            context.Result = new RedirectToPageResult("/Platform/Error");
+            return;
+        }
+        else if (tenant.Status != TenantStatus.Active)
+        {
+            _logger.LogWarning(
+                "Access attempt to tenant [{TenantId}] TenantStatus [{TenantStatus}] by user [{PlatformUserId}]",
+                CurrentTenantInfo.Id,
+                tenant?.Status,
+                platformUserId
+            );
+            // Tenant isn't active, redirect user to tenant selector to pick an active one
+            context.Result = new RedirectToPageResult("/Platform/TenantSelector");
+            return;
+        }
+
+        TenantConfig = tenant.GetConfig();
+        // Set view data for layout usage
+        ViewData["TenantConfig"] = TenantConfig;
+        
+        // Set logo URL if available in tenant config
+        if (!string.IsNullOrEmpty(TenantConfig.Theme.LogoUrl))
+        {
+            ViewData["TenantLogoUrl"] = TenantConfig.Theme.LogoUrl;
+        }
+        
+        // Build navbar for public layout
+        ViewData["Navbar"] = BuildNavbar();
         
         await next();
     }

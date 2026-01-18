@@ -10,9 +10,10 @@ public class AccessDeniedModel : TenantPageModel
 {
     public AccessDeniedModel(
         IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
+        ILogger<AccessDeniedModel> logger,
         ITenantConfigService tenantConfigService,
         AppDbContext dbContext)
-        : base(multiTenantContextAccessor, tenantConfigService, dbContext)
+        : base(multiTenantContextAccessor, logger, tenantConfigService, dbContext)
     {
     }
 

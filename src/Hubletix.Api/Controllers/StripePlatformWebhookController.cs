@@ -100,7 +100,7 @@ public class StripePlatformWebhookController : ControllerBase
                     break;
 
                 default:
-                    _logger.LogInformation("Unhandled event type: {EventType}", stripeEvent.Type);
+                    _logger.LogInformation("Unhandled Stripe Platform webhook event type: {EventType}", stripeEvent.Type);
                     break;
             }
 
@@ -113,7 +113,7 @@ public class StripePlatformWebhookController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error processing webhook");
+            _logger.LogError(ex, "Error processing Stripe Platform webhook");
             // Return 200 to prevent Stripe from retrying
             // We've logged the error and can investigate manually
             return Ok();
@@ -272,6 +272,7 @@ public class StripePlatformWebhookController : ControllerBase
             await _onboardingService.ActivateTenantAsync(
                 invoice.Parent.SubscriptionDetails.SubscriptionId,
                 invoice.CustomerId,
+                invoice.CustomerAccount,
                 subscriptionItem.CurrentPeriodStart,
                 subscriptionItem.CurrentPeriodEnd,
                 signupSessionId: signupSessionId
@@ -600,6 +601,7 @@ public class StripePlatformWebhookController : ControllerBase
         await _onboardingService.ActivateTenantAsync(
             session.SubscriptionId,
             session.CustomerId,
+            subscription.CustomerAccount,
             subscriptionItem.CurrentPeriodStart,
             subscriptionItem.CurrentPeriodEnd,
             stripeCheckoutSessionId: session.Id

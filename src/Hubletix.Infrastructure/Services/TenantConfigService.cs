@@ -46,6 +46,11 @@ public class TenantConfigService : ITenantConfigService
 
     public async Task<Tenant?> GetTenantAsync(string tenantId)
     {
+        if (string.IsNullOrEmpty(tenantId))
+        {
+            return null;
+        }
+
         var cacheKey = $"{CacheKeyPrefix}{tenantId}";
 
         return await _cacheService.GetOrSetAsync(

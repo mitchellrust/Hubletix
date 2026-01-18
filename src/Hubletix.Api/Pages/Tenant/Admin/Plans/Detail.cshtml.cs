@@ -25,11 +25,13 @@ public class PlanDetailModel : TenantAdminPageModel
     public PlanDetailModel(
         AppDbContext dbContext,
         ITenantConfigService tenantConfigService,
-        IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor
+        IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
+        ILogger<PlanDetailModel> logger
     ) : base(
         multiTenantContextAccessor,
         tenantConfigService,
-        dbContext
+        dbContext,
+        logger
     )
     { }
 

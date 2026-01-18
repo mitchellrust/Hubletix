@@ -7,39 +7,59 @@
 }
 
 <div class="container-fluid py-4">
-
-    <!-- Test Buttons Row -->
-    <div class="row mb-4">
-        <!-- Tenant Onboarding Test Button -->
+        <!-- Stripe Connect Onboarding -->
         <div class="col-12 col-lg-6 mb-3">
-            <div class="card border-0 shadow-sm bg-light h-100">
+            <div class="card border-0 shadow-sm @(Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.Completed ? "bg-success-subtle" : "bg-light") h-100">
                 <div class="card-body">
                     <h5 class="card-title mb-3">
-                        <i class="bi bi-person-plus"></i> Tenant Onboarding Flow (Test)
+                        <i class="bi bi-credit-card"></i> 
+                        @if (Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.Completed)
+                        {
+                            <span>Stripe Connected <i class="bi bi-check-circle-fill text-success"></i></span>
+                        }
+                        else
+                        {
+                            <span>Set Up Stripe Connect</span>
+                        }
                     </h5>
                     <p class="text-muted mb-3">
-                        Test the complete tenant signup flow including plan selection, account creation, and payment processing.
+                        @if (Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.Completed)
+                        {
+                            <span>Your Stripe account is connected and ready to accept payments.</span>
+                            @if (Model.CurrentTenant?.DetailsSubmitted == false)
+                            {
+                                <br/><span class="text-warning"><i class="bi bi-exclamation-triangle"></i> Complete additional details in Stripe to avoid interruptions.</span>
+                            }
+                        }
+                        else if (Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.NotStarted)
+                        {
+                            <span>Connect your Stripe account to accept membership payments and event registrations.</span>
+                        }
+                        else if (Model.CurrentTenant?.DetailsSubmitted == true)
+                        {
+                            <span><i class="bi bi-exclamation-circle text-warning"></i> Your Stripe details have been submitted, but you may have some pending actions. Login to Stripe to review before you can start collecting payments.</span>
+                        }
+                        else
+                        {
+                            <span><i class="bi bi-exclamation-circle text-warning"></i> Continue setting up your Stripe account to start accepting payments.</span>
+                        }
                     </p>
-                    <a href="/signup/selectplan" class="btn btn-success">
-                        <i class="bi bi-play-circle me-2"></i>Test Onboarding Flow
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Stripe Connect Test Button -->
-        <div class="col-12 col-lg-6 mb-3">
-            <div class="card border-0 shadow-sm bg-light h-100">
-                <div class="card-body">
-                    <h5 class="card-title mb-3">
-                        <i class="bi bi-credit-card"></i> Stripe Connect Setup (Test)
-                    </h5>
-                    <p class="text-muted mb-3">
-                        Test the Stripe Connect integration by creating a connected account and completing onboarding.
-                    </p>
-                    <form method="post" asp-page-handler="SetupStripe">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-plus-circle me-2"></i>Setup Stripe Connect
+                    <form method="post" asp-page-handler="@(Model.CurrentTenant?.StripeOnboardingState != Hubletix.Core.Constants.StripeOnboardingState.Completed && Model.CurrentTenant?.DetailsSubmitted == true ? "ContinueStripeSetup" : "SetupStripe")">
+                        <button type="submit" 
+                                class="btn @(Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.Completed ? "btn-outline-secondary" : "btn-primary")"
+                                disabled="@(Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.Completed)">
+                            @if (Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.Completed)
+                            {
+                                <i class="bi bi-check-circle me-2"></i><span>Setup Complete</span>
+                            }
+                            else if (Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.NotStarted)
+                            {
+                                <i class="bi bi-plus-circle me-2"></i><span>Setup Stripe Connect</span>
+                            }
+                            else
+                            {
+                                <i class="bi bi-arrow-repeat me-2"></i><span>Continue Stripe Setup</span>
+                            }
                         </button>
                     </form>
                     @if (!string.IsNullOrEmpty(Model.TenantAdminDashboardErrorMessage))
