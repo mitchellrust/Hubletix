@@ -29,9 +29,10 @@ public class EventsModel : TenantPageModel
 
     public EventsModel(
         IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
+        ILogger<EventsModel> logger,
         ITenantConfigService tenantConfigService,
         AppDbContext dbContext
-    ) : base(multiTenantContextAccessor, tenantConfigService, dbContext)
+    ) : base(multiTenantContextAccessor, logger, tenantConfigService, dbContext)
     {}
 
     public async Task<IActionResult> OnGetAsync()

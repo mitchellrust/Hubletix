@@ -58,6 +58,7 @@ public interface ITenantOnboardingService
     Task ActivateTenantAsync(
         string stripeSubscriptionId,
         string stripeCustomerId,
+        string stripeAccountId,
         DateTime currentPeriodStart,
         DateTime currentPeriodEnd,
         string? stripeCheckoutSessionId = null,
@@ -92,6 +93,15 @@ public interface ITenantOnboardingService
     Task<string> SetupStripeConnectAsync(
         string tenantId,
         string adminEmail,
+        string refreshUrl,
+        string returnUrl,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Get an account update link for an existing tenant
+    /// </summary>
+    Task<string> GetAccountUpdateLinkAsync(
+        string tenantId,
         string refreshUrl,
         string returnUrl,
         CancellationToken cancellationToken = default);
@@ -281,6 +291,24 @@ public class TenantOnboardingService : ITenantOnboardingService
             ConfigJson = GetDefaultConfig(),
         };
 
+        // Create the tenant in the Tenant Store database first, ensuring this succeeds before adding to main DB
+        try
+        {
+            var tenantStoreEntry = new ClubTenantInfo(
+                tenant.Id,
+                tenant.Subdomain,
+                tenant.Name
+            );
+            _tenantStoreDbContext.TenantInfo.Add(tenantStoreEntry);
+            await _tenantStoreDbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException(
+                $"Failed to create tenant '{tenant.Name}' in Tenant Store. Tenant was not created.", 
+                ex);
+        }
+
         _dbContext.Tenants.Add(tenant);
 
         // Get PlatformUser for this Identity user and create TenantUser with owner role
@@ -314,15 +342,6 @@ public class TenantOnboardingService : ITenantOnboardingService
         session.LastActivityAt = DateTime.UtcNow;
 
         await _dbContext.SaveChangesAsync(cancellationToken);
-
-        // Now create the tenant in the Tenant Store database as well
-        var tenantStoreEntry = new ClubTenantInfo(
-            tenant.Id,
-            tenant.Subdomain,
-            tenant.Name
-        );
-        _tenantStoreDbContext.TenantInfo.Add(tenantStoreEntry);
-        await _tenantStoreDbContext.SaveChangesAsync(cancellationToken);
 
         return tenant;
     }
@@ -388,6 +407,7 @@ public class TenantOnboardingService : ITenantOnboardingService
     public async Task ActivateTenantAsync(
         string stripeSubscriptionId,
         string stripeCustomerId,
+        string stripeAccountId,
         DateTime currentPeriodStart,
         DateTime currentPeriodEnd,
         string? stripeCheckoutSessionId = null,
@@ -458,6 +478,7 @@ public class TenantOnboardingService : ITenantOnboardingService
                 throw new InvalidOperationException("Tenant not found in session.");
             }
             tenant.Status = TenantStatus.Active;
+            tenant.StripeAccountId = stripeAccountId;
 
             // Update session
             session.State = SignupSessionState.Completed;
@@ -560,6 +581,7 @@ public class TenantOnboardingService : ITenantOnboardingService
 
     /// <summary>
     /// Sets up Stripe Connect for an existing tenant (existing functionality)
+    /// Supports resumption - can regenerate account links for incomplete onboarding
     /// </summary>
     public async Task<string> SetupStripeConnectAsync(
         string tenantId,
@@ -575,29 +597,51 @@ public class TenantOnboardingService : ITenantOnboardingService
             throw new InvalidOperationException($"Tenant with ID '{tenantId}' not found.");
         }
 
-        // Check if already has a Stripe account
-        if (!string.IsNullOrEmpty(tenant.StripeAccountId))
+        // Check if onboarding is already completed
+        if (tenant.StripeOnboardingState == StripeOnboardingState.Completed)
         {
-            throw new InvalidOperationException("Tenant already has a Stripe Connect account.");
+            throw new InvalidOperationException("Stripe Connect onboarding is already completed.");
         }
 
+        string accountId;
         // Parse tenant configuration
         var tenantConfig = ParseTenantConfig(tenant.ConfigJson);
 
-        // Create Stripe Connect account
-        var accountId = await _stripeConnectService.CreateConnectAccountAsync(
-            tenant.Id,
-            tenant.Name,
-            adminEmail,
-            tenantConfig,
-            cancellationToken
-        );
+        // If no Stripe account exists yet, create one
+        if (string.IsNullOrEmpty(tenant.StripeAccountId))
+        {
+            // Create Stripe Connect account
+            accountId = await _stripeConnectService.CreateConnectAccountAsync(
+                tenant.Id,
+                tenant.Name,
+                adminEmail,
+                tenantConfig,
+                cancellationToken
+            );
 
-        // Save the account ID to the tenant
-        tenant.StripeAccountId = accountId;
+            // Save the account ID and update state to AccountCreated
+            tenant.StripeAccountId = accountId;
+            tenant.StripeOnboardingState = StripeOnboardingState.AccountCreated;
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+        else
+        {
+            // Update Stripe Connect account to make it a merchant.
+            accountId = await _stripeConnectService.UpdateConnectAccountAsync(
+                tenant.Id,
+                tenant.StripeAccountId,
+                tenant.Name,
+                adminEmail,
+                tenantConfig,
+                cancellationToken
+            );
+        }
+
+        // Update state to OnboardingStarted (user is clicking the link)
+        tenant.StripeOnboardingState = StripeOnboardingState.OnboardingStarted;
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        // Create and return onboarding link
+        // Create and return onboarding link (regenerated on-demand)
         var onboardingUrl = await _stripeConnectService.CreateAccountLinkAsync(
             accountId,
             refreshUrl,
@@ -606,6 +650,36 @@ public class TenantOnboardingService : ITenantOnboardingService
         );
 
         return onboardingUrl;
+    }
+
+    public async Task<string> GetAccountUpdateLinkAsync(
+        string tenantId,
+        string refreshUrl,
+        string returnUrl,
+        CancellationToken cancellationToken = default)
+    {
+        // Get the tenant from the database
+        var tenant = await _tenantConfigService.GetTenantAsync(tenantId);
+        if (tenant == null)
+        {
+            throw new InvalidOperationException($"Tenant with ID '{tenantId}' not found.");
+        }
+
+        // If no Stripe account ID, cannot create update link
+        if (string.IsNullOrEmpty(tenant.StripeAccountId))
+        {
+            throw new InvalidOperationException($"Tenant with ID '{tenantId}' does not have a Stripe account associated.");
+        }
+
+        // Create and return update link (regenerated on-demand)
+        var updateUrl = await _stripeConnectService.CreateAccountLinkAsync(
+            tenant.StripeAccountId,
+            refreshUrl,
+            returnUrl,
+            cancellationToken
+        );
+
+        return updateUrl;
     }
 
     // Private helper methods

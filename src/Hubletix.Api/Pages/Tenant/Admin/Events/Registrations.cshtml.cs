@@ -25,11 +25,13 @@ public class EventRegistrationsModel : TenantAdminPageModel
     public EventRegistrationsModel(
         AppDbContext dbContext,
         ITenantConfigService tenantConfigService,
-        IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor
+        IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
+        ILogger<EventRegistrationsModel> logger
     ) : base(
         multiTenantContextAccessor,
         tenantConfigService,
-        dbContext
+        dbContext,
+        logger
     )
     { }
 

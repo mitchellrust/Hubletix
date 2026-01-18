@@ -29,6 +29,31 @@ public class Tenant : BaseEntity
     public string? StripeAccountId { get; set; }
     
     /// <summary>
+    /// Stripe Connect onboarding state: NotStarted, AccountCreated, OnboardingStarted, Completed
+    /// </summary>
+    public string StripeOnboardingState { get; set; } = Constants.StripeOnboardingState.NotStarted;
+    
+    /// <summary>
+    /// Whether the Stripe Connect account has charges enabled
+    /// </summary>
+    public bool ChargesEnabled { get; set; }
+    
+    /// <summary>
+    /// Whether the Stripe Connect account has payouts enabled
+    /// </summary>
+    public bool PayoutsEnabled { get; set; }
+    
+    /// <summary>
+    /// Whether all required details have been submitted to Stripe
+    /// </summary>
+    public bool DetailsSubmitted { get; set; }
+    
+    /// <summary>
+    /// Timestamp when Stripe onboarding was completed (charges enabled)
+    /// </summary>
+    public DateTime? OnboardingCompletedAt { get; set; }
+    
+    /// <summary>
     /// JSONB stored configuration including theme, feature flags, and settings
     /// </summary>
     public string? ConfigJson { get; set; }

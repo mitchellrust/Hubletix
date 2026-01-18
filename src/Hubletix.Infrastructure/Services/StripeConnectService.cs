@@ -67,12 +67,6 @@ public class StripeConnectService : IStripeConnectService
             {
                 Merchant = new AccountCreateConfigurationMerchantOptions
                 {
-                    Branding = new AccountCreateConfigurationMerchantBrandingOptions
-                    {
-                        // Logo = "", // TODO: Add logo ID, would need to upload first.
-                        PrimaryColor = tenantConfig.Theme.PrimaryColor,
-                        SecondaryColor = tenantConfig.Theme.SecondaryColor,
-                    },
                     Capabilities = new AccountCreateConfigurationMerchantCapabilitiesOptions
                     {
                         // US Bank Transfers
@@ -107,33 +101,95 @@ public class StripeConnectService : IStripeConnectService
         return account.Id;
     }
 
+    public async Task<string> UpdateConnectAccountAsync(
+      string tenantId,
+      string stripeAccountId,
+      string name,
+      string email,
+      TenantConfig tenantConfig,
+      CancellationToken cancellationToken = default
+    )
+    {
+        var options = new Stripe.V2.Core.AccountUpdateOptions
+        {
+            ContactEmail = email,
+            Dashboard = DASHBOARD_FULL, // Full dashboard access
+            DisplayName = name,
+            Metadata = new Dictionary<string, string>
+            {
+                { METADATA_TENANT_ID, tenantId }
+            },
+            Identity = new AccountUpdateIdentityOptions
+            {
+              Country = tenantConfig.Settings.DefaultCountry,
+            },
+            Defaults = new AccountUpdateDefaultsOptions
+            {
+                Currency = tenantConfig.Settings.DefaultCurrency,
+                Responsibilities = new AccountUpdateDefaultsResponsibilitiesOptions
+                {
+                    FeesCollector = RESPONSIBILITIES_STRIPE, // Stripe will collect fees from the account
+                    LossesCollector = RESPONSIBILITIES_STRIPE, // Stripe will be responsible for losses when acount can't pay back negative balances from payments
+                }
+            },
+            Configuration = new AccountUpdateConfigurationOptions
+            {
+                Merchant = new AccountUpdateConfigurationMerchantOptions
+                {
+                    Capabilities = new AccountUpdateConfigurationMerchantCapabilitiesOptions
+                    {
+                        // US Bank Transfers
+                        AchDebitPayments = new AccountUpdateConfigurationMerchantCapabilitiesAchDebitPaymentsOptions
+                        {
+                            Requested = true
+                        },
+                        // Debit and Credit Card Payments
+                        CardPayments = new AccountUpdateConfigurationMerchantCapabilitiesCardPaymentsOptions
+                        {
+                            Requested = true
+                        },
+                    },
+                    CardPayments = new AccountUpdateConfigurationMerchantCardPaymentsOptions
+                    {
+                        // Decline payments (or not) matching the specified criteria, regardless if the card issuer approves or not.
+                        DeclineOn = new AccountUpdateConfigurationMerchantCardPaymentsDeclineOnOptions
+                        {
+                            // Don't decline on incorrect ZIP or Postal Code if the card issuer approves
+                            AvsFailure = false,
+                            // Don't decline on incorrect CVC code if the card issuer approves
+                            CvcFailure = false,
+                        }
+                    }
+                }
+            }
+        };
+
+        var accountService = _stripeClient.V2.Core.Accounts;
+        var account = await accountService.UpdateAsync(stripeAccountId, options, cancellationToken: cancellationToken);
+        
+        return account.Id;
+    }
+
     public async Task<string> CreateAccountLinkAsync(
         string stripeAccountId,
         string refreshUrl,
         string returnUrl,
         CancellationToken cancellationToken = default)
     {
-        var options = new Stripe.V2.Core.AccountLinkCreateOptions
+        var options = new Stripe.AccountLinkCreateOptions
         {
             Account = stripeAccountId,
-            UseCase = new AccountLinkCreateUseCaseOptions
+            RefreshUrl = refreshUrl,
+            ReturnUrl = returnUrl,
+            Type = ACCOUNT_LINK_USE_CASE_ACCOUNT_ONBOARDING,
+            CollectionOptions = new AccountLinkCollectionOptionsOptions
             {
-                Type = ACCOUNT_LINK_USE_CASE_ACCOUNT_ONBOARDING,
-                AccountOnboarding = new AccountLinkCreateUseCaseAccountOnboardingOptions
-                {
-                    CollectionOptions = new AccountLinkCreateUseCaseAccountOnboardingCollectionOptionsOptions
-                    {
-                        // Only collect the currently due information on account creation
-                        Fields = ACCOUNT_ONBOARDING_COLLECTION_FIELDS,
-                    },
-                    Configurations = new List<string> { ACCOUNT_ONBOARDING_CONFIG_MERCHANT }, // This account is a "merchant", as they receive payments from members
-                    RefreshUrl = refreshUrl,
-                    ReturnUrl = returnUrl,
-                }
+                // Only collect the currently due information on account creation
+                Fields = ACCOUNT_ONBOARDING_COLLECTION_FIELDS,
             },
         };
 
-        var accountLinkService = _stripeClient.V2.Core.AccountLinks;
+        var accountLinkService = new Stripe.AccountLinkService(_stripeClient);
         var accountLink = await accountLinkService.CreateAsync(options, cancellationToken: cancellationToken);
         
         return accountLink.Url;

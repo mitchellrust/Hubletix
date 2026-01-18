@@ -14,9 +14,11 @@ public class HomeModel : TenantPageModel
     public HomeModel(
         AppDbContext dbContext,
         ITenantConfigService tenantConfigService,
-        IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor
+        IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
+        ILogger<HomeModel> logger
     ) : base(
         multiTenantContextAccessor,
+        logger,
         tenantConfigService,
         dbContext
     )

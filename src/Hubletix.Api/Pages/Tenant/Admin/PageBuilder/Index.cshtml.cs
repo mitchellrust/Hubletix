@@ -59,8 +59,9 @@ public class IndexModel : TenantAdminPageModel
         IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
         ITenantConfigService tenantConfigService,
         AppDbContext dbContext,
-        IStorageService storageService
-    ) : base(multiTenantContextAccessor, tenantConfigService, dbContext)
+        IStorageService storageService,
+        ILogger<IndexModel> logger
+    ) : base(multiTenantContextAccessor, tenantConfigService, dbContext, logger)
     {
         _storageService = storageService;
     }

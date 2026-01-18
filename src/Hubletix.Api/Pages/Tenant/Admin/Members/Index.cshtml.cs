@@ -24,11 +24,13 @@ public class MembersModel : TenantAdminPageModel
     public MembersModel(
         AppDbContext dbContext,
         ITenantConfigService tenantConfigService,
-        IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor
+        IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
+        ILogger<MembersModel> logger
     ) : base(
         multiTenantContextAccessor,
         tenantConfigService,
-        dbContext
+        dbContext,
+        logger
     )
     { }
 

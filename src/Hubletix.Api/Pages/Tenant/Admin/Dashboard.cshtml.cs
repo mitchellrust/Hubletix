@@ -5,15 +5,18 @@ using Finbuckle.MultiTenant.Abstractions;
 using Hubletix.Api.Utils;
 using Hubletix.Infrastructure.Services;
 using Hubletix.Core.Constants;
+using System.Security.Claims;
 
 namespace Hubletix.Api.Pages.Tenant.Admin;
 
 public class DashboardModel : TenantAdminPageModel
 {
     private readonly ITenantOnboardingService _tenantOnboardingService;
-    
+    private readonly ILogger<DashboardModel> _logger;
+    private readonly ITenantConfigService _tenantConfigService;
     public List<UpcomingEventDto> UpcomingEvents { get; set; } = new();
     public TenantStatsDto TenantStats { get; set; } = new();
+    public Core.Entities.Tenant? CurrentTenant { get; set; }
 
     [TempData]
     public string? TenantAdminDashboardErrorMessage { get; set; }
@@ -22,19 +25,26 @@ public class DashboardModel : TenantAdminPageModel
         AppDbContext dbContext,
         ITenantConfigService tenantConfigService,
         IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
-        ITenantOnboardingService tenantOnboardingService
+        ITenantOnboardingService tenantOnboardingService,
+        ILogger<DashboardModel> logger
     ) : base(
         multiTenantContextAccessor,
         tenantConfigService,
-        dbContext
+        dbContext,
+        logger
     )
     {
         _tenantOnboardingService = tenantOnboardingService;
+        _tenantConfigService = tenantConfigService;
+        _logger = logger;
     }
 
     public async Task OnGetAsync()
     {
         var utcNow = DateTime.UtcNow;
+
+        // Load current tenant for Stripe onboarding state
+        CurrentTenant = await _tenantConfigService.GetTenantAsync(CurrentTenantInfo.Id);
 
         // Fetch tenant statistics
         TenantStats.TotalMembers = await DbContext.TenantUsers
@@ -84,6 +94,14 @@ public class DashboardModel : TenantAdminPageModel
     {
         try
         {
+            // Get the logged-in admin user's email from claims
+            var adminEmail = User?.FindFirst(ClaimTypes.Email)?.Value;
+            if (string.IsNullOrEmpty(adminEmail))
+            {
+                TenantAdminDashboardErrorMessage = "Unable to determine admin user email.";
+                return RedirectToPage();
+            }
+
             // Generate URLs for redirect
             var refreshUrl = Url.PageLink("/Tenant/Admin/Dashboard") ?? "/admin/dashboard";
             var returnUrl = Url.PageLink("/Tenant/Admin/Dashboard") ?? "/admin/dashboard";
@@ -91,7 +109,7 @@ public class DashboardModel : TenantAdminPageModel
             // Use onboarding service to set up Stripe Connect
             var onboardingUrl = await _tenantOnboardingService.SetupStripeConnectAsync(
                 CurrentTenantInfo.Id,
-                "admin@example.com", // TODO: Use actual admin email
+                adminEmail,
                 refreshUrl,
                 returnUrl
             );
@@ -102,13 +120,65 @@ public class DashboardModel : TenantAdminPageModel
         catch (InvalidOperationException ex)
         {
             // Handle business logic errors (duplicate account, tenant not found, etc.)
+            _logger.LogError(
+                ex,
+                "Error setting up Stripe for tenant {TenantId}",
+                CurrentTenantInfo.Id
+            );
             TenantAdminDashboardErrorMessage = ex.Message;
             return RedirectToPage();
         }
         catch (Exception ex)
         {
             // Log error and show generic message
+            _logger.LogError(
+                ex,
+                "Unexpected error setting up Stripe for tenant {TenantId}",
+                CurrentTenantInfo.Id
+            );
             TenantAdminDashboardErrorMessage = $"Failed to set up Stripe Connect: {ex.Message}";
+            return RedirectToPage();
+        }
+    }
+
+    public async Task<IActionResult> OnPostContinueStripeSetupAsync()
+    {
+        try
+        {
+            // Generate URLs for redirect
+            var refreshUrl = Url.PageLink("/Tenant/Admin/Dashboard") ?? "/admin/dashboard";
+            var returnUrl = Url.PageLink("/Tenant/Admin/Dashboard") ?? "/admin/dashboard";
+            
+            // Use onboarding service to set up Stripe Connect
+            var onboardingUrl = await _tenantOnboardingService.GetAccountUpdateLinkAsync(
+                CurrentTenantInfo.Id,
+                refreshUrl,
+                returnUrl
+            );
+
+            // Redirect to Stripe onboarding
+            return Redirect(onboardingUrl);
+        }
+        catch (InvalidOperationException ex)
+        {
+            // Handle business logic errors (duplicate account, tenant not found, etc.)
+            _logger.LogError(
+                ex,
+                "Error continuing Stripe setup for tenant {TenantId}",
+                CurrentTenantInfo.Id
+            );
+            TenantAdminDashboardErrorMessage = ex.Message;
+            return RedirectToPage();
+        }
+        catch (Exception ex)
+        {
+            // Log error and show generic message
+            _logger.LogError(
+                ex,
+                "Unexpected error continuing Stripe setup for tenant {TenantId}",
+                CurrentTenantInfo.Id
+            );
+            TenantAdminDashboardErrorMessage = $"Failed to continue Stripe Connect setup: {ex.Message}";
             return RedirectToPage();
         }
     }

@@ -32,6 +32,7 @@ public class CreateEventModel : TenantAdminPageModel
     public string? ErrorMessage { get; set; }
 
     public CreateEventModel(
+        ILogger<CreateEventModel> logger,
         AppDbContext dbContext,
         ITenantConfigService tenantConfigService,
         IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor
@@ -39,7 +40,8 @@ public class CreateEventModel : TenantAdminPageModel
     ) : base(
         multiTenantContextAccessor,
         tenantConfigService,
-        dbContext
+        dbContext,
+        logger
     )
     { }
 
