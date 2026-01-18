@@ -68,7 +68,7 @@
                     </div>
                 }
 
-                @if (Model.UserTenants == null || !Model.UserTenants.Any())
+                @if (Model.TenantCards == null || !Model.TenantCards.Any())
                 {
                     <!-- No Tenants -->
                     <div class="card border-0 shadow-sm text-center p-5">
@@ -91,23 +91,22 @@
                 {
                     <!-- Tenant Cards -->
                     <div class="row g-4">
-                        @foreach (Core.Entities.TenantUser tenantUser in Model.UserTenants)
+                        @foreach (TenantCardDto tenantCard in Model.TenantCards)
                         {
                             <div class="col-md-6">
-                                <a href="javascript:void(0)" 
-                                   onclick="selectTenant('@tenantUser.Tenant.Subdomain', '@tenantUser.Tenant.Name')"
+                                <a href="@tenantCard.RedirectUrl" 
                                    class="text-decoration-none">
                                     <div class="card tenant-card border-0 shadow-sm h-100">
                                         <div class="card-body p-4">
                                             <div class="d-flex justify-content-between align-items-start mb-3">
                                                 <div>
-                                                    <h4 class="mb-1">@tenantUser.Tenant.Name</h4>
+                                                    <h4 class="mb-1">@tenantCard.Name</h4>
                                                     <p class="text-muted small mb-0">
-                                                        <i class="bi bi-globe me-1"></i>@(tenantUser.Tenant.Subdomain).hubletix.com
+                                                        <i class="bi bi-globe me-1"></i>@(tenantCard.Subdomain).hubletix.com
                                                     </p>
                                                 </div>
                                                 <div>
-                                                    @if (tenantUser.IsOwner)
+                                                    @if (tenantCard.IsOwner)
                                                     {
                                                         <span class="badge bg-primary tenant-badge">
                                                             <i class="bi bi-star-fill me-1"></i>Owner
@@ -116,7 +115,7 @@
                                                     else
                                                     {
                                                         <span class="badge bg-secondary tenant-badge">
-                                                            @tenantUser.Role.ToString()
+                                                            @tenantCard.Role
                                                         </span>
                                                     }
                                                 </div>
@@ -124,7 +123,7 @@
                                             
                                             <div class="d-flex align-items-center text-muted small">
                                                 <i class="bi bi-person-badge me-2"></i>
-                                                <span>@tenantUser.Role.ToString() Access</span>
+                                                <span>@tenantCard.Role Access</span>
                                                 <span class="ms-auto">
                                                     <i class="bi bi-arrow-right-circle"></i>
                                                 </span>
@@ -149,31 +148,3 @@
         </div>
     </div>
 </div>
-
-@section Scripts {
-    <script>
-        function selectTenant(identifier, name) {
-            // Redirect to tenant subdomain
-            // In development: tenant.hubletix.home:9000
-            // In production: tenant.hubletix.com
-            const protocol = window.location.protocol;
-            const port = window.location.port ? ':' + window.location.port : '';
-            const hostname = window.location.hostname;
-            
-            // Determine base domain
-            let baseDomain = hostname;
-            if (hostname === 'hubletix.home' || hostname === '127.0.0.1') {
-                // Development environment
-                window.location.href = `${protocol}//${identifier}.${hostname}${port}@(Model.ReturnUrl ?? "/")`;
-            } else {
-                // Production environment - extract base domain
-                // Remove any existing subdomain
-                const parts = hostname.split('.');
-                if (parts.length > 2) {
-                    baseDomain = parts.slice(-2).join('.');
-                }
-                window.location.href = `${protocol}//${identifier}.${baseDomain}${port}@(Model.ReturnUrl ?? "/")`;
-            }
-        }
-    </script>
-}
