@@ -6,6 +6,7 @@ using Hubletix.Infrastructure.Persistence;
 using Hubletix.Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Hubletix.Core.Constants;
 
 namespace Hubletix.Api.Pages.Platform;
 
@@ -44,29 +45,21 @@ public class TenantSelectorModel : PlatformPageModel
         try
         {
             // Fetch user's tenants using extension method
-            UserTenants = await _dbContext.GetUserTenantsAsync(
+            var tenantUsers = await _dbContext.GetUserTenantsAsync(
                 PlatformUserId,
                 TenantUserStatus.Active
             );
 
-            _logger.LogInformation("User {UserId} has {TenantCount} active tenants",
-                PlatformUserId, UserTenants.Count);
+            // Should only display tenants that are active.
+            // Also, if a tenant is not active, only display if user is owner
+            // so they can resolve the outstanding action.
+            UserTenants = tenantUsers
+                .Where(
+                    tu => tu.Tenant.Status == TenantStatus.Active ||
+                          tu.IsOwner
+                )
+                .ToList();
 
-            // Auto-redirect if user has exactly one tenant
-            // TODO: Might add this back later, but for now
-            // Want to always show selector for testing purposes
-            // if (UserTenants.Count == 1)
-            // {
-            //     var tenant = UserTenants.First().Tenant;
-            //     _logger.LogInformation("Auto-redirecting user {UserId} to their only tenant: {TenantId}",
-            //         PlatformUserId, tenant.Id);
-
-            //     // Build tenant URL
-            //     var tenantUrl = BuildTenantUrl(tenant.Subdomain);
-            //     return Redirect(tenantUrl);
-            // }
-
-            // Show selector if user has 0 or 2+ tenants
             return Page();
         }
         catch (Exception ex)
