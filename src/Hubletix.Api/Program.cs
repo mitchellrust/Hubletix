@@ -39,24 +39,31 @@ builder.Services.AddIdentity<Hubletix.Core.Entities.User, Microsoft.AspNetCore.I
     .AddEntityFrameworkStores<AppDbContext>()
     .AddUserValidator<RequireEmailValidator>();
 
-// Configure Cookie Authentication (used by Identity)
-builder.Services.ConfigureApplicationCookie(options =>
-{
-    options.Cookie.Name = ".Hubletix.Auth";
-    options.Cookie.HttpOnly = true;
-    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment() 
-        ? CookieSecurePolicy.SameAsRequest 
-        : CookieSecurePolicy.Always;
-    options.Cookie.SameSite = SameSiteMode.Strict;
-    
+    // Configure Cookie Authentication (used by Identity)
     // Set cookie domain to share across subdomains
     var rootDomain = builder.Configuration["AppSettings:RootDomain"];
+    string? cookieDomain = null;
     if (!string.IsNullOrEmpty(rootDomain))
     {
         // Extract domain without port when local (e.g., "hubletix.home" from "hubletix.home:9000")
         var domain = rootDomain.Split(':')[0];
         // Set with leading dot to share across subdomains
-        options.Cookie.Domain = $".{domain}";
+        cookieDomain = $".{domain}";
+    }
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.Name = ".Hubletix.Auth";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment() 
+        ? CookieSecurePolicy.None // In development, allow non-HTTPS for local testing 
+        : CookieSecurePolicy.Always;
+    options.Cookie.SameSite = builder.Environment.IsDevelopment() 
+        ? SameSiteMode.Lax // In development, allow non-HTTPS for local testing 
+        : SameSiteMode.Strict;
+    
+    if (!string.IsNullOrEmpty(cookieDomain))
+    {
+        options.Cookie.Domain = cookieDomain;
     }
     
     options.ExpireTimeSpan = TimeSpan.FromMinutes(15);
@@ -64,6 +71,20 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LoginPath = "/login";
     options.LogoutPath = "/logout";
     options.AccessDeniedPath = "/unauthorized";
+});
+builder.Services.AddAntiforgery(options =>
+{
+    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
+        ? CookieSecurePolicy.None // In development, allow non-HTTPS for local testing
+        : CookieSecurePolicy.Always;
+    options.Cookie.SameSite = builder.Environment.IsDevelopment()
+        ? SameSiteMode.Lax // In development, allow non-HTTPS for local testing
+        : SameSiteMode.Strict;
+    
+    if (!string.IsNullOrEmpty(cookieDomain))
+    {
+        options.Cookie.Domain = cookieDomain;
+    }
 });
 
 // Authorization policies
@@ -195,8 +216,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseHttpsRedirection();
+else
+{
+    // In production, use HTTPS redirection
+    app.UseHttpsRedirection();
+}
 
 // Serve static files from wwwroot, required for Bootstrap CSS/JS
 app.UseStaticFiles();
