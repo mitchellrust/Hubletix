@@ -14,6 +14,7 @@ public class TenantsController : ControllerBase
     private readonly IMultiTenantContextAccessor<ClubTenantInfo> _multiTenantContextAccessor;
     private readonly ITenantConfigService _tenantConfigService;
     private readonly IStorageService _storageService;
+    private readonly IEventBridgeService _eventBridgeService;
     private readonly ILogger<TenantsController> _logger;
 
     public TenantsController(
@@ -21,12 +22,14 @@ public class TenantsController : ControllerBase
         IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor,
         ITenantConfigService tenantConfigService,
         IStorageService storageService,
+        IEventBridgeService eventBridgeService,
         ILogger<TenantsController> logger
     )
     {
         _multiTenantContextAccessor = multiTenantContextAccessor;
         _tenantConfigService = tenantConfigService;
         _storageService = storageService;
+        _eventBridgeService = eventBridgeService;
         _logger = logger;
     }
 
@@ -140,6 +143,35 @@ public class TenantsController : ControllerBase
                 "Successfully uploaded hero image for tenant {TenantId}: {ImageUrl}", 
                 tenantId, 
                 imageUrl);
+
+            // Publish HeroImageUpdated event to EventBridge for background processing
+            // Fire-and-forget: don't await to avoid blocking the response
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    // Extract image key from URL path
+                    // URL format: https://domain.com/tenant-{tenantId}/{imageId}.ext
+                    var uri = new Uri(imageUrl);
+                    var imageKey = uri.AbsolutePath.TrimStart('/');
+
+                    await _eventBridgeService.PublishHeroImageUpdatedAsync(
+                        imageUrl,
+                        imageKey);
+
+                    _logger.LogInformation(
+                        "Published HeroImageUpdated event for image: {ImageKey}",
+                        imageKey);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(
+                        ex,
+                        "Failed to publish HeroImageUpdated event for image: {ImageUrl}",
+                        imageUrl);
+                    // Don't re-throw in background task - log only
+                }
+            });
 
             return Ok(new { success = true, imageUrl });
         }

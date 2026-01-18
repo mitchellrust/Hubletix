@@ -136,6 +136,21 @@ builder.Services.AddSingleton<Amazon.S3.IAmazonS3>(sp =>
 });
 builder.Services.AddScoped<IStorageService, CloudflareR2StorageService>();
 
+// Register EventBridge service for publishing events
+builder.Services.AddSingleton<Amazon.EventBridge.IAmazonEventBridge>(sp =>
+{
+    return new Amazon.EventBridge.AmazonEventBridgeClient(
+        Amazon.RegionEndpoint.USEast1); // Use default region
+});
+builder.Services.AddScoped<IEventBridgeService>(sp =>
+{
+    var eventBridgeClient = sp.GetRequiredService<Amazon.EventBridge.IAmazonEventBridge>();
+    var config = sp.GetRequiredService<IConfiguration>();
+    var eventBusName = config["EventBridge:EventBusName"] ?? "hubletix-events-dev";
+    var logger = sp.GetRequiredService<ILogger<EventBridgeService>>();
+    return new EventBridgeService(eventBridgeClient, eventBusName, logger);
+});
+
 // Configure Razor Pages
 var razorPagesBuilder = builder.Services.AddRazorPages(options =>
 {

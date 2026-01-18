@@ -87,12 +87,15 @@
     var sectionClass = isPreviewMode ? "hero-section preview-mode" : "hero-section";
     var useAnimatedGradient = false;
     
-    // Build background style
+    // Build background style and image URLs for responsive variants
     string backgroundStyle;
-    if (!string.IsNullOrEmpty(backgroundImageUrl))
+    bool hasBackgroundImage = !string.IsNullOrEmpty(backgroundImageUrl);
+    
+    if (hasBackgroundImage)
     {
         // Use image with dark overlay for text readability
-        backgroundStyle = $"background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('{backgroundImageUrl}'); background-size: cover; background-position: center;";
+        // Note: This will be replaced by picture element in the HTML
+        backgroundStyle = $"background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)); background-size: cover; background-position: center;";
     }
     else
     {
@@ -100,6 +103,38 @@
         useAnimatedGradient = true;
         sectionClass += " animated-gradient-bg";
         backgroundStyle = "";
+    }
+
+    // Helper function to generate variant URLs
+    Func<string, int, string, string> generateVariantUrl = (imageId, width, format) =>
+    {
+        // Remove extension from canonical URL to get base path
+        var baseUrl = backgroundImageUrl ?? "";
+        var lastDotIndex = baseUrl.LastIndexOf('.');
+        if (lastDotIndex > 0)
+        {
+            var basePath = baseUrl[..lastDotIndex];
+            return $"{basePath}-{width}w-{format}-q{(format == "avif" ? 50 : (format == "webp" ? 75 : 80))}-v1.{(format == "jpeg" ? "jpg" : format)}";
+        }
+        return "";
+    };
+
+    // Extract image ID from URL if available
+    // Format: https://domain.com/tenant-{tenantId}/{imageId}.ext
+    string? imageId = null;
+    if (hasBackgroundImage && backgroundImageUrl != null)
+    {
+        var uri = new Uri(backgroundImageUrl);
+        var pathParts = uri.AbsolutePath.TrimStart('/').Split('/');
+        if (pathParts.Length >= 2)
+        {
+            var fileName = pathParts[^1];
+            var lastDotIndex = fileName.LastIndexOf('.');
+            if (lastDotIndex > 0)
+            {
+                imageId = fileName[..lastDotIndex];
+            }
+        }
     }
 }
 
@@ -120,8 +155,71 @@
     </style>
 }
 
-<section class="@sectionClass position-relative overflow-hidden" style="@backgroundStyle">
-    <div class="container">
+<section class="@sectionClass position-relative overflow-hidden" style="min-height: 500px; @backgroundStyle">
+    @* Background image with responsive variants *@
+    @if (hasBackgroundImage && !string.IsNullOrEmpty(backgroundImageUrl) && imageId != null)
+    {
+        <style>
+            .hero-section-bg-picture {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 0;
+            }
+
+            .hero-section-bg-picture img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                object-position: center;
+            }
+
+            .hero-section-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));
+                z-index: 1;
+            }
+
+            .hero-section-content {
+                position: relative;
+                z-index: 2;
+            }
+        </style>
+
+        <picture class="hero-section-bg-picture">
+            <!-- AVIF variants - highest quality -->
+            <source 
+                srcset="@generateVariantUrl(imageId, 640, "avif") 640w, @generateVariantUrl(imageId, 1280, "avif") 1280w, @generateVariantUrl(imageId, 1920, "avif") 1920w" 
+                type="image/avif" />
+            
+            <!-- WebP variants - good quality and broad support -->
+            <source 
+                srcset="@generateVariantUrl(imageId, 640, "webp") 640w, @generateVariantUrl(imageId, 1280, "webp") 1280w, @generateVariantUrl(imageId, 1920, "webp") 1920w" 
+                type="image/webp" />
+            
+            <!-- JPEG variants - fallback for older browsers -->
+            <source 
+                srcset="@generateVariantUrl(imageId, 640, "jpeg") 640w, @generateVariantUrl(imageId, 1280, "jpeg") 1280w, @generateVariantUrl(imageId, 1920, "jpeg") 1920w" 
+                type="image/jpeg" />
+            
+            <!-- Canonical/original image as ultimate fallback -->
+            <img 
+                src="@backgroundImageUrl" 
+                alt="Hero background image"
+                loading="lazy"
+                decoding="async" />
+        </picture>
+
+        <div class="hero-section-overlay"></div>
+    }
+
+    <div class="container hero-section-content">
         <div class="row min-vh-50 align-items-center py-5">
             <div class="col-lg-8 col-xl-7 text-white">
                 @if (!string.IsNullOrEmpty(heading))
