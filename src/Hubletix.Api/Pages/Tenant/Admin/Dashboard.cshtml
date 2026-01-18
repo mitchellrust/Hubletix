@@ -44,24 +44,34 @@
                             <span><i class="bi bi-exclamation-circle text-warning"></i> Continue setting up your Stripe account to start accepting payments.</span>
                         }
                     </p>
-                    <form method="post" asp-page-handler="@(Model.CurrentTenant?.StripeOnboardingState != Hubletix.Core.Constants.StripeOnboardingState.Completed && Model.CurrentTenant?.DetailsSubmitted == true ? "ContinueStripeSetup" : "SetupStripe")">
-                        <button type="submit" 
-                                class="btn @(Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.Completed ? "btn-outline-secondary" : "btn-primary")"
-                                disabled="@(Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.Completed)">
-                            @if (Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.Completed)
-                            {
-                                <i class="bi bi-check-circle me-2"></i><span>Setup Complete</span>
-                            }
-                            else if (Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.NotStarted)
-                            {
-                                <i class="bi bi-plus-circle me-2"></i><span>Setup Stripe Connect</span>
-                            }
-                            else
-                            {
-                                <i class="bi bi-arrow-repeat me-2"></i><span>Continue Stripe Setup</span>
-                            }
-                        </button>
-                    </form>
+                    <div class="d-flex gap-2">
+                        <form method="post" asp-page-handler="@(Model.CurrentTenant?.StripeOnboardingState != Hubletix.Core.Constants.StripeOnboardingState.Completed && Model.CurrentTenant?.DetailsSubmitted == true ? "ContinueStripeSetup" : "SetupStripe")">
+                            <button type="submit" 
+                                    class="btn @(Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.Completed ? "btn-outline-secondary" : "btn-primary")"
+                                    disabled="@(Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.Completed)">
+                                @if (Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.Completed)
+                                {
+                                    <i class="bi bi-check-circle me-2"></i><span>Setup Complete</span>
+                                }
+                                else if (Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.NotStarted)
+                                {
+                                    <i class="bi bi-plus-circle me-2"></i><span>Setup Stripe Connect</span>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-arrow-repeat me-2"></i><span>Continue Stripe Setup</span>
+                                }
+                            </button>
+                        </form>
+                        @if (Model.CurrentTenant?.StripeOnboardingState != Hubletix.Core.Constants.StripeOnboardingState.Completed && Model.CurrentTenant?.StripeOnboardingState != Hubletix.Core.Constants.StripeOnboardingState.NotStarted)
+                        {
+                            <form method="post" asp-page-handler="RefreshStripeAccount">
+                                <button type="submit" class="btn btn-outline-primary" title="Refresh account status from Stripe">
+                                    <i class="bi bi-arrow-clockwise me-2"></i><span>Refresh Status</span>
+                                </button>
+                            </form>
+                        }
+                    </div>
                     @if (!string.IsNullOrEmpty(Model.TenantAdminDashboardErrorMessage))
                     {
                         <div class="alert alert-danger mt-3 mb-0">

@@ -105,6 +105,13 @@ public interface ITenantOnboardingService
         string refreshUrl,
         string returnUrl,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Refresh Stripe account information and update tenant accordingly
+    /// </summary>
+    Task RefreshStripeAccountAsync(
+        string tenantId,
+        CancellationToken cancellationToken = default);
 }
 
 public class TenantOnboardingService : ITenantOnboardingService
@@ -680,6 +687,59 @@ public class TenantOnboardingService : ITenantOnboardingService
         );
 
         return updateUrl;
+    }
+
+    public async Task RefreshStripeAccountAsync(
+        string tenantId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        // Load tenant (from central DB)
+        var tenant = await _tenantConfigService.GetTenantAsync(tenantId);
+        if (tenant == null)
+        {
+            throw new InvalidOperationException($"Tenant '{tenantId}' not found.");
+        }
+
+        // Ensure tenant has a Stripe account
+        if (string.IsNullOrEmpty(tenant.StripeAccountId))
+        {
+            throw new InvalidOperationException("Tenant does not have a Stripe Connect account set up.");
+        }
+
+        // Retrieve the Stripe account information
+        var account = await _stripeConnectService.GetConnectAccountAsync(
+            tenant.StripeAccountId,
+            cancellationToken
+        );
+        if (account == null)
+        {
+            throw new InvalidOperationException("Stripe Connect account not found.");
+        }
+
+        // Update tenant with latest account information only if something changed
+        if (
+            tenant.ChargesEnabled != account.ChargesEnabled ||
+            tenant.PayoutsEnabled != account.PayoutsEnabled ||
+            tenant.DetailsSubmitted != account.DetailsSubmitted
+        )
+        {
+            var previousChargesEnabled = tenant.ChargesEnabled;
+
+            tenant.ChargesEnabled = account.ChargesEnabled;
+            tenant.PayoutsEnabled = account.PayoutsEnabled;
+            tenant.DetailsSubmitted = account.DetailsSubmitted;
+
+            // Check if onboarding just completed (charges enabled for first time)
+            if (account.ChargesEnabled && !previousChargesEnabled)
+            {
+                tenant.StripeOnboardingState = StripeOnboardingState.Completed;
+                tenant.OnboardingCompletedAt = DateTime.UtcNow;
+            }
+
+
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
     }
 
     // Private helper methods

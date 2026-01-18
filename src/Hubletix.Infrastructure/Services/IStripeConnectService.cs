@@ -35,6 +35,17 @@ public interface IStripeConnectService
     Task<string> UpdateConnectAccountAsync(string tenantId, string stripeAccountId, string name, string email, TenantConfig tenantConfig, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Retrieves a Stripe Connect account.
+    /// </summary>
+    /// <param name="stripeAccountId">The Stripe Connect account ID</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>The Stripe Connect account</returns>
+    Task<Account?> GetConnectAccountAsync(
+        string stripeAccountId,
+        CancellationToken cancellationToken = default
+    );
+
+    /// <summary>
     /// Creates an account link for onboarding a Connect account.
     /// </summary>
     /// <param name="stripeAccountId">The Stripe Connect account ID</param>
