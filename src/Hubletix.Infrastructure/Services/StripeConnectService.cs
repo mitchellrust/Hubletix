@@ -18,7 +18,6 @@ public class StripeConnectService : IStripeConnectService
     private const string RESPONSIBILITIES_STRIPE = "stripe";
     private const string DASHBOARD_FULL = "full";
     private const string ACCOUNT_LINK_USE_CASE_ACCOUNT_ONBOARDING = "account_onboarding";
-    private const string ACCOUNT_ONBOARDING_CONFIG_MERCHANT = "merchant";
     private const string ACCOUNT_ONBOARDING_COLLECTION_FIELDS = "currently_due";
     private const string PRICE_TAX_BEHAVIOR = "exclusive";
     private const string CHECKOUT_SESSION_MODE_SUBSCRIPTION = "subscription";
@@ -168,6 +167,17 @@ public class StripeConnectService : IStripeConnectService
         var account = await accountService.UpdateAsync(stripeAccountId, options, cancellationToken: cancellationToken);
         
         return account.Id;
+    }
+
+    public async Task<Stripe.Account?> GetConnectAccountAsync(
+        string stripeAccountId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var service = new Stripe.AccountService(_stripeClient);
+        var account = await service.GetAsync(stripeAccountId, cancellationToken: cancellationToken);
+   
+        return account;
     }
 
     public async Task<string> CreateAccountLinkAsync(

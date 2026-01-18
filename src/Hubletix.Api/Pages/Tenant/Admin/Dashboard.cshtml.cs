@@ -182,6 +182,42 @@ public class DashboardModel : TenantAdminPageModel
             return RedirectToPage();
         }
     }
+
+    public async Task<IActionResult> OnPostRefreshStripeAccountAsync()
+    {
+        try
+        {
+            // Refresh Stripe account information
+            await _tenantOnboardingService.RefreshStripeAccountAsync(
+                CurrentTenantInfo.Id
+            );
+
+            // Redirect back to dashboard to show updated state
+            return RedirectToPage();
+        }
+        catch (InvalidOperationException ex)
+        {
+            // Handle business logic errors
+            _logger.LogError(
+                ex,
+                "Error refreshing Stripe account for tenant {TenantId}",
+                CurrentTenantInfo.Id
+            );
+            TenantAdminDashboardErrorMessage = ex.Message;
+            return RedirectToPage();
+        }
+        catch (Exception ex)
+        {
+            // Log error and show generic message
+            _logger.LogError(
+                ex,
+                "Unexpected error refreshing Stripe account for tenant {TenantId}",
+                CurrentTenantInfo.Id
+            );
+            TenantAdminDashboardErrorMessage = $"Failed to refresh Stripe account: {ex.Message}";
+            return RedirectToPage();
+        }
+    }
 }
 
 /// <summary>

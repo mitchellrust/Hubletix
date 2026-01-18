@@ -107,7 +107,16 @@ public class SetupOrganizationModel : PlatformPageModel
             if (!string.IsNullOrEmpty(session.TenantId))
             {
                 _logger.LogInformation("Organization setup already completed: {SessionId}", SessionId);
-                return await InitializeBillingAsync();
+                try
+                {
+                    return await InitializeBillingAsync();
+                }
+                catch (Exception ex)
+                {
+                    // Something got in a bad state, returning error for the user.
+                    _logger.LogCritical(ex, "Error initializing billing for session: {SessionId}", SessionId);
+                    return RedirectToPage("/Platform/Error");
+                }
             }
 
             return Page();
