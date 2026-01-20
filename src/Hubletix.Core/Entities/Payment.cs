@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using Hubletix.Core.Models;
 
 namespace Hubletix.Core.Entities;
@@ -18,9 +19,15 @@ public class Payment : BaseEntity
     public string StripePaymentId { get; set; } = null!;
     
     /// <summary>
-    /// Amount in cents
+    /// Price in cents
     /// </summary>
-    public int AmountInCents { get; set; }
+    public int PriceInCents { get; set; }
+
+    /// <summary>
+    /// Price formatted to dollar amount (e.g., 99.99)
+    /// </summary>
+    [NotMapped]
+    public decimal PriceInDollars => PriceInCents / 100.0m;
     
     /// <summary>
     /// Currency code (e.g., "usd")

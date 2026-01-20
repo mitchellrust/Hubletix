@@ -22,6 +22,14 @@
         "dist/cropper.js",
         "dist/cropper.min.js"
       ]
+    },
+    {
+      "library": "chart.js@4.4.1",
+      "destination": "wwwroot/lib/chartjs",
+      "files": [
+        "dist/chart.umd.js",
+        "dist/chart.umd.min.js"
+      ]
     }
   ]
 }

@@ -1,5 +1,6 @@
 @page
 @model DashboardModel
+@using System.Text.Json
 @{
     ViewData["Title"] = "Dashboard";
     ViewData["TenantName"] = Model.CurrentTenantInfo.Name;
@@ -63,11 +64,12 @@
         </div>
     }
 
-        <!-- Stripe Connect Onboarding -->
-        @if (Model.CurrentTenant?.StripeOnboardingState != Hubletix.Core.Constants.StripeOnboardingState.Completed)
-        {
-            <div class="col-12 col-lg-6 mb-3">
-                <div class="card border-0 shadow-sm @(Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.Completed ? "bg-success-subtle" : "bg-light") h-100">
+    <!-- Stripe Connect Onboarding -->
+    @if (Model.CurrentTenant?.StripeOnboardingState != Hubletix.Core.Constants.StripeOnboardingState.Completed)
+    {
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm @(Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.Completed ? "bg-success-subtle" : "bg-light")">
                     <div class="card-body">
                         <h5 class="card-title mb-3">
                             <i class="bi bi-credit-card"></i> 
@@ -139,32 +141,310 @@
                     </div>
                 </div>
             </div>
-        }
+        </div>
+    }
+
+    <!-- Key Performance Indicators -->
+    <div class="row mb-4">
+        <div class="col-12 col-md-6 col-xl-3 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="card-title text-muted text-uppercase small mb-2">Active Members</h6>
+                            <h2 class="text-primary mb-0">@Model.MemberMetrics.ActiveMembers</h2>
+                            @if (Model.MemberMetrics.NewMembersLast30Days > 0)
+                            {
+                                <small class="text-success">
+                                    <i class="bi bi-arrow-up"></i> @Model.MemberMetrics.NewMembersLast30Days new last 30 days
+                                </small>
+                            }
+                        </div>
+                        <div class="text-primary fs-1">
+                            <i class="bi bi-people"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-xl-3 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="card-title text-muted text-uppercase small mb-2">Active Events</h6>
+                            <h2 class="text-success mb-0">@Model.TenantStats.ActiveEvents</h2>
+                            <small class="text-muted">Upcoming or in progress</small>
+                        </div>
+                        <div class="text-success fs-1">
+                            <i class="bi bi-calendar-event"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-xl-3 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="card-title text-muted text-uppercase small mb-2">Monthly Revenue</h6>
+                            <h2 class="text-warning mb-0">$@Model.FinancialMetrics.MonthlyRevenueInDollars.ToString("N2")</h2>
+                            @if (Model.FinancialMetrics.PreviousMonthRevenueInDollars > 0)
+                            {
+                                decimal percentChange = ((Model.FinancialMetrics.MonthlyRevenueInDollars - Model.FinancialMetrics.PreviousMonthRevenueInDollars) / (decimal)Model.FinancialMetrics.PreviousMonthRevenueInDollars) * 100;
+                                @if (percentChange >= 0)
+                                {
+                                    <small class="text-success">
+                                        <i class="bi bi-arrow-up"></i> @percentChange.ToString("F1")% vs last month
+                                    </small>
+                                }
+                                else
+                                {
+                                    <small class="text-danger">
+                                        <i class="bi bi-arrow-down"></i> @Math.Abs(percentChange).ToString("F1")% vs last month
+                                    </small>
+                                }
+                            }
+                        </div>
+                        <div class="text-warning fs-1">
+                            <i class="bi bi-currency-dollar"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-xl-3 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="card-title text-muted text-uppercase small mb-2">Attendance Rate</h6>
+                            <h2 class="text-info mb-0">@Model.RegistrationMetrics.AttendanceRate.ToString("F1")%</h2>
+                            <small class="text-muted">From past events</small>
+                        </div>
+                        <div class="text-info fs-1">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Stats Row (placeholder) -->
     <div class="row mb-4">
-        <div class="col-12 col-md-3 mb-3">
-            <div class="card border-0 shadow-sm">
+        <!-- Financial Overview -->
+        <div class="col-12 col-xl-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>Financial Overview</h5>
+                </div>
                 <div class="card-body">
-                    <h6 class="card-title text-muted text-uppercase small">Total Members</h6>
-                    <h2 class="text-primary">@Model.TenantStats.TotalMembers</h2>
+                    @if (Model.FinancialMetrics.TotalRevenueInDollars == 0)
+                    {
+                        <div class="text-center py-5 text-muted">
+                            <i class="bi bi-cash-stack fs-1 mb-3 d-block"></i>
+                            <p>No revenue data yet</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <p class="text-muted small mb-1">Total Revenue</p>
+                                <h4 class="mb-0">$@Model.FinancialMetrics.TotalRevenueInDollars.ToString("N2")</h4>
+                            </div>
+                            <div class="col-6">
+                                <p class="text-muted small mb-1">Payment Success Rate</p>
+                                <h4 class="mb-0">@Model.FinancialMetrics.PaymentSuccessRate.ToString("F1")%</h4>
+                            </div>
+                        </div>
+                        <hr />
+                        <h6 class="mb-3">Recent Transactions</h6>
+                        @if (Model.FinancialMetrics.RecentTransactions.Any())
+                        {
+                            <div class="list-group list-group-flush">
+                                @foreach (var transaction in Model.FinancialMetrics.RecentTransactions)
+                                {
+                                    <div class="list-group-item px-0 py-2">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div class="flex-grow-1">
+                                                <div class="fw-semibold">$@transaction.AmountInDollars.ToString("N2")</div>
+                                                <small class="text-muted">
+                                                    @if (!string.IsNullOrEmpty(transaction.EventName))
+                                                    {
+                                                        <span>@transaction.EventName</span>
+                                                        @if (!string.IsNullOrEmpty(transaction.UserName))
+                                                        {
+                                                            <span> - @transaction.UserName</span>
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <span>Payment</span>
+                                                    }
+                                                </small>
+                                            </div>
+                                            <div class="text-end">
+                                                <span class="badge @(transaction.Status == "succeeded" ? "bg-success" : transaction.Status == "pending" ? "bg-warning" : "bg-danger")">
+                                                    @transaction.Status
+                                                </span>
+                                                <small class="text-muted d-block">@transaction.CreatedAt.ToString("MMM dd")</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted text-center py-3">No recent transactions</p>
+                        }
+                    }
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-3 mb-3">
-            <div class="card border-0 shadow-sm">
+
+        <!-- Member Insights -->
+        <div class="col-12 col-xl-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0"><i class="bi bi-people me-2"></i>Member Insights</h5>
+                </div>
                 <div class="card-body">
-                    <h6 class="card-title text-muted text-uppercase small">Active Events</h6>
-                    <h2 class="text-success">@Model.TenantStats.ActiveEvents</h2>
+                    @if (Model.MemberMetrics.TotalMembers == 0)
+                    {
+                        <div class="text-center py-5 text-muted">
+                            <i class="bi bi-people fs-1 mb-3 d-block"></i>
+                            <p>No members yet</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="row mb-3">
+                            <div class="col-4">
+                                <p class="text-muted small mb-1">Total</p>
+                                <h5 class="mb-0">@Model.MemberMetrics.TotalMembers</h5>
+                            </div>
+                            <div class="col-4">
+                                <p class="text-muted small mb-1">Active</p>
+                                <h5 class="mb-0 text-success">@Model.MemberMetrics.ActiveMembers</h5>
+                            </div>
+                            <div class="col-4">
+                                <p class="text-muted small mb-1">Inactive</p>
+                                <h5 class="mb-0 text-secondary">@Model.MemberMetrics.InactiveMembers</h5>
+                            </div>
+                        </div>
+                        @if (Model.MemberMetrics.PendingInvites > 0)
+                        {
+                            <div class="alert alert-info py-2 mb-3">
+                                <i class="bi bi-envelope me-2"></i>
+                                <strong>@Model.MemberMetrics.PendingInvites</strong> pending invite@(Model.MemberMetrics.PendingInvites > 1 ? "s" : "")
+                            </div>
+                        }
+                        <div class="mb-3">
+                            <h6 class="mb-2">Member Growth (Last 30 Days)</h6>
+                            <div style="height: 150px;">
+                                <canvas id="memberGrowthChart"></canvas>
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-3 mb-3">
-            <div class="card border-0 shadow-sm">
+    </div>
+
+    <div class="row mb-4">
+        <!-- Event Performance -->
+        <div class="col-12 col-xl-8 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0"><i class="bi bi-calendar-event me-2"></i>Event Performance</h5>
+                </div>
                 <div class="card-body">
-                    <h6 class="card-title text-muted text-uppercase small">Revenue</h6>
-                    <h2 class="text-warning">$12.5K</h2>
+                    @if (!Model.EventMetrics.UpcomingEventsCapacity.Any() && !Model.EventMetrics.EventTypeDistribution.Any() && !Model.RegistrationMetrics.RegistrationTrendLast30Days.Any())
+                    {
+                        <div class="text-center py-5 text-muted">
+                            <i class="bi bi-calendar-x fs-1 mb-3 d-block"></i>
+                            <p>No event data yet</p>
+                        </div>
+                    }
+                    else
+                    {
+                        @if (Model.EventMetrics.UpcomingEventsCapacity.Any())
+                        {
+                            <div class="mb-4">
+                                <h6 class="mb-3">Capacity Utilization (Upcoming Events)</h6>
+                                <div style="height: 300px;">
+                                    <canvas id="capacityChart"></canvas>
+                                </div>
+                            </div>
+                        }
+                        
+                        <div class="row">
+                            @if (Model.EventMetrics.EventTypeDistribution.Any())
+                            {
+                                <div class="col-md-6 mb-3 mb-md-0">
+                                    <h6 class="mb-3">Event Type Distribution</h6>
+                                    <div style="height: 250px;">
+                                        <canvas id="eventTypeChart"></canvas>
+                                    </div>
+                                </div>
+                            }
+                            @if (Model.RegistrationMetrics.RegistrationTrendLast30Days.Any())
+                            {
+                                <div class="col-md-6">
+                                    <h6 class="mb-3">Registration Trend (Last 30 Days)</h6>
+                                    <div style="height: 250px;">
+                                        <canvas id="registrationTrendChart"></canvas>
+                                    </div>
+                                </div>
+                            }
+                            @if (!Model.EventMetrics.EventTypeDistribution.Any() && !Model.RegistrationMetrics.RegistrationTrendLast30Days.Any())
+                            {
+                                <div class="col-12 text-center py-3 text-muted">
+                                    <p>No event statistics available yet</p>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="col-12 col-xl-4 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Recent Activity</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.RecentActivities.Any())
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (RecentActivityDto activity in Model.RecentActivities)
+                            {
+                                <div class="list-group-item px-0 py-3">
+                                    <div class="d-flex">
+                                        <div class="me-3">
+                                            <i class="@activity.Icon text-primary"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <p class="mb-1 small">@activity.Description</p>
+                                            <small class="text-muted">@activity.CreatedAt.ToString("MMM dd, h:mm tt")</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5 text-muted">
+                            <i class="bi bi-clock-history fs-1 mb-3 d-block"></i>
+                            <p>No recent activity</p>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
@@ -175,38 +455,218 @@
         <div class="col-12">
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Upcoming Events</h5>
+                    <h5 class="mb-0"><i class="bi bi-calendar-week me-2"></i>Upcoming Events</h5>
                     <a href="/admin/events" class="btn btn-sm btn-outline-primary">View All</a>
                 </div>
                 <div class="card-body p-0">
-                    <div class="list-group list-group-flush">
-                        @foreach (UpcomingEventDto evt in Model.UpcomingEvents)
-                        {
-                            <div class="list-group-item px-4 py-3 d-flex justify-content-between align-items-center">
-                                <div class="flex-grow-1">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <div class="badge bg-primary me-2">@evt.Date.ToString("MMM dd, yyyy")</div>
-                                        <h6 class="mb-0 fw-semibold">@evt.Name</h6>
-                                        @if (evt.IsHappening)
-                                        {
-                                            <span class="badge bg-success ms-2">Happening Now</span>
-                                        }
+                    @if (Model.UpcomingEvents.Any())
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (UpcomingEventDto evt in Model.UpcomingEvents)
+                            {
+                                <div class="list-group-item px-4 py-3 d-flex justify-content-between align-items-center">
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div class="badge bg-primary me-2">@evt.Date.ToString("MMM dd, yyyy")</div>
+                                            <h6 class="mb-0 fw-semibold">@evt.Name</h6>
+                                            @if (evt.IsHappening)
+                                            {
+                                                <span class="badge bg-success ms-2">Happening Now</span>
+                                            }
+                                        </div>
+                                        <p class="text-muted small mb-0">
+                                            <i class="bi bi-clock"></i> @evt.Time | 
+                                            @if (!string.IsNullOrEmpty(evt.LocationDetails))
+                                            {
+                                                <i class="bi bi-geo-alt"></i> @($"{evt.LocationDetails} | ")
+                                            }
+                                            <i class="bi bi-people"></i> @evt.Registrations registrations
+                                        </p>
                                     </div>
-                                    <p class="text-muted small mb-0">
-                                        <i class="bi bi-clock"></i> @evt.Time | 
-                                        @if (!string.IsNullOrEmpty(evt.LocationDetails))
-                                        {
-                                            <i class="bi bi-geo-alt"></i> @($"{evt.LocationDetails} | ")
-                                        }
-                                        <i class="bi bi-people"></i> @evt.Registrations registrations
-                                    </p>
+                                    <a href="/admin/events/@evt.Id" class="btn btn-sm btn-outline-secondary">Manage</a>
                                 </div>
-                                <a href="/admin/events/@evt.Id" class="btn btn-sm btn-outline-secondary">Manage</a>
-                            </div>
-                        }
-                    </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5 text-muted">
+                            <i class="bi bi-calendar-x fs-1 mb-3 d-block"></i>
+                            <p>No upcoming events</p>
+                            <a href="/admin/events/create" class="btn btn-primary">Create Your First Event</a>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+<script>
+    // Prepare data for charts
+    const memberGrowthData = @Html.Raw(JsonSerializer.Serialize(Model.MemberMetrics.MemberGrowthLast30Days));
+    const capacityData = @Html.Raw(JsonSerializer.Serialize(Model.EventMetrics.UpcomingEventsCapacity));
+    const eventTypeData = @Html.Raw(JsonSerializer.Serialize(Model.EventMetrics.EventTypeDistribution));
+    const registrationTrendData = @Html.Raw(JsonSerializer.Serialize(Model.RegistrationMetrics.RegistrationTrendLast30Days));
+
+    // Color palette
+    const colors = {
+        primary: '#0d6efd',
+        success: '#198754',
+        warning: '#ffc107',
+        danger: '#dc3545',
+        info: '#0dcaf0',
+        secondary: '#6c757d'
+    };
+
+    // Chart.js default configuration
+    Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+    Chart.defaults.color = '#6c757d';
+
+    // Member Growth Chart
+    if (memberGrowthData && memberGrowthData.length > 0) {
+        const ctx = document.getElementById('memberGrowthChart');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: memberGrowthData.map(d => new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
+                    datasets: [{
+                        label: 'New Members',
+                        data: memberGrowthData.map(d => d.count),
+                        borderColor: colors.primary,
+                        backgroundColor: colors.primary + '20',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    // Capacity Utilization Chart
+    if (capacityData && capacityData.length > 0) {
+        const ctx = document.getElementById('capacityChart');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: capacityData.map(e => e.eventName.length > 30 ? e.eventName.substring(0, 30) + '...' : e.eventName),
+                    datasets: [
+                        {
+                            label: 'Registered',
+                            data: capacityData.map(e => e.registeredCount),
+                            backgroundColor: colors.success
+                        },
+                        {
+                            label: 'Available',
+                            data: capacityData.map(e => Math.max(0, e.maxCapacity - e.registeredCount)),
+                            backgroundColor: colors.secondary + '40'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            stacked: true
+                        },
+                        y: {
+                            stacked: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    // Event Type Distribution Chart
+    if (eventTypeData && Object.keys(eventTypeData).length > 0) {
+        const ctx = document.getElementById('eventTypeChart');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(eventTypeData),
+                    datasets: [{
+                        data: Object.values(eventTypeData),
+                        backgroundColor: [colors.primary, colors.success, colors.warning, colors.danger, colors.info, colors.secondary]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    // Registration Trend Chart
+    if (registrationTrendData && registrationTrendData.length > 0) {
+        const ctx = document.getElementById('registrationTrendChart');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: registrationTrendData.map(d => new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
+                    datasets: [{
+                        label: 'Registrations',
+                        data: registrationTrendData.map(d => d.count),
+                        borderColor: colors.info,
+                        backgroundColor: colors.info + '20',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+</script>
+}
