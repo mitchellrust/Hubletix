@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Hubletix.Core.Entities;
 using Hubletix.Core.Constants;
 using Hubletix.Core.Enums;
@@ -88,6 +89,14 @@ public interface ITenantOnboardingService
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Refresh signup session by checking Stripe checkout session status.
+    /// If payment is complete, activates tenant idempotently. Used to reconcile missed webhooks.
+    /// </summary>
+    Task RefreshPlatformSubscriptionAsync(
+        string sessionId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Sets up Stripe Connect for an existing tenant (existing functionality)
     /// </summary>
     Task<string> SetupStripeConnectAsync(
@@ -122,6 +131,7 @@ public class TenantOnboardingService : ITenantOnboardingService
     private readonly IStripeConnectService _stripeConnectService;
     private readonly IStripePlatformService _stripePlatformService;
     private readonly ITenantConfigService _tenantConfigService;
+    private readonly ILogger<TenantOnboardingService> _logger;
     private const string SIGNUP_SESSION_ID_KEY = "signup_session_id";
     private const string TENANT_ID_KEY = "tenant_id";
     private const string PLATFORM_PLAN_ID_KEY = "plan_id";
@@ -132,7 +142,8 @@ public class TenantOnboardingService : ITenantOnboardingService
         UserManager<User> userManager,
         IStripeConnectService stripeConnectService,
         IStripePlatformService stripePlatformService,
-        ITenantConfigService tenantConfigService)
+        ITenantConfigService tenantConfigService,
+        ILogger<TenantOnboardingService> logger)
     {
         _dbContext = dbContext;
         _tenantStoreDbContext = tenantStoreDbContext;
@@ -140,6 +151,7 @@ public class TenantOnboardingService : ITenantOnboardingService
         _stripeConnectService = stripeConnectService;
         _stripePlatformService = stripePlatformService;
         _tenantConfigService = tenantConfigService;
+        _logger = logger;
     }
 
     /// <summary>
@@ -760,6 +772,132 @@ public class TenantOnboardingService : ITenantOnboardingService
         }
 
         return tenant;
+    }
+
+    /// <summary>
+    /// Refresh signup session by checking Stripe checkout session status.
+    /// If payment is complete, activates tenant idempotently. Used to reconcile missed webhooks.
+    /// </summary>
+    public async Task RefreshPlatformSubscriptionAsync(
+        string sessionId,
+        CancellationToken cancellationToken = default)
+    {
+        // Load signup session with related entities
+        var session = await _dbContext.SignupSessions
+            .Include(s => s.Tenant)
+            .Include(s => s.PlatformPlan)
+            .FirstOrDefaultAsync(s => s.Id == sessionId, cancellationToken);
+
+        if (session == null)
+        {
+            _logger.LogWarning("Signup session not found for refresh: {SessionId}", sessionId);
+            return;
+        }
+
+        // Skip if already completed
+        if (session.State == SignupSessionState.Completed)
+        {
+            _logger.LogDebug("Signup session already completed, skipping refresh: {SessionId}", sessionId);
+            return;
+        }
+
+        // Tenant and checkout session must exist to check Stripe
+        if (session.Tenant == null)
+        {
+            _logger.LogDebug("Tenant not yet created, skipping refresh: {SessionId}", sessionId);
+            return;
+        }
+
+        if (string.IsNullOrEmpty(session.StripeCheckoutSessionId))
+        {
+            _logger.LogDebug("Stripe checkout session not yet created, skipping refresh: {SessionId}", sessionId);
+            return;
+        }
+
+        _logger.LogInformation("Refreshing platform subscription status from Stripe: SessionId={SessionId}, CheckoutSessionId={CheckoutSessionId}",
+            sessionId, session.StripeCheckoutSessionId);
+
+        try
+        {
+            // Fetch checkout session from Stripe
+            var checkoutSession = await _stripePlatformService.GetCheckoutSessionAsync(
+                session.StripeCheckoutSessionId,
+                cancellationToken);
+
+            if (checkoutSession == null)
+            {
+                _logger.LogWarning("Stripe checkout session not found: {CheckoutSessionId}", session.StripeCheckoutSessionId);
+                return;
+            }
+
+            // Check if checkout is complete and has a subscription
+            if (checkoutSession.Status != "complete" || checkoutSession.PaymentStatus != "paid")
+            {
+                _logger.LogDebug("Checkout session not yet complete: SessionId={SessionId}, Status={Status}, PaymentStatus={PaymentStatus}",
+                    sessionId, checkoutSession.Status, checkoutSession.PaymentStatus);
+                return;
+            }
+
+            if (checkoutSession.Mode != "subscription" || string.IsNullOrEmpty(checkoutSession.SubscriptionId))
+            {
+                _logger.LogWarning("Checkout session is not a subscription or missing subscription ID: SessionId={SessionId}, Mode={Mode}",
+                    sessionId, checkoutSession.Mode);
+                return;
+            }
+
+            _logger.LogInformation("Checkout session is complete: SessionId={SessionId}, SubscriptionId={SubscriptionId}, CustomerId={CustomerId}",
+                sessionId, checkoutSession.SubscriptionId, checkoutSession.CustomerId);
+
+            // Fetch the subscription to get period dates
+            var subscription = await _stripePlatformService.GetSubscriptionAsync(
+                checkoutSession.SubscriptionId,
+                cancellationToken);
+
+            if (subscription == null)
+            {
+                _logger.LogWarning("Subscription not found in Stripe: {SubscriptionId}", checkoutSession.SubscriptionId);
+                return;
+            }
+
+            // Get all active platform plan price IDs from database (matching webhook logic)
+            var platformPlanPriceIds = await _dbContext.PlatformPlans
+                .Where(p => !string.IsNullOrEmpty(p.StripePriceId))
+                .Select(p => p.StripePriceId!)
+                .ToListAsync(cancellationToken);
+
+            var dbPriceSet = new HashSet<string>(platformPlanPriceIds);
+
+            // Find subscription item with matching platform plan price
+            var matchingItem = subscription.Items.Data
+                .FirstOrDefault(i => i.Price != null && dbPriceSet.Contains(i.Price.Id));
+
+            if (matchingItem == null)
+            {
+                _logger.LogWarning("No matching platform plan found in subscription: SessionId={SessionId}, SubscriptionId={SubscriptionId}",
+                    sessionId, subscription.Id);
+                return;
+            }
+
+            _logger.LogInformation("Found matching platform subscription in Stripe: SessionId={SessionId}, SubscriptionId={SubscriptionId}, Status={Status}",
+                sessionId, subscription.Id, subscription.Status);
+
+            // Activate tenant idempotently using existing activation logic
+            await ActivateTenantAsync(
+                subscription.Id,
+                subscription.CustomerId,
+                subscription.CustomerAccount,
+                matchingItem.CurrentPeriodStart,
+                matchingItem.CurrentPeriodEnd,
+                signupSessionId: sessionId,
+                cancellationToken: cancellationToken);
+
+            _logger.LogInformation("Successfully refreshed and activated tenant from Stripe: SessionId={SessionId}", sessionId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error refreshing platform subscription from Stripe: SessionId={SessionId}", sessionId);
+            // Don't throw - this is a best-effort reconciliation
+        }
     }
 
     // Private helper methods

@@ -119,6 +119,19 @@ public class StripePlatformService : IStripePlatformService
         return await service.GetAsync(subscriptionId, cancellationToken: cancellationToken);
     }
 
+    public async Task<List<Subscription>> GetCustomerSubscriptionsAsync(string customerId, CancellationToken cancellationToken = default)
+    {
+        var options = new SubscriptionListOptions
+        {
+            Customer = customerId,
+        };
+
+        var service = new SubscriptionService(_stripeClient);
+        var subscriptions = await service.ListAsync(options, cancellationToken: cancellationToken);
+        
+        return subscriptions.Data.ToList();
+    }
+
     public async Task CancelSubscriptionAsync(string subscriptionId, CancellationToken cancellationToken = default)
     {
         var service = new SubscriptionService(_stripeClient);

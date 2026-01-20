@@ -52,6 +52,45 @@ public class SuccessModel : PlatformPageModel
             // Check if tenant is activated
             IsActivated = session.State == SignupSessionState.Completed;
 
+            // If not activated and tenant exists, try to refresh status from Stripe (once per page view)
+            if (!IsActivated && session.Tenant != null)
+            {
+                var cookieName = $"hubletix_signup_refresh_{SessionId}";
+                
+                // Check if we've already attempted a refresh (within 30 seconds)
+                if (!Request.Cookies.ContainsKey(cookieName))
+                {
+                    _logger.LogInformation("Attempting to refresh platform subscription status from Stripe: {SessionId}", SessionId);
+                    
+                    // Set cookie to prevent duplicate refresh on auto-reload (30 second TTL)
+                    Response.Cookies.Append(cookieName, "1", new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Secure = true,
+                        SameSite = SameSiteMode.Lax,
+                        MaxAge = TimeSpan.FromSeconds(30)
+                    });
+
+                    // Attempt to reconcile status from Stripe
+                    await _onboardingService.RefreshPlatformSubscriptionAsync(SessionId);
+
+                    // Reload session to get potentially updated state
+                    session = await _onboardingService.GetSignupSessionAsync(SessionId);
+                    if (session == null)
+                    {
+                        _logger.LogWarning("Signup session not found after refresh: {SessionId}", SessionId);
+                        return RedirectToPage("/Platform/Signup/SelectPlan");
+                    }
+
+                    // Re-check activation status
+                    IsActivated = session.State == SignupSessionState.Completed;
+                }
+                else
+                {
+                    _logger.LogDebug("Skipping Stripe refresh (cookie present): {SessionId}", SessionId);
+                }
+            }
+
             if (IsActivated && session.Tenant != null)
             {
                 OrganizationName = session.Tenant.Name;
