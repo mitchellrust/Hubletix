@@ -3,6 +3,7 @@ using System;
 using Hubletix.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Hubletix.Infrastructure.Migrations.App
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260120014549_TenantStatusForStripeRequirements")]
+    partial class TenantStatusForStripeRequirements
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -575,7 +578,6 @@ namespace Hubletix.Infrastructure.Migrations.App
                         .HasColumnType("text");
 
                     b.Property<string>("StripeAccountRequirementsStatus")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("StripeOnboardingState")
