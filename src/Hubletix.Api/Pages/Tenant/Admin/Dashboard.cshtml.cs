@@ -39,12 +39,46 @@ public class DashboardModel : TenantAdminPageModel
         _logger = logger;
     }
 
-    public async Task OnGetAsync()
+    public async Task<IActionResult> OnGetAsync()
     {
         var utcNow = DateTime.UtcNow;
 
         // Load current tenant for Stripe onboarding state
         CurrentTenant = await _tenantConfigService.GetTenantAsync(CurrentTenantInfo.Id);
+        if (CurrentTenant == null)
+        {
+            _logger.LogError(
+                "Current tenant not found for tenant ID {TenantId}",
+                CurrentTenantInfo.Id
+            );
+            return RedirectToPage("/Platform/Error");
+        }
+
+        // Check if we need to refresh onboarding state from Stripe
+        if (
+            CurrentTenant.StripeOnboardingState != StripeOnboardingState.NotStarted &&
+            CurrentTenant.StripeOnboardingState != StripeOnboardingState.Completed
+        )
+        {
+            try
+            {
+                // Update tenant state based on current state in Stripe
+                var tenant = await _tenantOnboardingService.RefreshStripeAccountAsync(
+                    CurrentTenantInfo.Id
+                );
+
+                // Reload tenant to get updated onboarding state
+                CurrentTenant = tenant;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Error refreshing Stripe account for tenant {TenantId}",
+                    CurrentTenantInfo.Id
+                );
+            }
+        }
 
         // Fetch tenant statistics
         TenantStats.TotalMembers = await DbContext.TenantUsers
@@ -88,6 +122,8 @@ public class DashboardModel : TenantAdminPageModel
                 IsHappening = utcNow >= e.StartTimeUtc && utcNow <= e.EndTimeUtc
             };
         }).ToList();
+        
+        return Page();
     }
 
     public async Task<IActionResult> OnPostSetupStripeAsync()
@@ -188,7 +224,7 @@ public class DashboardModel : TenantAdminPageModel
         try
         {
             // Refresh Stripe account information
-            await _tenantOnboardingService.RefreshStripeAccountAsync(
+            var _ = await _tenantOnboardingService.RefreshStripeAccountAsync(
                 CurrentTenantInfo.Id
             );
 

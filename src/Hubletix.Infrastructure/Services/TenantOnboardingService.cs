@@ -107,9 +107,9 @@ public interface ITenantOnboardingService
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Refresh Stripe account information and update tenant accordingly
+    /// Refresh Stripe account information for a tenant
     /// </summary>
-    Task RefreshStripeAccountAsync(
+    Task<Tenant> RefreshStripeAccountAsync(
         string tenantId,
         CancellationToken cancellationToken = default);
 }
@@ -689,7 +689,7 @@ public class TenantOnboardingService : ITenantOnboardingService
         return updateUrl;
     }
 
-    public async Task RefreshStripeAccountAsync(
+    public async Task<Tenant> RefreshStripeAccountAsync(
         string tenantId,
         CancellationToken cancellationToken = default
     )
@@ -717,29 +717,49 @@ public class TenantOnboardingService : ITenantOnboardingService
             throw new InvalidOperationException("Stripe Connect account not found.");
         }
 
-        // Update tenant with latest account information only if something changed
-        if (
-            tenant.ChargesEnabled != account.ChargesEnabled ||
-            tenant.PayoutsEnabled != account.PayoutsEnabled ||
-            tenant.DetailsSubmitted != account.DetailsSubmitted
-        )
+        var previousChargesEnabled = tenant.ChargesEnabled;
+        tenant.ChargesEnabled = account.ChargesEnabled;
+        tenant.PayoutsEnabled = account.PayoutsEnabled;
+        tenant.DetailsSubmitted = account.DetailsSubmitted;
+
+        // Check if onboarding just completed (charges enabled for first time)
+        if (account.ChargesEnabled && !previousChargesEnabled)
         {
-            var previousChargesEnabled = tenant.ChargesEnabled;
-
-            tenant.ChargesEnabled = account.ChargesEnabled;
-            tenant.PayoutsEnabled = account.PayoutsEnabled;
-            tenant.DetailsSubmitted = account.DetailsSubmitted;
-
-            // Check if onboarding just completed (charges enabled for first time)
-            if (account.ChargesEnabled && !previousChargesEnabled)
-            {
-                tenant.StripeOnboardingState = StripeOnboardingState.Completed;
-                tenant.OnboardingCompletedAt = DateTime.UtcNow;
-            }
-
-
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            tenant.StripeOnboardingState = StripeOnboardingState.Completed;
+            tenant.OnboardingCompletedAt = DateTime.UtcNow;
         }
+
+        // Order of checking matters here - we want to show the most urgent status
+        if (account.Requirements.PendingVerification.Count > 0)
+        {
+            tenant.StripeAccountRequirementsStatus = StripeAccountRequirementsStatus.PendingVerification;
+        }
+        else if (account.Requirements.PastDue.Count > 0)
+        {
+            tenant.StripeAccountRequirementsStatus = StripeAccountRequirementsStatus.PastDue;
+        }
+        else if (account.Requirements.CurrentlyDue.Count > 0)
+        {
+            tenant.StripeAccountRequirementsStatus = StripeAccountRequirementsStatus.CurrentlyDue;
+        }
+        else if (account.Requirements.EventuallyDue.Count > 0)
+        {
+            tenant.StripeAccountRequirementsStatus = StripeAccountRequirementsStatus.EventuallyDue;
+        }
+        else
+        {
+            tenant.StripeAccountRequirementsStatus = StripeAccountRequirementsStatus.None;
+        }
+
+        // Check if anything actually changed so we can key off of that
+        int numChanges = await _dbContext.SaveChangesAsync(cancellationToken);
+        if (numChanges > 0)
+        {
+            // Invalidate cache
+            _tenantConfigService.InvalidateCache(tenantId);
+        }
+
+        return tenant;
     }
 
     // Private helper methods

@@ -5,6 +5,7 @@ using Hubletix.Core.Models;
 using Hubletix.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Hubletix.Core.Constants;
+using Hubletix.Infrastructure.Services;
 
 namespace Hubletix.Api.Controllers;
 
@@ -16,15 +17,18 @@ namespace Hubletix.Api.Controllers;
 [Route("api/webhooks/stripe/connect")]
 public class StripeConnectWebhookController : ControllerBase
 {
+    private readonly ITenantConfigService _tenantConfigService;
     private readonly ILogger<StripeConnectWebhookController> _logger;
     private readonly AppDbContext _dbContext;
     private readonly string _webhookSecret;
 
     public StripeConnectWebhookController(
+        ITenantConfigService tenantConfigService,
         ILogger<StripeConnectWebhookController> logger,
         IOptions<StripeSettings> stripeSettings,
         AppDbContext dbContext)
     {
+        _tenantConfigService = tenantConfigService;
         _logger = logger;
         _webhookSecret = stripeSettings.Value.Connect.WebhookSecret;
         _dbContext = dbContext;
@@ -145,15 +149,49 @@ public class StripeConnectWebhookController : ControllerBase
             );
         }
 
-        await _dbContext.SaveChangesAsync();
+        // Order of checking matters here - we want to show the most urgent status
+        if (account.Requirements.PendingVerification.Count > 0)
+        {
+            tenant.StripeAccountRequirementsStatus = StripeAccountRequirementsStatus.PendingVerification;
+        }
+        else if (account.Requirements.PastDue.Count > 0)
+        {
+            tenant.StripeAccountRequirementsStatus = StripeAccountRequirementsStatus.PastDue;
+        }
+        else if (account.Requirements.CurrentlyDue.Count > 0)
+        {
+            tenant.StripeAccountRequirementsStatus = StripeAccountRequirementsStatus.CurrentlyDue;
+        }
+        else if (account.Requirements.EventuallyDue.Count > 0)
+        {
+            tenant.StripeAccountRequirementsStatus = StripeAccountRequirementsStatus.EventuallyDue;
+        }
+        else
+        {
+            tenant.StripeAccountRequirementsStatus = StripeAccountRequirementsStatus.None;
+        }
 
-        _logger.LogInformation(
-            "Updated tenant {TenantId}: ChargesEnabled={ChargesEnabled}, PayoutsEnabled={PayoutsEnabled}, DetailsSubmitted={DetailsSubmitted}, State={State}",
-            tenant.Id,
-            tenant.ChargesEnabled,
-            tenant.PayoutsEnabled,
-            tenant.DetailsSubmitted,
-            tenant.StripeOnboardingState
-        );
+        // Check if anything actually changed so we can key off of that
+        int numChanges = await _dbContext.SaveChangesAsync();
+        if (numChanges > 0)
+        {
+            // Invalidate cache
+            _tenantConfigService.InvalidateCache(tenant.Id);
+            _logger.LogInformation(
+                "Updated tenant {TenantId}: ChargesEnabled={ChargesEnabled}, PayoutsEnabled={PayoutsEnabled}, DetailsSubmitted={DetailsSubmitted}, State={State}",
+                tenant.Id,
+                tenant.ChargesEnabled,
+                tenant.PayoutsEnabled,
+                tenant.DetailsSubmitted,
+                tenant.StripeOnboardingState
+            );
+        }
+        else
+        {
+            _logger.LogInformation(
+                "No changes for tenant [{TenantId}] on account.updated event",
+                tenant.Id
+            );
+        }
     }
 }

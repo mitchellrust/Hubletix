@@ -27,6 +27,11 @@ public class Tenant : BaseEntity
     /// Stripe Connect Account ID for this tenant's payment processing
     /// </summary>
     public string? StripeAccountId { get; set; }
+
+    /// <summary>
+    /// Latest requirements status from Stripe (e.g., "currently_due", "past_due", "complete")
+    /// </summary>
+    public string StripeAccountRequirementsStatus { get; set; } = Constants.StripeAccountRequirementsStatus.None;
     
     /// <summary>
     /// Stripe Connect onboarding state: NotStarted, AccountCreated, OnboardingStarted, Completed

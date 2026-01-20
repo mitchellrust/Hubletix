@@ -7,80 +7,139 @@
 }
 
 <div class="container-fluid py-4">
-        <!-- Stripe Connect Onboarding -->
-        <div class="col-12 col-lg-6 mb-3">
-            <div class="card border-0 shadow-sm @(Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.Completed ? "bg-success-subtle" : "bg-light") h-100">
-                <div class="card-body">
-                    <h5 class="card-title mb-3">
-                        <i class="bi bi-credit-card"></i> 
-                        @if (Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.Completed)
-                        {
-                            <span>Stripe Connected <i class="bi bi-check-circle-fill text-success"></i></span>
-                        }
-                        else
-                        {
-                            <span>Set Up Stripe Connect</span>
-                        }
-                    </h5>
-                    <p class="text-muted mb-3">
-                        @if (Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.Completed)
-                        {
-                            <span>Your Stripe account is connected and ready to accept payments.</span>
-                            @if (Model.CurrentTenant?.DetailsSubmitted == false)
+    <!-- Stripe Requirements Banner -->
+    @if (Model.CurrentTenant?.StripeAccountRequirementsStatus != Hubletix.Core.Constants.StripeAccountRequirementsStatus.None)
+    {
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="alert @(Model.CurrentTenant?.StripeAccountRequirementsStatus == Hubletix.Core.Constants.StripeAccountRequirementsStatus.PastDue ? "alert-danger" : "alert-warning") alert-dismissible fade show d-flex align-items-center" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-3 fs-4"></i>
+                    <div class="flex-grow-1">
+                        <h5 class="alert-heading mb-1">
+                            @if (Model.CurrentTenant?.StripeAccountRequirementsStatus == Hubletix.Core.Constants.StripeAccountRequirementsStatus.PastDue)
                             {
-                                <br/><span class="text-warning"><i class="bi bi-exclamation-triangle"></i> Complete additional details in Stripe to avoid interruptions.</span>
+                                <strong>Urgent: Stripe Account Requirements Past Due</strong>
                             }
-                        }
-                        else if (Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.NotStarted)
-                        {
-                            <span>Connect your Stripe account to accept membership payments and event registrations.</span>
-                        }
-                        else if (Model.CurrentTenant?.DetailsSubmitted == true)
-                        {
-                            <span><i class="bi bi-exclamation-circle text-warning"></i> Your Stripe details have been submitted, but you may have some pending actions. Login to Stripe to review before you can start collecting payments.</span>
-                        }
-                        else
-                        {
-                            <span><i class="bi bi-exclamation-circle text-warning"></i> Continue setting up your Stripe account to start accepting payments.</span>
-                        }
-                    </p>
-                    <div class="d-flex gap-2">
-                        <form method="post" asp-page-handler="@(Model.CurrentTenant?.StripeOnboardingState != Hubletix.Core.Constants.StripeOnboardingState.Completed && Model.CurrentTenant?.DetailsSubmitted == true ? "ContinueStripeSetup" : "SetupStripe")">
-                            <button type="submit" 
-                                    class="btn @(Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.Completed ? "btn-outline-secondary" : "btn-primary")"
-                                    disabled="@(Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.Completed)">
-                                @if (Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.Completed)
-                                {
-                                    <i class="bi bi-check-circle me-2"></i><span>Setup Complete</span>
-                                }
-                                else if (Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.NotStarted)
-                                {
-                                    <i class="bi bi-plus-circle me-2"></i><span>Setup Stripe Connect</span>
-                                }
-                                else
-                                {
-                                    <i class="bi bi-arrow-repeat me-2"></i><span>Continue Stripe Setup</span>
-                                }
-                            </button>
-                        </form>
-                        @if (Model.CurrentTenant?.StripeOnboardingState != Hubletix.Core.Constants.StripeOnboardingState.Completed && Model.CurrentTenant?.StripeOnboardingState != Hubletix.Core.Constants.StripeOnboardingState.NotStarted)
-                        {
-                            <form method="post" asp-page-handler="RefreshStripeAccount">
-                                <button type="submit" class="btn btn-outline-primary" title="Refresh account status from Stripe">
-                                    <i class="bi bi-arrow-clockwise me-2"></i><span>Refresh Status</span>
-                                </button>
-                            </form>
-                        }
+                            else if (Model.CurrentTenant?.StripeAccountRequirementsStatus == Hubletix.Core.Constants.StripeAccountRequirementsStatus.CurrentlyDue)
+                            {
+                                <strong>Action Required: Stripe Account Requirements Due</strong>
+                            }
+                            else if (Model.CurrentTenant?.StripeAccountRequirementsStatus == Hubletix.Core.Constants.StripeAccountRequirementsStatus.PendingVerification)
+                            {
+                                <strong>Stripe Account Verification Pending</strong>
+                            }
+                            else
+                            {
+                                <strong>Stripe Account Requirements Needed</strong>
+                            }
+                        </h5>
+                        <p class="mb-0">
+                            @if (Model.CurrentTenant?.StripeAccountRequirementsStatus == Hubletix.Core.Constants.StripeAccountRequirementsStatus.PastDue)
+                            {
+                                <span>Your Stripe account has past due requirements that must be addressed immediately to continue accepting payments. Please complete the required information in Stripe.</span>
+                            }
+                            else if (Model.CurrentTenant?.StripeAccountRequirementsStatus == Hubletix.Core.Constants.StripeAccountRequirementsStatus.CurrentlyDue)
+                            {
+                                <span>Your Stripe account has requirements that need to be completed to ensure uninterrupted payment processing.</span>
+                            }
+                            else if (Model.CurrentTenant?.StripeAccountRequirementsStatus == Hubletix.Core.Constants.StripeAccountRequirementsStatus.PendingVerification)
+                            {
+                                <span>Your Stripe account information is pending verification. This may take a few moments.</span>
+                            }
+                            else
+                            {
+                                <span>There are requirements that need to be addressed for your Stripe account. Please review and complete them.</span>
+                            }
+                        </p>
                     </div>
-                    @if (!string.IsNullOrEmpty(Model.TenantAdminDashboardErrorMessage))
-                    {
-                        <div class="alert alert-danger mt-3 mb-0">
-                            @Model.TenantAdminDashboardErrorMessage
-                        </div>
-                    }
+                    <form method="post" asp-page-handler="ContinueStripeSetup" class="ms-3">
+                        <button type="submit" class="btn @(Model.CurrentTenant?.StripeAccountRequirementsStatus == Hubletix.Core.Constants.StripeAccountRequirementsStatus.PastDue ? "btn-danger" : "btn-warning")">
+                            <i class="bi bi-arrow-right-circle me-2"></i>Address Requirements
+                        </button>
+                    </form>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             </div>
         </div>
+    }
+
+        <!-- Stripe Connect Onboarding -->
+        @if (Model.CurrentTenant?.StripeOnboardingState != Hubletix.Core.Constants.StripeOnboardingState.Completed)
+        {
+            <div class="col-12 col-lg-6 mb-3">
+                <div class="card border-0 shadow-sm @(Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.Completed ? "bg-success-subtle" : "bg-light") h-100">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">
+                            <i class="bi bi-credit-card"></i> 
+                            @if (Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.Completed)
+                            {
+                                <span>Stripe Connected <i class="bi bi-check-circle-fill text-success"></i></span>
+                            }
+                            else
+                            {
+                                <span>Set Up Stripe Connect</span>
+                            }
+                        </h5>
+                        <p class="text-muted mb-3">
+                            @if (Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.Completed)
+                            {
+                                <span>Your Stripe account is connected and ready to accept payments.</span>
+                                @if (Model.CurrentTenant?.DetailsSubmitted == false)
+                                {
+                                    <br/><span class="text-warning"><i class="bi bi-exclamation-triangle"></i> Complete additional details in Stripe to avoid interruptions.</span>
+                                }
+                            }
+                            else if (Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.NotStarted)
+                            {
+                                <span>Connect your Stripe account to accept membership payments and event registrations.</span>
+                            }
+                            else if (Model.CurrentTenant?.DetailsSubmitted == true)
+                            {
+                                <span><i class="bi bi-exclamation-circle text-warning"></i> Your Stripe details have been submitted, but you may have some pending actions. Login to Stripe to review before you can start collecting payments.</span>
+                            }
+                            else
+                            {
+                                <span><i class="bi bi-exclamation-circle text-warning"></i> Continue setting up your Stripe account to start accepting payments.</span>
+                            }
+                        </p>
+                        <div class="d-flex gap-2">
+                            <form method="post" asp-page-handler="@(Model.CurrentTenant?.StripeOnboardingState != Hubletix.Core.Constants.StripeOnboardingState.Completed && Model.CurrentTenant?.DetailsSubmitted == true ? "ContinueStripeSetup" : "SetupStripe")">
+                                <button type="submit" 
+                                        class="btn @(Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.Completed ? "btn-outline-secondary" : "btn-primary")"
+                                        disabled="@(Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.Completed)">
+                                    @if (Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.Completed)
+                                    {
+                                        <i class="bi bi-check-circle me-2"></i><span>Setup Complete</span>
+                                    }
+                                    else if (Model.CurrentTenant?.StripeOnboardingState == Hubletix.Core.Constants.StripeOnboardingState.NotStarted)
+                                    {
+                                        <i class="bi bi-plus-circle me-2"></i><span>Setup Stripe Connect</span>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-arrow-repeat me-2"></i><span>Continue Stripe Setup</span>
+                                    }
+                                </button>
+                            </form>
+                            @if (Model.CurrentTenant?.StripeOnboardingState != Hubletix.Core.Constants.StripeOnboardingState.Completed && Model.CurrentTenant?.StripeOnboardingState != Hubletix.Core.Constants.StripeOnboardingState.NotStarted)
+                            {
+                                <form method="post" asp-page-handler="RefreshStripeAccount">
+                                    <button type="submit" class="btn btn-outline-primary" title="Refresh account status from Stripe">
+                                        <i class="bi bi-arrow-clockwise me-2"></i><span>Refresh Status</span>
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.TenantAdminDashboardErrorMessage))
+                        {
+                            <div class="alert alert-danger mt-3 mb-0">
+                                @Model.TenantAdminDashboardErrorMessage
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
     </div>
 
     <!-- Stats Row (placeholder) -->
