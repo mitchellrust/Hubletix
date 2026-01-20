@@ -72,6 +72,14 @@ public interface IStripePlatformService
     Task<Subscription> GetSubscriptionAsync(string subscriptionId, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Retrieves all subscriptions for a customer from the platform account.
+    /// </summary>
+    /// <param name="customerId">The Stripe Customer ID</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>List of subscriptions for the customer</returns>
+    Task<List<Subscription>> GetCustomerSubscriptionsAsync(string customerId, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Cancels a subscription on the platform account.
     /// </summary>
     /// <param name="subscriptionId">The Stripe Subscription ID</param>
