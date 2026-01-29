@@ -1,0 +1,40 @@
+root = true
+
+# Project-wide defaults
+[*.{cs,cshtml,razor,razor.css,csproj,sln}]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+# C# specific preferences
+[*.cs]
+dotnet_sort_system_directives_first = true
+
+# Razor pages (keep consistent with C# files)
+[*.cshtml]
+indent_style = space
+indent_size = 4
+
+# JSON files are typically 2-space indented
+[*.json]
+indent_style = space
+indent_size = 2
+charset = utf-8
+
+# Shell scripts: prefer small indentation
+[*.sh]
+indent_style = space
+indent_size = 2
+end_of_line = lf
+
+# Markdown: preserve trailing whitespace (used intentionally for line breaks)
+[*.md]
+trim_trailing_whitespace = false
+insert_final_newline = true
+
+# Binary or generated files: avoid trimming (no textual edits expected)
+[bin/**]
+trim_trailing_whitespace = false
