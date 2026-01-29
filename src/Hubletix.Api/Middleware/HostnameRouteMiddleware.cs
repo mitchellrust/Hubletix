@@ -18,7 +18,7 @@ public class HostnameRouteMiddleware
     {
         _next = next;
         _logger = logger;
-        _rootDomain = configuration["AppSettings:RootDomain"] 
+        _rootDomain = configuration["AppSettings:RootDomain"]
             ?? throw new InvalidOperationException("AppSettings:RootDomain configuration is required");
     }
 
@@ -87,11 +87,11 @@ public class HostnameRouteMiddleware
         {
             var returnUrl = Uri.EscapeDataString(pathAndQuery);
             var redirectUrl = $"/TenantSelector?returnUrl={returnUrl}";
-            
+
             _logger.LogWarning(
                 "Root domain attempted to access tenant route. Path: {Path}, Redirecting to: {RedirectUrl}",
                 path, redirectUrl);
-            
+
             context.Response.Redirect(redirectUrl);
             return;
         }
@@ -101,11 +101,11 @@ public class HostnameRouteMiddleware
         {
             var scheme = request.Scheme;
             var redirectUrl = $"{scheme}://{_rootDomain}{pathAndQuery}";
-            
+
             _logger.LogWarning(
                 "Subdomain attempted to access platform route. Host: {Host}, Path: {Path}, Redirecting to: {RedirectUrl}",
                 host, path, redirectUrl);
-            
+
             context.Response.Redirect(redirectUrl, permanent: true);
             return;
         }

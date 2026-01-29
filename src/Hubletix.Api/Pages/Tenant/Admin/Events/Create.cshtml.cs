@@ -36,7 +36,7 @@ public class CreateEventModel : TenantAdminPageModel
         AppDbContext dbContext,
         ITenantConfigService tenantConfigService,
         IMultiTenantContextAccessor<ClubTenantInfo> multiTenantContextAccessor
-        
+
     ) : base(
         multiTenantContextAccessor,
         tenantConfigService,
@@ -83,7 +83,7 @@ public class CreateEventModel : TenantAdminPageModel
             return Page();
         }
 
-        if (!DateTime.TryParse(LocalStartTime, out var localStart) || 
+        if (!DateTime.TryParse(LocalStartTime, out var localStart) ||
             !DateTime.TryParse(LocalEndTime, out var localEnd))
         {
             ErrorMessage = "Invalid date/time format.";

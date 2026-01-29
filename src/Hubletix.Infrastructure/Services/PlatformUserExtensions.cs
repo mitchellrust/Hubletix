@@ -24,9 +24,9 @@ public static class PlatformUserExtensions
         return await dbContext.TenantUsers
             .Include(tu => tu.Tenant)
             .Include(tu => tu.PlatformUser)
-            .FirstOrDefaultAsync(tu => 
-                tu.PlatformUserId == platformUserId && 
-                tu.TenantId == tenantId, 
+            .FirstOrDefaultAsync(tu =>
+                tu.PlatformUserId == platformUserId &&
+                tu.TenantId == tenantId,
                 ct);
     }
 
@@ -103,10 +103,10 @@ public static class PlatformUserExtensions
         CancellationToken ct = default)
     {
         return await dbContext.TenantUsers
-            .AnyAsync(tu => 
-                tu.PlatformUserId == platformUserId && 
-                tu.TenantId == tenantId && 
-                tu.IsOwner, 
+            .AnyAsync(tu =>
+                tu.PlatformUserId == platformUserId &&
+                tu.TenantId == tenantId &&
+                tu.IsOwner,
                 ct);
     }
 

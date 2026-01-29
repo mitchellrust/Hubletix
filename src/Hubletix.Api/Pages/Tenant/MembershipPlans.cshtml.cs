@@ -18,7 +18,7 @@ public class MembershipPlansModel : TenantPageModel
         ITenantConfigService tenantConfigService,
         AppDbContext dbContext
     ) : base(multiTenantContextAccessor, logger, tenantConfigService, dbContext)
-    {}
+    { }
 
     public async Task<IActionResult> OnGetAsync()
     {
@@ -89,7 +89,7 @@ public class MembershipPlansModel : TenantPageModel
         {
             return "/ Year";
         }
-        
+
         return "";
     }
 

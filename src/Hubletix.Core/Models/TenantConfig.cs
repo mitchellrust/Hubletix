@@ -81,7 +81,7 @@ public class FeatureFlags
     [NotMapped]
     public bool EnableUserSignup =>
         EnableEventRegistration ||
-        EnablePayments || 
+        EnablePayments ||
         EnableMemberships;
 
     /// <summary>
@@ -149,7 +149,7 @@ public class CardsComponentConfig : HomePageComponentConfig
 {
     public string? Heading { get; set; }
     public string? Subheading { get; set; }
-    
+
     /// <summary>
     /// Up to 3 cards per component
     /// </summary>

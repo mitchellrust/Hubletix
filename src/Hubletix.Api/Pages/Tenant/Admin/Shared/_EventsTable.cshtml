@@ -11,21 +11,25 @@
                     <h6 class="mb-0">Filters</h6>
                     @if (Model.HasActiveFilters)
                     {
-                        <a href="@Model.PageName?status=all&date=all&sort=@Model.SortField&dir=@Model.SortDirection" class="btn btn-sm btn-link text-decoration-none p-0">Clear</a>
+                        <a href="@Model.PageName?status=all&date=all&sort=@Model.SortField&dir=@Model.SortDirection"
+                            class="btn btn-sm btn-link text-decoration-none p-0">Clear</a>
                     }
                 </div>
-                <div class="card-body p-0">                    
+                <div class="card-body p-0">
                     <!-- Status Facet -->
                     <div class="border-bottom p-3">
                         <h6 class="mb-2 fw-semibold small text-uppercase text-muted">Status</h6>
                         <div class="list-group list-group-flush small">
-                            <a href="@Model.BuildStatusUrl("all")" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.StatusFilter == "all" ? "fw-bold text-primary" : "")">
+                            <a href="@Model.BuildStatusUrl("all")"
+                                class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.StatusFilter == "all" ? "fw-bold text-primary" : "")">
                                 All
                             </a>
-                            <a href="@Model.BuildStatusUrl("active")" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.StatusFilter == "active" ? "fw-bold text-primary" : "")">
+                            <a href="@Model.BuildStatusUrl("active")"
+                                class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.StatusFilter == "active" ? "fw-bold text-primary" : "")">
                                 Active
                             </a>
-                            <a href="@Model.BuildStatusUrl("inactive")" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.StatusFilter == "inactive" ? "fw-bold text-primary" : "")">
+                            <a href="@Model.BuildStatusUrl("inactive")"
+                                class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.StatusFilter == "inactive" ? "fw-bold text-primary" : "")">
                                 Inactive
                             </a>
                         </div>
@@ -35,13 +39,16 @@
                     <div class="border-bottom p-3">
                         <h6 class="mb-2 fw-semibold small text-uppercase text-muted">Date</h6>
                         <div class="list-group list-group-flush small">
-                            <a href="@Model.BuildDateUrl("all")" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.DateFilter == "all" ? "fw-bold text-primary" : "")">
+                            <a href="@Model.BuildDateUrl("all")"
+                                class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.DateFilter == "all" ? "fw-bold text-primary" : "")">
                                 All
                             </a>
-                            <a href="@Model.BuildDateUrl("upcoming")" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.DateFilter == "upcoming" ? "fw-bold text-primary" : "")">
+                            <a href="@Model.BuildDateUrl("upcoming")"
+                                class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.DateFilter == "upcoming" ? "fw-bold text-primary" : "")">
                                 Upcoming
                             </a>
-                            <a href="@Model.BuildDateUrl("past")" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.DateFilter == "past" ? "fw-bold text-primary" : "")">
+                            <a href="@Model.BuildDateUrl("past")"
+                                class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.DateFilter == "past" ? "fw-bold text-primary" : "")">
                                 Past
                             </a>
                         </div>
@@ -59,7 +66,8 @@
                     <div class="d-flex gap-2 align-items-center">
                         @if (Model.ShowFilterFacets)
                         {
-                            <button class="btn btn-sm btn-outline-secondary d-xl-none" data-bs-toggle="modal" data-bs-target="#filterModal">
+                            <button class="btn btn-sm btn-outline-secondary d-xl-none" data-bs-toggle="modal"
+                                data-bs-target="#filterModal">
                                 <i class="bi bi-funnel"></i> Filters
                                 @if (Model.HasActiveFilters)
                                 {
@@ -184,7 +192,8 @@
                                 <li class="page-item @(Model.PageNum == 1 ? "disabled" : "")">
                                     <a class="page-link" href="@Model.BuildPageUrl(Model.PageNum - 1)">Previous</a>
                                 </li>
-                                @for (int i = Math.Max(1, Model.PageNum - 2); i <= Math.Min(Model.TotalPages, Model.PageNum + 2); i++)
+                                @for (int i = Math.Max(1, Model.PageNum - 2); i <= Math.Min(Model.TotalPages, Model.PageNum
+                                                            + 2); i++)
                                 {
                                     <li class="page-item @(i == Model.PageNum ? "active" : "")">
                                         <a class="page-link" href="@Model.BuildPageUrl(i)">@i</a>
@@ -210,29 +219,30 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="filterModalLabel">Filter Events</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="resetFilters()" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="resetFilters()"
+                        aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="filterForm" action="@Model.PageName" method="get">
                         <input type="hidden" name="sort" value="@Model.SortField" />
                         <input type="hidden" name="dir" value="@Model.SortDirection" />
-                        
+
                         <!-- Status Filter -->
                         <div class="mb-4">
                             <h6 class="fw-semibold text-uppercase text-muted small mb-3">Status</h6>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="status" id="statusAll" value="all" 
-                                       @(Model.StatusFilter == "all" ? "checked" : "")>
+                                <input class="form-check-input" type="radio" name="status" id="statusAll" value="all"
+                                    @(Model.StatusFilter == "all" ? "checked" : "")>
                                 <label class="form-check-label" for="statusAll">All</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="status" id="statusActive" value="active" 
-                                       @(Model.StatusFilter == "active" ? "checked" : "")>
+                                <input class="form-check-input" type="radio" name="status" id="statusActive" value="active"
+                                    @(Model.StatusFilter == "active" ? "checked" : "")>
                                 <label class="form-check-label" for="statusActive">Active</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="status" id="statusInactive" value="inactive" 
-                                       @(Model.StatusFilter == "inactive" ? "checked" : "")>
+                                <input class="form-check-input" type="radio" name="status" id="statusInactive"
+                                    value="inactive" @(Model.StatusFilter == "inactive" ? "checked" : "")>
                                 <label class="form-check-label" for="statusInactive">Inactive</label>
                             </div>
                         </div>
@@ -241,25 +251,26 @@
                         <div class="mb-4">
                             <h6 class="fw-semibold text-uppercase text-muted small mb-3">Date</h6>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="date" id="dateAll" value="all" 
-                                       @(Model.DateFilter == "all" ? "checked" : "")>
+                                <input class="form-check-input" type="radio" name="date" id="dateAll" value="all"
+                                    @(Model.DateFilter == "all" ? "checked" : "")>
                                 <label class="form-check-label" for="dateAll">All</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="date" id="dateUpcoming" value="upcoming" 
-                                       @(Model.DateFilter == "upcoming" ? "checked" : "")>
+                                <input class="form-check-input" type="radio" name="date" id="dateUpcoming" value="upcoming"
+                                    @(Model.DateFilter == "upcoming" ? "checked" : "")>
                                 <label class="form-check-label" for="dateUpcoming">Upcoming</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="date" id="datePast" value="past" 
-                                       @(Model.DateFilter == "past" ? "checked" : "")>
+                                <input class="form-check-input" type="radio" name="date" id="datePast" value="past"
+                                    @(Model.DateFilter == "past" ? "checked" : "")>
                                 <label class="form-check-label" for="datePast">Past</label>
                             </div>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="resetFilters()">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        onclick="resetFilters()">Cancel</button>
                     <button type="button" class="btn btn-outline-secondary" onclick="clearFilters()">Clear</button>
                     <button type="button" class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
                 </div>
@@ -270,24 +281,24 @@
     <script>
         let initialStatus = '@Model.StatusFilter';
         let initialDate = '@Model.DateFilter';
-        
+
         function applyFilters() {
             document.getElementById('filterForm').submit();
         }
-        
+
         function clearFilters() {
             const form = document.getElementById('filterForm');
             const sortField = form.querySelector('input[name="sort"]').value;
             const sortDir = form.querySelector('input[name="dir"]').value;
             window.location.href = `@Model.PageName?status=all&date=all&sort=${sortField}&dir=${sortDir}`;
         }
-        
+
         function resetFilters() {
             const statusRadios = document.querySelectorAll('input[name="status"]');
             statusRadios.forEach(radio => {
                 radio.checked = (radio.value === initialStatus);
             });
-            
+
             const dateRadios = document.querySelectorAll('input[name="date"]');
             dateRadios.forEach(radio => {
                 radio.checked = (radio.value === initialDate);

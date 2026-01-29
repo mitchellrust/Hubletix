@@ -25,12 +25,12 @@ public class TenantPageModel : PageModel
     protected AppDbContext DbContext { get; }
     protected ITenantConfigService TenantConfigService { get; }
     protected TenantConfig TenantConfig { get; set; } = new TenantConfig();
-    
+
     /// <summary>
     /// Gets the current tenant info. Returns null if not in a tenant context.
     /// Pages requiring tenant context should check for null or use HasTenantContext.
     /// </summary>
-    public ClubTenantInfo? CurrentTenantInfo => 
+    public ClubTenantInfo? CurrentTenantInfo =>
         _multiTenantContextAccessor.MultiTenantContext?.TenantInfo;
 
     /// <summary>
@@ -79,7 +79,7 @@ public class TenantPageModel : PageModel
         }
 
         var tenantUser = await DbContext.GetTenantUserAsync(
-            platformUserId, 
+            platformUserId,
             CurrentTenantInfo.Id
         );
         if (tenantUser == null)
@@ -105,7 +105,7 @@ public class TenantPageModel : PageModel
             context.Result = new RedirectToPageResult("/Platform/Unauthorized");
             return;
         }
-        
+
         // Set tenant information in ViewData for use in layouts
         ViewData["TenantName"] = CurrentTenantInfo.Name;
 
@@ -139,19 +139,19 @@ public class TenantPageModel : PageModel
         TenantConfig = tenant.GetConfig();
         // Set view data for layout usage
         ViewData["TenantConfig"] = TenantConfig;
-        
+
         // Set logo URL if available in tenant config
         if (!string.IsNullOrEmpty(TenantConfig.Theme.LogoUrl))
         {
             ViewData["TenantLogoUrl"] = TenantConfig.Theme.LogoUrl;
         }
-        
+
         // Build navbar for public layout
         ViewData["Navbar"] = BuildNavbar();
-        
+
         await next();
     }
-    
+
     /// <summary>
     /// Builds the navbar view model based on tenant configuration and feature flags.
     /// Only call this when in a tenant context.
@@ -164,7 +164,7 @@ public class TenantPageModel : PageModel
         }
 
         var navItems = new List<NavItem>();
-        
+
         // Conditionally add nav items based on feature flags
         if (TenantConfig.Features.EnableMemberships)
         {

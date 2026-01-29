@@ -50,14 +50,14 @@ else
             </div>
         </div>
     </nav>
-    
+
     @foreach (object contextObj in components)
     {
         @if (contextObj is ComponentRenderContext<HomePageComponentConfig> context)
         {
             var component = context.Component;
             var partialPath = ComponentRegistry.GetPartialViewPath(component.GetType());
-            
+
             @if (!string.IsNullOrEmpty(partialPath))
             {
                 <partial name="@partialPath" model="contextObj" />
@@ -95,4 +95,3 @@ else
         </div>
     </footer>
 }
-

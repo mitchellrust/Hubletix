@@ -222,7 +222,7 @@
             }
                 </div>
             }
-            
+
             <!-- Loading Spinner -->
             <div id="loadingSpinner" class="text-center py-4" style="display: none;">
                 <div class="spinner-border text-primary" role="status">
@@ -248,7 +248,7 @@
                     <div class="mb-4">
                         <h6 class="fw-semibold text-uppercase text-muted small mb-3">Event Type</h6>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="TypeFilter" id="typeAll" value="all" 
+                            <input class="form-check-input" type="radio" name="TypeFilter" id="typeAll" value="all"
                                    @(Model.TypeFilter == "all" ? "checked" : "")>
                             <label class="form-check-label" for="typeAll">All Types</label>
                         </div>
@@ -256,7 +256,7 @@
                         {
                             var sanitizedId = "type" + eventType.Replace(" ", "");
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="TypeFilter" id="@sanitizedId" value="@eventType" 
+                                <input class="form-check-input" type="radio" name="TypeFilter" id="@sanitizedId" value="@eventType"
                                        @(Model.TypeFilter == eventType ? "checked" : "")>
                                 <label class="form-check-label" for="@sanitizedId">@eventType.Humanize()</label>
                             </div>
@@ -267,17 +267,17 @@
                     <div class="mb-4">
                         <h6 class="fw-semibold text-uppercase text-muted small mb-3">Availability</h6>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="AvailabilityFilter" id="availabilityAll" value="all" 
+                            <input class="form-check-input" type="radio" name="AvailabilityFilter" id="availabilityAll" value="all"
                                    @(Model.AvailabilityFilter == "all" ? "checked" : "")>
                             <label class="form-check-label" for="availabilityAll">All</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="AvailabilityFilter" id="availabilityAvailable" value="available" 
+                            <input class="form-check-input" type="radio" name="AvailabilityFilter" id="availabilityAvailable" value="available"
                                    @(Model.AvailabilityFilter == "available" ? "checked" : "")>
                             <label class="form-check-label" for="availabilityAvailable">Available</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="AvailabilityFilter" id="availabilityFull" value="full" 
+                            <input class="form-check-input" type="radio" name="AvailabilityFilter" id="availabilityFull" value="full"
                                    @(Model.AvailabilityFilter == "full" ? "checked" : "")>
                             <label class="form-check-label" for="availabilityFull">Full</label>
                         </div>
@@ -299,45 +299,45 @@
     let isLoading = false;
     const typeFilter = '@Model.TypeFilter';
     const availabilityFilter = '@Model.AvailabilityFilter';
-    
+
     function applyFilters() {
         document.getElementById('filterForm').submit();
     }
-    
+
     function clearFilters() {
         window.location.href = '/events?TypeFilter=all&AvailabilityFilter=all';
     }
-    
+
     // Infinite scroll functionality
     function checkScroll() {
         if (isLoading || !hasMoreEvents) return;
-        
+
         const scrollPosition = window.innerHeight + window.scrollY;
         const pageHeight = document.documentElement.scrollHeight;
-        
+
         // Load more when within 500px of bottom
         if (scrollPosition >= pageHeight - 500) {
             loadMoreEvents();
         }
     }
-    
+
     async function loadMoreEvents() {
         if (isLoading || !hasMoreEvents) return;
-        
+
         isLoading = true;
         document.getElementById('loadingSpinner').style.display = 'block';
-        
+
         try {
             currentPage++;
             const response = await fetch(`/events?handler=LoadMore&pageNum=${currentPage}&typeFilter=${typeFilter}&availabilityFilter=${availabilityFilter}`);
             const data = await response.json();
-            
+
             if (data.events && data.events.length > 0) {
                 const eventsContainer = document.querySelector('.row.g-4');
                 data.events.forEach(evt => {
                     eventsContainer.insertAdjacentHTML('beforeend', createEventCard(evt));
                 });
-                
+
                 hasMoreEvents = data.hasMore;
             } else {
                 hasMoreEvents = false;
@@ -350,7 +350,7 @@
             document.getElementById('loadingSpinner').style.display = 'none';
         }
     }
-    
+
     function createEventCard(evt) {
         const isSoldOut = evt.maxAttendees && evt.currentAttendees >= evt.maxAttendees;
         const startDate = new Date(evt.startTimeLocal);
@@ -358,7 +358,7 @@
         today.setHours(0, 0, 0, 0);
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
-        
+
         let dateLabel = '';
         if (startDate.toDateString() === today.toDateString()) {
             dateLabel = 'Today';
@@ -367,9 +367,9 @@
         } else {
             dateLabel = startDate.toLocaleDateString('en-US', { day: '2-digit', month: 'short' });
         }
-        
+
         const timeString = startDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-        
+
         return `
             <div class="col-12">
                 <div class="card border-0 shadow-sm">
@@ -387,7 +387,7 @@
                                     </div>
                                     <div class="col d-md-none">
                                         <div class="d-flex flex-column gap-2">
-                                            ${isSoldOut ? 
+                                            ${isSoldOut ?
                                                 '<button class="btn btn-secondary rounded-pill px-4" disabled>Event Full</button>' :
                                                 `<a href="/event/${evt.id}/register" class="btn btn-dark rounded-pill px-4" style="background-color: var(--bs-primary); border-color: var(--bs-primary);"><i class="bi bi-calendar-check me-2"></i>Register</a>`
                                             }
@@ -400,8 +400,8 @@
                                 <div class="mb-2">
                                     <h3 class="h4 fw-bold mb-2">${evt.name}</h3>
                                     ${evt.description ? `<p class="text-muted mb-2 event-card-description">${evt.description}</p>` : ''}
-                                    ${evt.price !== null && evt.price !== undefined ? 
-                                        evt.price > 0 ? 
+                                    ${evt.price !== null && evt.price !== undefined ?
+                                        evt.price > 0 ?
                                             `<div class="small text-muted"><i class="bi bi-tag me-1"></i>$${evt.price.toFixed(2)}</div>` :
                                             `<div class="small text-success"><i class="bi bi-tag me-1"></i>Free</div>`
                                         : ''}
@@ -417,7 +417,7 @@
                             </div>
                             <div class="col-auto d-none d-md-block">
                                 <div class="d-flex flex-column gap-2">
-                                    ${isSoldOut ? 
+                                    ${isSoldOut ?
                                         '<button class="btn btn-secondary rounded-pill px-4" disabled>Event Full</button>' :
                                         `<a href="/event/${evt.id}/register" class="btn btn-dark rounded-pill px-4" style="background-color: var(--bs-primary); border-color: var(--bs-primary);"><i class="bi bi-calendar-check me-2"></i>Register</a>`
                                     }
@@ -430,7 +430,7 @@
             </div>
         `;
     }
-    
+
     // Attach scroll listener
     window.addEventListener('scroll', checkScroll);
     window.addEventListener('resize', checkScroll);

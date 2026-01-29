@@ -18,7 +18,7 @@ public class StripePlatformService : IStripePlatformService
     public StripePlatformService(IOptions<StripeSettings> stripeSettings)
     {
         _settings = stripeSettings.Value.Platform;
-        
+
         // Create StripeClient with API key (thread-safe, no global config)
         _stripeClient = new StripeClient(_settings.SecretKey);
     }
@@ -59,7 +59,7 @@ public class StripePlatformService : IStripePlatformService
 
         var service = new SessionService(_stripeClient);
         var session = await service.CreateAsync(options, requestOptions, cancellationToken);
-        
+
         return session;
     }
 
@@ -84,7 +84,7 @@ public class StripePlatformService : IStripePlatformService
 
         var service = new CustomerService(_stripeClient);
         var customer = await service.CreateAsync(options, cancellationToken: cancellationToken);
-        
+
         return customer.Id;
     }
 
@@ -109,7 +109,7 @@ public class StripePlatformService : IStripePlatformService
 
         var service = new SubscriptionService(_stripeClient);
         var subscription = await service.CreateAsync(options, cancellationToken: cancellationToken);
-        
+
         return subscription.Id;
     }
 
@@ -128,7 +128,7 @@ public class StripePlatformService : IStripePlatformService
 
         var service = new SubscriptionService(_stripeClient);
         var subscriptions = await service.ListAsync(options, cancellationToken: cancellationToken);
-        
+
         return subscriptions.Data.ToList();
     }
 
@@ -148,7 +148,7 @@ public class StripePlatformService : IStripePlatformService
 
         var service = new ProductService(_stripeClient);
         var product = await service.CreateAsync(options, cancellationToken: cancellationToken);
-        
+
         return product.Id;
     }
 
@@ -177,7 +177,7 @@ public class StripePlatformService : IStripePlatformService
 
         var service = new PriceService(_stripeClient);
         var price = await service.CreateAsync(options, cancellationToken: cancellationToken);
-        
+
         return price.Id;
     }
 }

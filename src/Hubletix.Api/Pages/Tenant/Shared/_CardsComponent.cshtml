@@ -28,8 +28,8 @@
         isPreviewMode = configContext.IsPreviewMode;
     }
     // Try to extract from ComponentRenderContext<HomePageComponentConfig>
-    else if (Model is ComponentRenderContext<HomePageComponentConfig> baseConfigContext && 
-             baseConfigContext.Component is CardsComponentConfig cardsConfig)
+    else if (Model is ComponentRenderContext<HomePageComponentConfig> baseConfigContext &&
+    baseConfigContext.Component is CardsComponentConfig cardsConfig)
     {
         cardsComponent = cardsConfig;
         primaryColor = baseConfigContext.PrimaryColor;
@@ -96,7 +96,7 @@
                 }
             </div>
         }
-        
+
         @if (cards != null && cards.Count > 0)
         {
             <div class="row g-4">
@@ -121,7 +121,8 @@
                             <div class="card-body p-4">
                                 @if (!string.IsNullOrEmpty(cardHeading))
                                 {
-                                    <h5 class="card-title fw-bold mb-3" style="color: @(primaryColor ?? "#333"); font-size: 1.5rem;">
+                                    <h5 class="card-title fw-bold mb-3"
+                                        style="color: @(primaryColor ?? "#333"); font-size: 1.5rem;">
                                         @cardHeading
                                     </h5>
                                 }
@@ -145,4 +146,3 @@
         transform: translateY(-5px);
     }
 </style>
-

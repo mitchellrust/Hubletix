@@ -37,7 +37,7 @@ public class PlansModel : TenantAdminPageModel
     {
         // Capture status message from redirect
         StatusMessage = message;
-        
+
         // Calculate pagination and sorting
         PageNum = Math.Max(1, pageNum);
         PageSize = Math.Clamp(pageSize, 5, 50);

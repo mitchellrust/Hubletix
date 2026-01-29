@@ -165,7 +165,7 @@ public class TenantOnboardingService : ITenantOnboardingService
         // Validate plan exists and is active
         var plan = await _dbContext.PlatformPlans
             .FirstOrDefaultAsync(p => p.Id == platformPlanId && p.IsActive, cancellationToken);
-        
+
         if (plan == null)
         {
             throw new InvalidOperationException($"Platform plan '{platformPlanId}' not found or inactive.");
@@ -224,7 +224,7 @@ public class TenantOnboardingService : ITenantOnboardingService
 
         // Check if email already exists
         var existingUser = await _userManager.FindByEmailAsync(email);
-        
+
         if (existingUser != null)
         {
             throw new InvalidOperationException($"User with email '{email}' already exists.");
@@ -239,7 +239,7 @@ public class TenantOnboardingService : ITenantOnboardingService
         };
 
         var result = await _userManager.CreateAsync(identityUser, password);
-        
+
         if (!result.Succeeded)
         {
             var errors = string.Join(", ", result.Errors.Select(e => e.Description));
@@ -294,7 +294,7 @@ public class TenantOnboardingService : ITenantOnboardingService
 
         var existingTenant = await _dbContext.Tenants
             .FirstOrDefaultAsync(t => t.Subdomain == subdomain, cancellationToken);
-        
+
         if (existingTenant != null)
         {
             throw new InvalidOperationException($"Subdomain '{subdomain}' is already taken.");
@@ -324,7 +324,7 @@ public class TenantOnboardingService : ITenantOnboardingService
         catch (Exception ex)
         {
             throw new InvalidOperationException(
-                $"Failed to create tenant '{tenant.Name}' in Tenant Store. Tenant was not created.", 
+                $"Failed to create tenant '{tenant.Name}' in Tenant Store. Tenant was not created.",
                 ex);
         }
 
@@ -333,7 +333,7 @@ public class TenantOnboardingService : ITenantOnboardingService
         // Get PlatformUser for this Identity user and create TenantUser with owner role
         var platformUser = await _dbContext.PlatformUsers
             .FirstOrDefaultAsync(pu => pu.IdentityUserId == session.UserId, cancellationToken);
-        
+
         if (platformUser == null)
         {
             throw new InvalidOperationException("PlatformUser not found for signup session.");
@@ -558,7 +558,7 @@ public class TenantOnboardingService : ITenantOnboardingService
         {
             return null;
         }
-        
+
         return await _dbContext.SignupSessions
             .Include(s => s.PlatformPlan)
             .Include(s => s.User)

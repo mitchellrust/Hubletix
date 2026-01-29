@@ -10,12 +10,14 @@
             }
             else
             {
-                <span class="fw-bold fs-5" style="@(!string.IsNullOrEmpty(Model.PrimaryColor) ? $"color: {Model.PrimaryColor};" : "")">@Model.TenantName</span>
+                <span class="fw-bold fs-5"
+                    style="@(!string.IsNullOrEmpty(Model.PrimaryColor) ? $"color: {Model.PrimaryColor};" : "")">@Model.TenantName</span>
             }
         </a>
         @if (Model.ShowMenuButton)
         {
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
         }
@@ -30,18 +32,25 @@
                 @if (Model.IsUserAuthenticated)
                 {
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-person-circle"></i>
                             <span class="ms-1">@(Model.UserEmail ?? "User")</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             @if (Model.IsUserTenantAdmin)
                             {
-                                <li><a class="dropdown-item" href="/admin"><i class="bi bi-speedometer2 me-2"></i>Admin Portal</a></li>
-                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/admin"><i class="bi bi-speedometer2 me-2"></i>Admin
+                                        Portal</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
                             }
-                            <li><a class="dropdown-item" href="/tenantselector"><i class="bi bi-arrow-left-right me-2"></i>Switch Organization</a></li>
-                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/tenantselector"><i
+                                        class="bi bi-arrow-left-right me-2"></i>Switch Organization</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
                             <li>
                                 <form method="post" asp-page="/Platform/Logout" class="px-3 py-1">
                                     <button type="submit" class="btn btn-sm btn-outline-danger w-100">

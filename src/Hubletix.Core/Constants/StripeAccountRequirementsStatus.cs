@@ -9,12 +9,12 @@ public static class StripeAccountRequirementsStatus
     /// Stripe Connect onboarding not started
     /// </summary>
     public const string PendingVerification = "PendingVerification";
-    
+
     /// <summary>
     /// Stripe Connect account created, onboarding in progress
     /// </summary>
     public const string PastDue = "PastDue";
-    
+
     /// <summary>
     /// User clicked onboarding link and started the process
     /// </summary>

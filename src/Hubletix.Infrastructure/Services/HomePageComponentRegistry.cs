@@ -16,7 +16,7 @@ public class HomePageComponentRegistry : IHomePageComponentRegistry
     public HomePageComponentRegistry(IHostEnvironment environment)
     {
         _environment = environment;
-        
+
         // Define component type mappings
         _mappings = new Dictionary<Type, string>
         {

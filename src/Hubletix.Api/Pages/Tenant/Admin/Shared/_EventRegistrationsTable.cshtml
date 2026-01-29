@@ -11,7 +11,8 @@
                     <h6 class="mb-0">Filters</h6>
                     @if (Model.HasActiveFilters)
                     {
-                        <a href="@Model.PageName?time=all&sort=@Model.SortField&dir=@Model.SortDirection" class="btn btn-sm btn-link text-decoration-none p-0">Clear</a>
+                        <a href="@Model.PageName?time=all&sort=@Model.SortField&dir=@Model.SortDirection"
+                            class="btn btn-sm btn-link text-decoration-none p-0">Clear</a>
                     }
                 </div>
                 <div class="card-body p-0">
@@ -19,40 +20,45 @@
                     <div class="border-bottom p-3">
                         <h6 class="mb-2 fw-semibold small text-uppercase text-muted">Status</h6>
                         <div class="list-group list-group-flush small">
-                            <a href="@Model.BuildRouteUrl("all")" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.StatusFilter == "all" ? "fw-bold text-primary" : "")">
+                            <a href="@Model.BuildRouteUrl("all")"
+                                class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.StatusFilter == "all" ? "fw-bold text-primary" : "")">
                                 All
                             </a>
-                            <a href="@Model.BuildRouteUrl("registered")" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.StatusFilter == "registered" ? "fw-bold text-primary" : "")">
+                            <a href="@Model.BuildRouteUrl("registered")"
+                                class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.StatusFilter == "registered" ? "fw-bold text-primary" : "")">
                                 Registered
                             </a>
-                            <a href="@Model.BuildRouteUrl("attended")" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.StatusFilter == "attended" ? "fw-bold text-primary" : "")">
+                            <a href="@Model.BuildRouteUrl("attended")"
+                                class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.StatusFilter == "attended" ? "fw-bold text-primary" : "")">
                                 Attended
                             </a>
-                            <a href="@Model.BuildRouteUrl("waitlist")" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.StatusFilter == "waitlist" ? "fw-bold text-primary" : "")">
+                            <a href="@Model.BuildRouteUrl("waitlist")"
+                                class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.StatusFilter == "waitlist" ? "fw-bold text-primary" : "")">
                                 Waitlist
                             </a>
-                            <a href="@Model.BuildRouteUrl("cancelled")" class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.StatusFilter == "cancelled" ? "fw-bold text-primary" : "")">
+                            <a href="@Model.BuildRouteUrl("cancelled")"
+                                class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.StatusFilter == "cancelled" ? "fw-bold text-primary" : "")">
                                 Cancelled
                             </a>
                         </div>
                     </div>
-                    
+
                     @if (!string.IsNullOrEmpty(Model.TimeFilter))
                     {
                         <!-- Time Period Facet -->
                         <div class="border-bottom p-3">
                             <h6 class="mb-2 fw-semibold small text-uppercase text-muted">Time Period</h6>
                             <div class="list-group list-group-flush small">
-                                <a href="@(Model.PageName)?status=@Model.StatusFilter&time=all&sort=@Model.SortField&dir=@Model.SortDirection" 
-                                class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.TimeFilter == "all" ? "fw-bold text-primary" : "")">
+                                <a href="@(Model.PageName)?status=@Model.StatusFilter&time=all&sort=@Model.SortField&dir=@Model.SortDirection"
+                                    class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.TimeFilter == "all" ? "fw-bold text-primary" : "")">
                                     All Events
                                 </a>
-                                <a href="@(Model.PageName)?status=@Model.StatusFilter&time=upcoming&sort=@Model.SortField&dir=@Model.SortDirection" 
-                                class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.TimeFilter == "upcoming" ? "fw-bold text-primary" : "")">
+                                <a href="@(Model.PageName)?status=@Model.StatusFilter&time=upcoming&sort=@Model.SortField&dir=@Model.SortDirection"
+                                    class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.TimeFilter == "upcoming" ? "fw-bold text-primary" : "")">
                                     Upcoming Events
                                 </a>
-                                <a href="@(Model.PageName)?status=@Model.StatusFilter&time=previous&sort=@Model.SortField&dir=@Model.SortDirection" 
-                                class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.TimeFilter == "previous" ? "fw-bold text-primary" : "")">
+                                <a href="@(Model.PageName)?status=@Model.StatusFilter&time=previous&sort=@Model.SortField&dir=@Model.SortDirection"
+                                    class="list-group-item list-group-item-action border-0 py-1 px-0 @(Model.TimeFilter == "previous" ? "fw-bold text-primary" : "")">
                                     Previous Events
                                 </a>
                             </div>
@@ -70,7 +76,8 @@
                     <h4 class="mb-0">@Model.Title</h4>
                     @if (Model.ShowFilterFacets)
                     {
-                        <button class="btn btn-sm btn-outline-secondary d-xl-none" data-bs-toggle="modal" data-bs-target="#filterModal">
+                        <button class="btn btn-sm btn-outline-secondary d-xl-none" data-bs-toggle="modal"
+                            data-bs-target="#filterModal">
                             <i class="bi bi-funnel"></i> Filters
                             @if (Model.HasActiveFilters)
                             {
@@ -154,7 +161,7 @@
                                                 "waitlist" => "bg-warning",
                                                 "cancelled" => "bg-secondary",
                                                 _ => "bg-secondary"
-                                            };
+                                                        };
                                         }
                                         <span class="badge @badgeClass">@reg.Status</span>
                                         @if (!string.IsNullOrEmpty(reg.CancellationReason))
@@ -163,7 +170,8 @@
                                         }
                                     </td>
                                     <td class="text-end">
-                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="alert('TODO: Manage registration')">Manage</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                            onclick="alert('TODO: Manage registration')">Manage</button>
                                     </td>
                                 </tr>
                             }
@@ -193,7 +201,8 @@
                                 <li class="page-item @(Model.PageNum == 1 ? "disabled" : "")">
                                     <a class="page-link" href="@Model.BuildPageUrl(Model.PageNum - 1)">Previous</a>
                                 </li>
-                                @for (int i = Math.Max(1, Model.PageNum - 2); i <= Math.Min(Model.TotalPages, Model.PageNum + 2); i++)
+                                @for (int i = Math.Max(1, Model.PageNum - 2); i <= Math.Min(Model.TotalPages, Model.PageNum
+                                                            + 2); i++)
                                 {
                                     <li class="page-item @(i == Model.PageNum ? "active" : "")">
                                         <a class="page-link" href="@Model.BuildPageUrl(i)">@i</a>
@@ -219,61 +228,62 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="filterModalLabel">Filter Registrations</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="resetFilters()" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="resetFilters()"
+                        aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="filterForm" action="@Model.PageName" method="get">
                         <input type="hidden" name="sort" value="@Model.SortField" />
                         <input type="hidden" name="dir" value="@Model.SortDirection" />
-                        
+
                         <!-- Status Filter -->
                         <div class="mb-4">
                             <h6 class="fw-semibold text-uppercase text-muted small mb-3">Status</h6>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="regStatus" id="statusAll" value="all" 
-                                       @(Model.StatusFilter == "all" ? "checked" : "")>
+                                <input class="form-check-input" type="radio" name="regStatus" id="statusAll" value="all"
+                                    @(Model.StatusFilter == "all" ? "checked" : "")>
                                 <label class="form-check-label" for="statusAll">All</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="regStatus" id="statusRegistered" value="registered" 
-                                       @(Model.StatusFilter == "registered" ? "checked" : "")>
+                                <input class="form-check-input" type="radio" name="regStatus" id="statusRegistered"
+                                    value="registered" @(Model.StatusFilter == "registered" ? "checked" : "")>
                                 <label class="form-check-label" for="statusRegistered">Registered</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="regStatus" id="statusAttended" value="attended" 
-                                       @(Model.StatusFilter == "attended" ? "checked" : "")>
+                                <input class="form-check-input" type="radio" name="regStatus" id="statusAttended"
+                                    value="attended" @(Model.StatusFilter == "attended" ? "checked" : "")>
                                 <label class="form-check-label" for="statusAttended">Attended</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="regStatus" id="statusWaitlist" value="waitlist" 
-                                       @(Model.StatusFilter == "waitlist" ? "checked" : "")>
+                                <input class="form-check-input" type="radio" name="regStatus" id="statusWaitlist"
+                                    value="waitlist" @(Model.StatusFilter == "waitlist" ? "checked" : "")>
                                 <label class="form-check-label" for="statusWaitlist">Waitlist</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="regStatus" id="statusCancelled" value="cancelled" 
-                                       @(Model.StatusFilter == "cancelled" ? "checked" : "")>
+                                <input class="form-check-input" type="radio" name="regStatus" id="statusCancelled"
+                                    value="cancelled" @(Model.StatusFilter == "cancelled" ? "checked" : "")>
                                 <label class="form-check-label" for="statusCancelled">Cancelled</label>
                             </div>
                         </div>
-                        
+
                         @if (!string.IsNullOrEmpty(Model.TimeFilter))
                         {
                             <!-- Time Period Filter -->
                             <div class="mb-4">
                                 <h6 class="fw-semibold text-uppercase text-muted small mb-3">Time Period</h6>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="time" id="timeAll" value="all" 
-                                           @(Model.TimeFilter == "all" ? "checked" : "")>
+                                    <input class="form-check-input" type="radio" name="time" id="timeAll" value="all"
+                                        @(Model.TimeFilter == "all" ? "checked" : "")>
                                     <label class="form-check-label" for="timeAll">All Events</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="time" id="timeUpcoming" value="upcoming" 
-                                           @(Model.TimeFilter == "upcoming" ? "checked" : "")>
+                                    <input class="form-check-input" type="radio" name="time" id="timeUpcoming" value="upcoming"
+                                        @(Model.TimeFilter == "upcoming" ? "checked" : "")>
                                     <label class="form-check-label" for="timeUpcoming">Upcoming Events</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="time" id="timePrevious" value="previous" 
-                                           @(Model.TimeFilter == "previous" ? "checked" : "")>
+                                    <input class="form-check-input" type="radio" name="time" id="timePrevious" value="previous"
+                                        @(Model.TimeFilter == "previous" ? "checked" : "")>
                                     <label class="form-check-label" for="timePrevious">Previous Events</label>
                                 </div>
                             </div>
@@ -281,7 +291,8 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="resetFilters()">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        onclick="resetFilters()">Cancel</button>
                     <button type="button" class="btn btn-outline-secondary" onclick="clearFilters()">Clear</button>
                     <button type="button" class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
                 </div>
@@ -292,24 +303,24 @@
     <script>
         let initialStatus = '@Model.StatusFilter';
         let initialTime = '@(Model.TimeFilter ?? "")';
-        
+
         function applyFilters() {
             document.getElementById('filterForm').submit();
         }
-        
+
         function clearFilters() {
             const form = document.getElementById('filterForm');
             const sortField = form.querySelector('input[name="sort"]').value;
             const sortDir = form.querySelector('input[name="dir"]').value;
             window.location.href = `@Model.PageName?time=all&sort=${sortField}&dir=${sortDir}`;
         }
-        
+
         function resetFilters() {
             const statusRadios = document.querySelectorAll('input[name="status"]');
             statusRadios.forEach(radio => {
                 radio.checked = (radio.value === initialStatus);
             });
-            
+
             if (initialTime) {
                 const timeRadios = document.querySelectorAll('input[name="time"]');
                 timeRadios.forEach(radio => {

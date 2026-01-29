@@ -29,7 +29,7 @@ public static class TimeZoneExtensions
         var tzName = timeZone.IsDaylightSavingTime(dateTime)
             ? timeZone.DaylightName
             : timeZone.StandardName;
-        
+
         // Extract first letters of each word (e.g., "Mountain Standard Time" -> "MST")
         return string.Concat(tzName.Split(' ').Select(word => word[0]));
     }

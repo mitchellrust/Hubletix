@@ -40,7 +40,7 @@ public class EventsModel : TenantAdminPageModel
     {
         // Capture status message from redirect
         StatusMessage = message;
-        
+
         // Calculate pagination and sorting
         PageNum = Math.Max(1, pageNum);
         PageSize = Math.Clamp(pageSize, 5, 50);
@@ -114,7 +114,7 @@ public class EventsModel : TenantAdminPageModel
                 Date = localStart,
                 Time = $"{localStart:h:mm tt} ({tzShort})",
                 LocationDetails = e.LocationDetails,
-                Registrations = e.EventRegistrations?.Count(r => 
+                Registrations = e.EventRegistrations?.Count(r =>
                         r.Status == EventRegistrationStatus.Registered ||
                         r.Status == EventRegistrationStatus.Attended
                     ) ?? 0,
@@ -125,7 +125,7 @@ public class EventsModel : TenantAdminPageModel
             };
         }).ToList();
     }
-    
+
     public EventsTableViewModel GetEventsTableViewModel()
     {
         return new EventsTableViewModel

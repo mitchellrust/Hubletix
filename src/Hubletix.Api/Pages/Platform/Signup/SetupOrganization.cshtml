@@ -15,7 +15,8 @@
                         <span class="small text-muted">Setup Organization</span>
                     </div>
                     <div class="progress" style="height: 8px;">
-                        <div class="progress-bar" role="progressbar" style="width: 66%" aria-valuenow="66" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div class="progress-bar" role="progressbar" style="width: 66%" aria-valuenow="66"
+                            aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                 </div>
 
@@ -69,7 +70,8 @@
                                     <input asp-for="Subdomain" class="form-control" />
                                     <span class="input-group-text">@($".{Model.RootDomain}")</span>
                                 </div>
-                                <div class="form-text">This will be your unique URL (only lowercase letters, numbers, and hyphens)</div>
+                                <div class="form-text">This will be your unique URL (only lowercase letters, numbers,
+                                    and hyphens)</div>
                                 <span asp-validation-for="Subdomain" class="text-danger small"></span>
                             </div>
 
@@ -112,7 +114,8 @@
                             </div>
 
                             <div class="d-grid gap-2 d-md-flex">
-                                <a href="/signup/CreateAccount?sessionId=@Model.SessionId" class="btn btn-outline-secondary btn-lg flex-fill">
+                                <a href="/signup/CreateAccount?sessionId=@Model.SessionId"
+                                    class="btn btn-outline-secondary btn-lg flex-fill">
                                     <i class="bi bi-arrow-left me-1"></i> Back
                                 </a>
                                 <button type="submit" class="btn btn-primary btn-lg flex-fill">
@@ -130,24 +133,24 @@
 @section Scripts {
     <script>
         // Subdomain validation - allow only lowercase letters, numbers, and hyphens
-        document.querySelector('input[name="Subdomain"]')?.addEventListener('input', function(e) {
+        document.querySelector('input[name="Subdomain"]')?.addEventListener('input', function (e) {
             // Convert to lowercase and remove invalid characters
             let value = e.target.value.toLowerCase();
             value = value.replace(/[^a-z0-9-]/g, '');
-            
+
             // Don't allow starting or ending with hyphen
             value = value.replace(/^-+|-+$/g, '');
-            
+
             // Don't allow consecutive hyphens
             value = value.replace(/--+/g, '-');
-            
+
             e.target.value = value;
         });
-        
+
         // Real-time subdomain format check
-        document.querySelector('input[name="Subdomain"]')?.addEventListener('blur', function(e) {
+        document.querySelector('input[name="Subdomain"]')?.addEventListener('blur', function (e) {
             const subdomain = e.target.value.trim();
-            
+
             if (subdomain.length > 0 && subdomain.length < 3) {
                 alert('Subdomain must be at least 3 characters long.');
                 e.target.classList.add('is-invalid');
@@ -158,24 +161,24 @@
                 e.target.classList.remove('is-invalid');
             }
         });
-        
+
         // Form validation
-        document.querySelector('form')?.addEventListener('submit', function(e) {
+        document.querySelector('form')?.addEventListener('submit', function (e) {
             const subdomain = document.querySelector('input[name="Subdomain"]').value.trim();
             const orgName = document.querySelector('input[name="OrganizationName"]').value.trim();
-            
+
             if (!orgName) {
                 e.preventDefault();
                 alert('Organization name is required.');
                 return false;
             }
-            
+
             if (!subdomain) {
                 e.preventDefault();
                 alert('Subdomain is required.');
                 return false;
             }
-            
+
             if (subdomain.length < 3) {
                 e.preventDefault();
                 alert('Subdomain must be at least 3 characters long.');

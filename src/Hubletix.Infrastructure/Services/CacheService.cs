@@ -14,22 +14,22 @@ public interface ICacheService
     /// Get a cached value, or execute the factory function to populate it.
     /// </summary>
     Task<T?> GetOrSetAsync<T>(string key, Func<Task<T?>> factory, TimeSpan? slidingExpiration = null, TimeSpan? absoluteExpiration = null) where T : class;
-    
+
     /// <summary>
     /// Try to get a cached value.
     /// </summary>
     bool TryGet<T>(string key, out T? value) where T : class;
-    
+
     /// <summary>
     /// Set a value in the cache.
     /// </summary>
     void Set<T>(string key, T value, TimeSpan? slidingExpiration = null, TimeSpan? absoluteExpiration = null) where T : class;
-    
+
     /// <summary>
     /// Remove a specific key from the cache.
     /// </summary>
     void Remove(string key);
-    
+
     /// <summary>
     /// Remove all keys matching a pattern.
     /// </summary>
@@ -58,9 +58,9 @@ public class CacheService : ICacheService
     }
 
     public async Task<T?> GetOrSetAsync<T>(
-        string key, 
-        Func<Task<T?>> factory, 
-        TimeSpan? slidingExpiration = null, 
+        string key,
+        Func<Task<T?>> factory,
+        TimeSpan? slidingExpiration = null,
         TimeSpan? absoluteExpiration = null) where T : class
     {
         // In development, skip cache to always get fresh data
@@ -77,9 +77,9 @@ public class CacheService : ICacheService
         }
 
         _logger.LogDebug("Cache miss for key: {Key}", key);
-        
+
         var value = await factory();
-        
+
         if (value != null)
         {
             Set(key, value, slidingExpiration, absoluteExpiration);

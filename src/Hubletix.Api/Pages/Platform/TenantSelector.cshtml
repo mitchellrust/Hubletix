@@ -10,55 +10,55 @@
             background-color: #f8f9fa;
             min-height: 100vh;
         }
-        
+
         .tenant-card {
             transition: all 0.3s ease;
             cursor: pointer;
             border: 2px solid transparent;
         }
-        
+
         .tenant-card:hover {
             border-color: var(--primary-color);
             transform: translateY(-5px);
             box-shadow: 0 10px 30px rgba(0, 102, 204, 0.2);
         }
-        
+
         .tenant-card.border-warning {
             border-color: #ffc107 !important;
         }
-        
+
         .tenant-card.border-danger {
             border-color: #dc3545 !important;
         }
-        
+
         .tenant-card.border-warning:hover {
             box-shadow: 0 10px 30px rgba(255, 193, 7, 0.3);
         }
-        
+
         .tenant-card.border-danger:hover {
             box-shadow: 0 10px 30px rgba(220, 53, 69, 0.3);
         }
-        
+
         .tenant-card.disabled {
             opacity: 0.6;
             cursor: not-allowed;
         }
-        
+
         .tenant-card.disabled:hover {
             border-color: transparent;
             transform: none;
             box-shadow: none;
         }
-        
+
         .card-link-disabled {
             pointer-events: none;
         }
-        
+
         .tenant-badge {
             font-size: 0.75rem;
             padding: 0.25rem 0.5rem;
         }
-        
+
         .alert-sm {
             padding: 0.5rem 1rem;
             font-size: 0.875rem;
@@ -87,163 +87,170 @@
 }
 
 <div class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-12 col-lg-10 col-xl-8">
-                <!-- Header -->
-                <div class="text-center mb-5">
-                    <h1 class="display-5 fw-bold mb-3">Select Your Organization</h1>
-                    <p class="lead text-muted">Choose an organization to access its dashboard and features</p>
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10 col-xl-8">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-5 fw-bold mb-3">Select Your Organization</h1>
+                <p class="lead text-muted">Choose an organization to access its dashboard and features</p>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.TenantSelectorErrorMessage))
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    @Model.TenantSelectorErrorMessage
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
+            }
 
-                @if (!string.IsNullOrEmpty(Model.TenantSelectorErrorMessage))
-                {
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                        @Model.TenantSelectorErrorMessage
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            @if (Model.TenantCards == null || !Model.TenantCards.Any())
+            {
+                <!-- No Tenants -->
+                <div class="card border-0 shadow-sm text-center p-5">
+                    <div class="mb-4">
+                        <i class="bi bi-inbox display-1 text-muted"></i>
                     </div>
-                }
-
-                @if (Model.TenantCards == null || !Model.TenantCards.Any())
-                {
-                    <!-- No Tenants -->
-                    <div class="card border-0 shadow-sm text-center p-5">
-                        <div class="mb-4">
-                            <i class="bi bi-inbox display-1 text-muted"></i>
-                        </div>
-                        <h4 class="mb-3">No Organizations Found</h4>
-                        <p class="text-muted mb-4">
-                            You're not currently a member of any organizations. 
-                            Create a new organization or ask an admin to invite you.
-                        </p>
-                        <div>
-                            <a href="/signup/selectplan" class="btn btn-primary">
-                                <i class="bi bi-plus-circle me-2"></i>Create New Organization
-                            </a>
-                        </div>
+                    <h4 class="mb-3">No Organizations Found</h4>
+                    <p class="text-muted mb-4">
+                        You're not currently a member of any organizations.
+                        Create a new organization or ask an admin to invite you.
+                    </p>
+                    <div>
+                        <a href="/signup/selectplan" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-2"></i>Create New Organization
+                        </a>
                     </div>
-                }
-                else
-                {
-                    <!-- Tenant Cards -->
-                    <div class="row g-4">
-                        @foreach (TenantCardDto tenantCard in Model.TenantCards)
-                        {
-                            <div class="col-md-6">
-                                @if (tenantCard.IsDisabled)
-                                {
-                                    <div class="text-decoration-none card-link-disabled">
-                                        <div class="card tenant-card disabled border-0 shadow-sm h-100 @(tenantCard.Status == Hubletix.Core.Constants.TenantStatus.PendingActivation ? "border-warning" : tenantCard.Status == Hubletix.Core.Constants.TenantStatus.Suspended ? "border-danger" : "")">
-                                            <div class="card-body p-4">
-                                                <div class="alert @(tenantCard.Status == Hubletix.Core.Constants.TenantStatus.PendingActivation ? "alert-warning" : "alert-danger") alert-sm mb-3 py-2">
-                                                    <i class="bi @(tenantCard.Status == Hubletix.Core.Constants.TenantStatus.PendingActivation ? "bi-exclamation-circle" : "bi-exclamation-triangle-fill") me-1"></i>
-                                                    <small><strong>@tenantCard.StatusMessage</strong><br/>
+                </div>
+            }
+            else
+            {
+                <!-- Tenant Cards -->
+                <div class="row g-4">
+                    @foreach (TenantCardDto tenantCard in Model.TenantCards)
+                    {
+                        <div class="col-md-6">
+                            @if (tenantCard.IsDisabled)
+                            {
+                                <div class="text-decoration-none card-link-disabled">
+                                    <div
+                                        class="card tenant-card disabled border-0 shadow-sm h-100 @(tenantCard.Status == Hubletix.Core.Constants.TenantStatus.PendingActivation ? "border-warning" : tenantCard.Status == Hubletix.Core.Constants.TenantStatus.Suspended ? "border-danger" : "")">
+                                        <div class="card-body p-4">
+                                            <div
+                                                class="alert @(tenantCard.Status == Hubletix.Core.Constants.TenantStatus.PendingActivation ? "alert-warning" : "alert-danger") alert-sm mb-3 py-2">
+                                                <i
+                                                    class="bi @(tenantCard.Status == Hubletix.Core.Constants.TenantStatus.PendingActivation ? "bi-exclamation-circle" : "bi-exclamation-triangle-fill") me-1"></i>
+                                                <small><strong>@tenantCard.StatusMessage</strong><br />
                                                     Please contact the organization owner to resolve this issue.</small>
+                                            </div>
+
+                                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                                <div>
+                                                    <h4 class="mb-1">@tenantCard.Name</h4>
+                                                    <p class="text-muted small mb-0">
+                                                        <i class="bi bi-globe me-1"></i>@(tenantCard.Subdomain).hubletix.com
+                                                    </p>
                                                 </div>
-                                                
-                                                <div class="d-flex justify-content-between align-items-start mb-3">
-                                                    <div>
-                                                        <h4 class="mb-1">@tenantCard.Name</h4>
-                                                        <p class="text-muted small mb-0">
-                                                            <i class="bi bi-globe me-1"></i>@(tenantCard.Subdomain).hubletix.com
-                                                        </p>
-                                                    </div>
-                                                    <div>
-                                                        @if (tenantCard.IsOwner)
-                                                        {
-                                                            <span class="badge bg-primary tenant-badge">
-                                                                <i class="bi bi-star-fill me-1"></i>Owner
-                                                            </span>
-                                                        }
-                                                        else
-                                                        {
-                                                            <span class="badge bg-secondary tenant-badge">
-                                                                @tenantCard.Role
-                                                            </span>
-                                                        }
-                                                    </div>
-                                                </div>
-                                                
-                                                <div class="d-flex align-items-center justify-content-between">
-                                                    <div class="text-muted small">
-                                                        <i class="bi bi-person-badge me-2"></i>
-                                                        <span>@tenantCard.Role Access</span>
-                                                    </div>
-                                                    <div class="text-end">
-                                                        <span class="badge bg-secondary">
-                                                            <i class="bi bi-lock-fill me-1"></i>Owner Only
+                                                <div>
+                                                    @if (tenantCard.IsOwner)
+                                                    {
+                                                        <span class="badge bg-primary tenant-badge">
+                                                            <i class="bi bi-star-fill me-1"></i>Owner
                                                         </span>
-                                                    </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-secondary tenant-badge">
+                                                            @tenantCard.Role
+                                                        </span>
+                                                    }
+                                                </div>
+                                            </div>
+
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <div class="text-muted small">
+                                                    <i class="bi bi-person-badge me-2"></i>
+                                                    <span>@tenantCard.Role Access</span>
+                                                </div>
+                                                <div class="text-end">
+                                                    <span class="badge bg-secondary">
+                                                        <i class="bi bi-lock-fill me-1"></i>Owner Only
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                }
-                                else
-                                {
-                                    <a href="@tenantCard.RedirectUrl" class="text-decoration-none">
-                                        <div class="card tenant-card border-0 shadow-sm h-100 @(tenantCard.Status == Hubletix.Core.Constants.TenantStatus.PendingActivation ? "border-warning" : tenantCard.Status == Hubletix.Core.Constants.TenantStatus.Suspended ? "border-danger" : "")">
-                                            <div class="card-body p-4">
-                                                @if (!string.IsNullOrEmpty(tenantCard.StatusMessage))
-                                                {
-                                                    <div class="alert @(tenantCard.Status == Hubletix.Core.Constants.TenantStatus.PendingActivation ? "alert-warning" : "alert-danger") alert-sm mb-3 py-2">
-                                                        <i class="bi @(tenantCard.Status == Hubletix.Core.Constants.TenantStatus.PendingActivation ? "bi-exclamation-circle" : "bi-exclamation-triangle-fill") me-1"></i>
-                                                        <small><strong>@tenantCard.StatusMessage</strong></small>
-                                                    </div>
-                                                }
-                                                
-                                                <div class="d-flex justify-content-between align-items-start mb-3">
-                                                    <div>
-                                                        <h4 class="mb-1">@tenantCard.Name</h4>
-                                                        <p class="text-muted small mb-0">
-                                                            <i class="bi bi-globe me-1"></i>@(tenantCard.Subdomain).hubletix.com
-                                                        </p>
-                                                    </div>
-                                                    <div>
-                                                        @if (tenantCard.IsOwner)
-                                                        {
-                                                            <span class="badge bg-primary tenant-badge">
-                                                                <i class="bi bi-star-fill me-1"></i>Owner
-                                                            </span>
-                                                        }
-                                                        else
-                                                        {
-                                                            <span class="badge bg-secondary tenant-badge">
-                                                                @tenantCard.Role
-                                                            </span>
-                                                        }
-                                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <a href="@tenantCard.RedirectUrl" class="text-decoration-none">
+                                    <div
+                                        class="card tenant-card border-0 shadow-sm h-100 @(tenantCard.Status == Hubletix.Core.Constants.TenantStatus.PendingActivation ? "border-warning" : tenantCard.Status == Hubletix.Core.Constants.TenantStatus.Suspended ? "border-danger" : "")">
+                                        <div class="card-body p-4">
+                                            @if (!string.IsNullOrEmpty(tenantCard.StatusMessage))
+                                            {
+                                                <div
+                                                    class="alert @(tenantCard.Status == Hubletix.Core.Constants.TenantStatus.PendingActivation ? "alert-warning" : "alert-danger") alert-sm mb-3 py-2">
+                                                    <i
+                                                        class="bi @(tenantCard.Status == Hubletix.Core.Constants.TenantStatus.PendingActivation ? "bi-exclamation-circle" : "bi-exclamation-triangle-fill") me-1"></i>
+                                                    <small><strong>@tenantCard.StatusMessage</strong></small>
                                                 </div>
-                                                
-                                                <div class="d-flex align-items-center justify-content-between">
-                                                    <div class="text-muted small">
-                                                        <i class="bi bi-person-badge me-2"></i>
-                                                        <span>@tenantCard.Role Access</span>
-                                                    </div>
-                                                    <div class="text-end">
-                                                        <span class="badge @(tenantCard.Status == Hubletix.Core.Constants.TenantStatus.PendingActivation ? "bg-warning text-dark" : tenantCard.Status == Hubletix.Core.Constants.TenantStatus.Suspended ? "bg-danger" : "bg-primary")">
-                                                            @tenantCard.ActionText <i class="bi bi-arrow-right ms-1"></i>
+                                            }
+
+                                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                                <div>
+                                                    <h4 class="mb-1">@tenantCard.Name</h4>
+                                                    <p class="text-muted small mb-0">
+                                                        <i class="bi bi-globe me-1"></i>@(tenantCard.Subdomain).hubletix.com
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    @if (tenantCard.IsOwner)
+                                                    {
+                                                        <span class="badge bg-primary tenant-badge">
+                                                            <i class="bi bi-star-fill me-1"></i>Owner
                                                         </span>
-                                                    </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-secondary tenant-badge">
+                                                            @tenantCard.Role
+                                                        </span>
+                                                    }
+                                                </div>
+                                            </div>
+
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <div class="text-muted small">
+                                                    <i class="bi bi-person-badge me-2"></i>
+                                                    <span>@tenantCard.Role Access</span>
+                                                </div>
+                                                <div class="text-end">
+                                                    <span
+                                                        class="badge @(tenantCard.Status == Hubletix.Core.Constants.TenantStatus.PendingActivation ? "bg-warning text-dark" : tenantCard.Status == Hubletix.Core.Constants.TenantStatus.Suspended ? "bg-danger" : "bg-primary")">
+                                                        @tenantCard.ActionText <i class="bi bi-arrow-right ms-1"></i>
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
-                                    </a>
-                                }
-                            </div>
-                        }
-                    </div>
+                                    </div>
+                                </a>
+                            }
+                        </div>
+                    }
+                </div>
 
-                    <!-- Create New Organization -->
-                    <div class="text-center mt-5">
-                        <hr class="my-4">
-                        <p class="text-muted mb-3">Need to manage another organization?</p>
-                        <a href="/signup/selectplan" class="btn btn-outline-primary">
-                            <i class="bi bi-plus-circle me-2"></i>Create New Organization
-                        </a>
-                    </div>
-                }
-            </div>
+                <!-- Create New Organization -->
+                <div class="text-center mt-5">
+                    <hr class="my-4">
+                    <p class="text-muted mb-3">Need to manage another organization?</p>
+                    <a href="/signup/selectplan" class="btn btn-outline-primary">
+                        <i class="bi bi-plus-circle me-2"></i>Create New Organization
+                    </a>
+                </div>
+            }
         </div>
     </div>
+</div>
 </div>

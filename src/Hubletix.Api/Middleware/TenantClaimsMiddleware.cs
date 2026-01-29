@@ -33,7 +33,7 @@ public class TenantClaimsMiddleware
     {
         // Check if we have tenant context
         var tenantInfo = tenantAccessor.MultiTenantContext?.TenantInfo;
-        
+
         if (tenantInfo != null && context.User.Identity?.IsAuthenticated == true)
         {
             // Get current claims
@@ -42,7 +42,7 @@ public class TenantClaimsMiddleware
             var identityUserIdClaim = context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
             // Check if user needs tenant claims (either no tenant_id claim, or it doesn't match current tenant)
-            if (!string.IsNullOrEmpty(platformUserIdClaim) && 
+            if (!string.IsNullOrEmpty(platformUserIdClaim) &&
                 !string.IsNullOrEmpty(identityUserIdClaim) &&
                 currentTenantIdClaim != tenantInfo.Id)
             {
@@ -54,7 +54,7 @@ public class TenantClaimsMiddleware
                 {
                     // Get the identity user
                     var identityUser = await userManager.FindByIdAsync(identityUserIdClaim);
-                    
+
                     if (identityUser != null)
                     {
                         // Create new claims principal with tenant context

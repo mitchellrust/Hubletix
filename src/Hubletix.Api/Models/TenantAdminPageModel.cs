@@ -72,7 +72,7 @@ public class TenantAdminPageModel : PageModel
             context.Result = new RedirectToPageResult("/Platform/Login");
             return;
         }
-        
+
         // Verify tenant user exists, is active for this platform user and has admin role
         var hasAdminRole = await DbContext.HasRoleInTenantAsync(
             platformUserId,
@@ -114,11 +114,11 @@ public class TenantAdminPageModel : PageModel
             context.Result = new RedirectToPageResult("/Platform/TenantSelector");
             return;
         }
-        
+
         TenantConfig = tenant.GetConfig();
         // Set view data for layout usage
         ViewData["TenantConfig"] = TenantConfig;
-        
+
         // Set logo URL if available in tenant config
         if (!string.IsNullOrEmpty(TenantConfig.Theme.LogoUrl))
         {
@@ -127,7 +127,7 @@ public class TenantAdminPageModel : PageModel
 
         // Set tenant information in ViewData for use in layouts
         ViewData["TenantName"] = CurrentTenantInfo.Name;
-        
+
         await next();
     }
 }

@@ -9,10 +9,6 @@ trim_trailing_whitespace = true
 indent_style = space
 indent_size = 4
 
-# C# specific preferences
-[*.cs]
-dotnet_sort_system_directives_first = true
-
 # Razor pages (keep consistent with C# files)
 [*.cshtml]
 indent_style = space

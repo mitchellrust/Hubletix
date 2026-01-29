@@ -33,7 +33,7 @@ public static class TenantConfigExtensions
 
         try
         {
-            return JsonSerializer.Deserialize<TenantConfig>(tenant.ConfigJson, JsonOptions) 
+            return JsonSerializer.Deserialize<TenantConfig>(tenant.ConfigJson, JsonOptions)
                    ?? new TenantConfig();
         }
         catch

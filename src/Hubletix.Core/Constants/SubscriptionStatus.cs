@@ -12,17 +12,17 @@ public static class SubscriptionStatus
     /// Subscription is active and fully functional
     /// </summary>
     public const string Active = "active";
-    
+
     /// <summary>
     /// Subscription billing is past due
     /// </summary>
     public const string PastDue = "past_due";
-    
+
     /// <summary>
     /// Subscription has been cancelled, by tenant or platform.
     /// </summary>
     public const string Cancelled = "cancelled";
-    
+
     /// <summary>
     /// Subscription has not yet been paid.
     /// </summary>

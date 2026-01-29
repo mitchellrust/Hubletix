@@ -56,12 +56,12 @@ public class SuccessModel : PlatformPageModel
             if (!IsActivated && session.Tenant != null)
             {
                 var cookieName = $"hubletix_signup_refresh_{SessionId}";
-                
+
                 // Check if we've already attempted a refresh (within 30 seconds)
                 if (!Request.Cookies.ContainsKey(cookieName))
                 {
                     _logger.LogInformation("Attempting to refresh platform subscription status from Stripe: {SessionId}", SessionId);
-                    
+
                     // Set cookie to prevent duplicate refresh on auto-reload (30 second TTL)
                     Response.Cookies.Append(cookieName, "1", new CookieOptions
                     {

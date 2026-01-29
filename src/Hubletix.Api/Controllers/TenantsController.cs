@@ -71,10 +71,11 @@ public class TenantsController : ControllerBase
         var tenantId = _multiTenantContextAccessor.MultiTenantContext.TenantInfo.Id;
         _tenantConfigService.InvalidateCache(tenantId);
 
-        return Ok(new { 
-            message = "Cache invalidated successfully", 
+        return Ok(new
+        {
+            message = "Cache invalidated successfully",
             tenantId,
-            timestamp = DateTime.UtcNow 
+            timestamp = DateTime.UtcNow
         });
     }
 
@@ -121,24 +122,24 @@ public class TenantsController : ControllerBase
             var supportedTypes = new[] { "image/jpeg", "image/png", "image/webp" };
             if (!supportedTypes.Contains(file.ContentType.ToLowerInvariant()))
             {
-                return BadRequest(new 
-                { 
-                    success = false, 
-                    error = "Unsupported file type. Only JPEG, PNG, and WebP are supported" 
+                return BadRequest(new
+                {
+                    success = false,
+                    error = "Unsupported file type. Only JPEG, PNG, and WebP are supported"
                 });
             }
 
             // Upload to R2 storage
             using var stream = file.OpenReadStream();
             var imageUrl = await _storageService.UploadImageAsync(
-                stream, 
-                file.FileName, 
-                file.ContentType, 
+                stream,
+                file.FileName,
+                file.ContentType,
                 tenantId);
 
             _logger.LogInformation(
-                "Successfully uploaded hero image for tenant {TenantId}: {ImageUrl}", 
-                tenantId, 
+                "Successfully uploaded hero image for tenant {TenantId}: {ImageUrl}",
+                tenantId,
                 imageUrl);
 
             return Ok(new { success = true, imageUrl });
@@ -151,10 +152,10 @@ public class TenantsController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error uploading hero image");
-            return StatusCode(500, new 
-            { 
-                success = false, 
-                error = "An error occurred while uploading the image. Please try again." 
+            return StatusCode(500, new
+            {
+                success = false,
+                error = "An error occurred while uploading the image. Please try again."
             });
         }
     }

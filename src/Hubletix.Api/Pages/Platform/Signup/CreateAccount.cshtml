@@ -15,7 +15,8 @@
                         <span class="small text-muted">Create Account</span>
                     </div>
                     <div class="progress" style="height: 8px;">
-                        <div class="progress-bar" role="progressbar" style="width: 33%" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div class="progress-bar" role="progressbar" style="width: 33%" aria-valuenow="33"
+                            aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                 </div>
 
@@ -72,7 +73,8 @@
                                     Password <span class="text-danger">*</span>
                                 </label>
                                 <input asp-for="Password" type="password" class="form-control form-control-lg" />
-                                <div class="form-text">Minimum 8 characters, including uppercase, lowercase, and number</div>
+                                <div class="form-text">Minimum 8 characters, including uppercase, lowercase, and number
+                                </div>
                                 <span asp-validation-for="Password" class="text-danger small"></span>
                             </div>
 
@@ -87,7 +89,7 @@
                             <div class="form-check mb-4">
                                 <input asp-for="AcceptTerms" type="checkbox" class="form-check-input" />
                                 <label asp-for="AcceptTerms" class="form-check-label">
-                                    I agree to the <a href="#" class="text-primary">Terms of Service</a> and 
+                                    I agree to the <a href="#" class="text-primary">Terms of Service</a> and
                                     <a href="#" class="text-primary">Privacy Policy</a>
                                 </label>
                                 <div>
@@ -122,25 +124,25 @@
 @section Scripts {
     <script>
         // Password confirmation validation
-        document.querySelector('form')?.addEventListener('submit', function(e) {
+        document.querySelector('form')?.addEventListener('submit', function (e) {
             const password = document.querySelector('input[name="Password"]').value;
             const confirmPassword = document.querySelector('input[name="ConfirmPassword"]').value;
             const acceptTerms = document.querySelector('input[name="AcceptTerms"]').checked;
-            
+
             // Check if passwords match
             if (password !== confirmPassword) {
                 e.preventDefault();
                 alert('Passwords do not match. Please try again.');
                 return false;
             }
-            
+
             // Check if terms are accepted
             if (!acceptTerms) {
                 e.preventDefault();
                 alert('You must accept the Terms of Service and Privacy Policy to continue.');
                 return false;
             }
-            
+
             // Basic password strength check
             if (password.length < 8) {
                 e.preventDefault();
@@ -148,12 +150,12 @@
                 return false;
             }
         });
-        
+
         // Real-time password match indicator
         const passwordInput = document.querySelector('input[name="Password"]');
         const confirmPasswordInput = document.querySelector('input[name="ConfirmPassword"]');
-        
-        confirmPasswordInput?.addEventListener('input', function() {
+
+        confirmPasswordInput?.addEventListener('input', function () {
             if (this.value && passwordInput.value !== this.value) {
                 this.classList.add('is-invalid');
             } else {

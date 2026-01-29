@@ -36,17 +36,17 @@ public class IndexModel : TenantAdminPageModel
 {
     [BindProperty]
     public List<ComponentDto> ComponentDtos { get; set; } = new();
-    
+
     public List<HomePageComponentConfig> Components { get; set; } = new();
-    
+
     public List<object> ComponentRenderContexts { get; set; } = new();
-    
+
     public string PrimaryColor { get; set; } = ThemeDefaults.PrimaryColor;
     public string SecondaryColor { get; set; } = ThemeDefaults.SecondaryColor;
 
     public int MaxComponents => 5;
     public int MaxCardsPerComponent => 3;
-    
+
     public List<(string Value, string Label)> AllowedCtaUrls { get; } = new()
     {
         ("/events", "Events"),
@@ -73,20 +73,20 @@ public class IndexModel : TenantAdminPageModel
         {
             TenantConfig = tenant.GetConfig();
             Components = TenantConfig.HomePage?.Components ?? new();
-            
+
             // Load theme colors from tenant config with defaults
-            PrimaryColor = !string.IsNullOrEmpty(TenantConfig.Theme?.PrimaryColor) 
-                ? TenantConfig.Theme.PrimaryColor 
+            PrimaryColor = !string.IsNullOrEmpty(TenantConfig.Theme?.PrimaryColor)
+                ? TenantConfig.Theme.PrimaryColor
                 : ThemeDefaults.PrimaryColor;
-            SecondaryColor = !string.IsNullOrEmpty(TenantConfig.Theme?.SecondaryColor) 
-                ? TenantConfig.Theme.SecondaryColor 
+            SecondaryColor = !string.IsNullOrEmpty(TenantConfig.Theme?.SecondaryColor)
+                ? TenantConfig.Theme.SecondaryColor
                 : ThemeDefaults.SecondaryColor;
-            
+
             // Pass tenant name to view for preview panel
             ViewData["TenantName"] = CurrentTenantInfo?.Name ?? "Organization";
-            
+
             // Create render contexts for initial preview
-            var renderContexts = Components.Select(component => 
+            var renderContexts = Components.Select(component =>
                 (object)new ComponentRenderContext<HomePageComponentConfig>
                 {
                     Component = component,
@@ -97,19 +97,19 @@ public class IndexModel : TenantAdminPageModel
             ).ToList();
 
             // Create preview model for initial load
-            ComponentRenderContexts = new List<object> 
-            { 
+            ComponentRenderContexts = new List<object>
+            {
                 new PreviewPanelModel
                 {
                     ComponentRenderContexts = renderContexts,
                     TenantName = CurrentTenantInfo?.Name ?? "Organization"
                 }
             };
-            
+
             // Convert to DTOs for display
             ComponentDtos = Components.Select(ToDto).ToList();
         }
-        
+
         return Page();
     }
 
@@ -118,10 +118,10 @@ public class IndexModel : TenantAdminPageModel
         // Use provided theme colors or defaults
         var primaryColor = !string.IsNullOrEmpty(PrimaryColor) ? PrimaryColor : ThemeDefaults.PrimaryColor;
         var secondaryColor = !string.IsNullOrEmpty(SecondaryColor) ? SecondaryColor : ThemeDefaults.SecondaryColor;
-        
+
         // Convert DTOs to components
         Components = ComponentDtos.Select(FromDto).Where(c => c != null).Cast<HomePageComponentConfig>().ToList();
-        
+
         // Validate components
         var validationResult = ValidateComponents();
         if (!string.IsNullOrEmpty(validationResult))
@@ -130,7 +130,7 @@ public class IndexModel : TenantAdminPageModel
         }
 
         // Wrap components in render context for preview
-        var renderContexts = Components.Select(component => 
+        var renderContexts = Components.Select(component =>
             (object)new ComponentRenderContext<HomePageComponentConfig>
             {
                 Component = component,
@@ -155,7 +155,7 @@ public class IndexModel : TenantAdminPageModel
     {
         // Convert DTOs to components
         Components = ComponentDtos.Select(FromDto).Where(c => c != null).Cast<HomePageComponentConfig>().ToList();
-        
+
         if (!ModelState.IsValid)
         {
             await InitializePageDataAsync();
@@ -213,7 +213,7 @@ public class IndexModel : TenantAdminPageModel
             });
 
             await DbContext.SaveChangesAsync();
-            
+
             // Invalidate cache
             TenantConfigService.InvalidateCache(CurrentTenantInfo.Id!);
 
@@ -235,27 +235,27 @@ public class IndexModel : TenantAdminPageModel
         TempData["SuccessMessage"] = "Homepage saved successfully!";
         return RedirectToPage();
     }
-    
+
     private async Task InitializePageDataAsync()
     {
         var tenant = await TenantConfigService.GetTenantAsync(CurrentTenantInfo.Id!);
         if (tenant != null)
         {
             TenantConfig = tenant.GetConfig();
-            
+
             // Load theme colors from tenant config with defaults
-            PrimaryColor = !string.IsNullOrEmpty(TenantConfig.Theme?.PrimaryColor) 
-                ? TenantConfig.Theme.PrimaryColor 
+            PrimaryColor = !string.IsNullOrEmpty(TenantConfig.Theme?.PrimaryColor)
+                ? TenantConfig.Theme.PrimaryColor
                 : ThemeDefaults.PrimaryColor;
-            SecondaryColor = !string.IsNullOrEmpty(TenantConfig.Theme?.SecondaryColor) 
-                ? TenantConfig.Theme.SecondaryColor 
+            SecondaryColor = !string.IsNullOrEmpty(TenantConfig.Theme?.SecondaryColor)
+                ? TenantConfig.Theme.SecondaryColor
                 : ThemeDefaults.SecondaryColor;
-            
+
             // Pass tenant name to view for preview panel
             ViewData["TenantName"] = CurrentTenantInfo?.Name ?? "Organization";
-            
+
             // Create render contexts for preview using current Components
-            var renderContexts = Components.Select(component => 
+            var renderContexts = Components.Select(component =>
                 (object)new ComponentRenderContext<HomePageComponentConfig>
                 {
                     Component = component,
@@ -266,8 +266,8 @@ public class IndexModel : TenantAdminPageModel
             ).ToList();
 
             // Create preview model
-            ComponentRenderContexts = new List<object> 
-            { 
+            ComponentRenderContexts = new List<object>
+            {
                 new PreviewPanelModel
                 {
                     ComponentRenderContexts = renderContexts,
@@ -276,7 +276,7 @@ public class IndexModel : TenantAdminPageModel
             };
         }
     }
-    
+
     private ComponentDto ToDto(HomePageComponentConfig component)
     {
         var dto = new ComponentDto

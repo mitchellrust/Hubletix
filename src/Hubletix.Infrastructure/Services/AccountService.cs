@@ -182,8 +182,8 @@ public class AccountService : IAccountService
             if (!string.IsNullOrEmpty(tenantId))
             {
                 var hasTenantAccess = await _db.TenantUsers
-                    .AnyAsync(tu => tu.PlatformUserId == platformUser.Id 
-                        && tu.TenantId == tenantId 
+                    .AnyAsync(tu => tu.PlatformUserId == platformUser.Id
+                        && tu.TenantId == tenantId
                         && tu.Status == TenantUserStatus.Active, ct);
 
                 if (!hasTenantAccess)
@@ -207,7 +207,7 @@ public class AccountService : IAccountService
                 _logger.LogWarning("Login failed: invalid password for user {Email}", email);
                 return (false, "Invalid email or password.", null, null);
             }
-            
+
             _logger.LogInformation("User {UserId} logged in successfully", identityUser.Id);
             return (true, null, identityUser, platformUser);
         }

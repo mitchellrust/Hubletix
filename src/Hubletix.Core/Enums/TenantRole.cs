@@ -10,12 +10,12 @@ public enum TenantRole
     /// Regular member with basic access to tenant resources
     /// </summary>
     Member = 1,
-    
+
     /// <summary>
     /// Coach with ability to manage events and sessions
     /// </summary>
     Coach = 2,
-    
+
     /// <summary>
     /// Administrator with full control over tenant configuration
     /// </summary>

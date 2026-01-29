@@ -60,14 +60,15 @@ else
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <div class="d-flex align-items-start">
-                                        <i class="bi bi-calendar-event fs-4 me-3" style="color: @(Model.Event.AccentColor ?? "var(--bs-primary)");"></i>
+                                        <i class="bi bi-calendar-event fs-4 me-3"
+                                            style="color: @(Model.Event.AccentColor ?? "var(--bs-primary)");"></i>
                                         <div>
                                             <div class="small text-muted">Date & Time</div>
                                             <div class="fw-semibold">
                                                 @if (Model.Event.IsSameDay)
                                                 {
                                                     @Model.Event.StartTimeLocal.ToString("dddd, MMMM dd, yyyy")
-                                                    <br/>
+                                                    <br />
                                                     @Model.Event.StartTimeLocal.ToString("h:mm tt")
                                                     @if (Model.Event.EndTimeLocal.HasValue)
                                                     {
@@ -78,8 +79,9 @@ else
                                                 else
                                                 {
                                                     @Model.Event.StartTimeLocal.ToString("MMM dd, h:mm tt")
-                                                    <br/>
-                                                    @: to @Model.Event.EndTimeLocal?.ToString("MMM dd, h:mm tt") @Model.Event.TimeZoneAbbreviation
+                                                    <br />
+                                                    @: to @Model.Event.EndTimeLocal?.ToString("MMM dd, h:mm tt")
+                                                    @Model.Event.TimeZoneAbbreviation
                                                 }
                                             </div>
                                         </div>
@@ -90,7 +92,8 @@ else
                                 {
                                     <div class="col-md-6">
                                         <div class="d-flex align-items-start">
-                                            <i class="bi bi-geo-alt fs-4 me-3" style="color: @(Model.Event.AccentColor ?? "var(--bs-primary)");"></i>
+                                            <i class="bi bi-geo-alt fs-4 me-3"
+                                                style="color: @(Model.Event.AccentColor ?? "var(--bs-primary)");"></i>
                                             <div>
                                                 <div class="small text-muted">Location Details</div>
                                                 <div class="fw-semibold">@Model.Event.LocationDetails</div>
@@ -103,7 +106,8 @@ else
                                 {
                                     <div class="col-md-6">
                                         <div class="d-flex align-items-start">
-                                            <i class="bi bi-people fs-4 me-3" style="color: @(Model.Event.AccentColor ?? "var(--bs-primary)");"></i>
+                                            <i class="bi bi-people fs-4 me-3"
+                                                style="color: @(Model.Event.AccentColor ?? "var(--bs-primary)");"></i>
                                             <div>
                                                 <div class="small text-muted">Attendance</div>
                                                 <div class="fw-semibold">
@@ -118,7 +122,8 @@ else
                                 {
                                     <div class="col-md-6">
                                         <div class="d-flex align-items-start">
-                                            <i class="bi bi-tag fs-4 me-3" style="color: @(Model.Event.AccentColor ?? "var(--bs-primary)");"></i>
+                                            <i class="bi bi-tag fs-4 me-3"
+                                                style="color: @(Model.Event.AccentColor ?? "var(--bs-primary)");"></i>
                                             <div>
                                                 <div class="small text-muted">Price</div>
                                                 <div class="fw-semibold">$@Model.Event.Price.Value.ToString("N2")</div>
@@ -131,7 +136,8 @@ else
                                 {
                                     <div class="col-md-6">
                                         <div class="d-flex align-items-start">
-                                            <i class="bi bi-clock fs-4 me-3" style="color: @(Model.Event.AccentColor ?? "var(--bs-primary)");"></i>
+                                            <i class="bi bi-clock fs-4 me-3"
+                                                style="color: @(Model.Event.AccentColor ?? "var(--bs-primary)");"></i>
                                             <div>
                                                 <div class="small text-muted">Registration Deadline</div>
                                                 <div class="fw-semibold">
@@ -163,13 +169,15 @@ else
                                 }
                                 else
                                 {
-                                    <div class="text-uppercase small fw-semibold text-muted">@Model.Event.StartTimeLocal.ToString("MMM dd")</div>
+                                    <div class="text-uppercase small fw-semibold text-muted">
+                                        @Model.Event.StartTimeLocal.ToString("MMM dd")</div>
                                 }
-                                <div class="h1 fw-bold mb-0" style="color: @(Model.Event.AccentColor ?? "var(--bs-primary)");">
+                                <div class="h1 fw-bold mb-0"
+                                    style="color: @(Model.Event.AccentColor ?? "var(--bs-primary)");">
                                     @Model.Event.StartTimeLocal.ToString("h:mm tt")
                                 </div>
                             </div>
-                            
+
                             @if (Model.Event.Price.HasValue && Model.Event.Price.Value > 0)
                             {
                                 <div class="h3 mb-3">$@Model.Event.Price.Value.ToString("N2")</div>
@@ -200,18 +208,18 @@ else
                         }
                         else
                         {
-                            <a href="/event/@Model.Event.Id/register" class="btn btn-primary w-100 rounded-pill py-3 mb-3" style="background-color: @(Model.Event.AccentColor ?? "var(--bs-primary)"); border-color: @(Model.Event.AccentColor ?? "var(--bs-primary)");">
+                            <a href="/event/@Model.Event.Id/register" class="btn btn-primary w-100 rounded-pill py-3 mb-3"
+                                style="background-color: @(Model.Event.AccentColor ?? "var(--bs-primary)"); border-color: @(Model.Event.AccentColor ?? "var(--bs-primary)");">
                                 <i class="bi bi-calendar-check me-2"></i>Register Now
                             </a>
-                            
+
                             @if (Model.Event.MaxAttendees.HasValue)
                             {
                                 <div class="progress mb-2" style="height: 8px;">
-                                    <div class="progress-bar" role="progressbar" 
-                                         style="width: @((Model.Event.CurrentAttendees * 100.0 / Model.Event.MaxAttendees.Value))%; background-color: @(Model.Event.AccentColor ?? "var(--bs-primary)");"
-                                         aria-valuenow="@Model.Event.CurrentAttendees" 
-                                         aria-valuemin="0" 
-                                         aria-valuemax="@Model.Event.MaxAttendees">
+                                    <div class="progress-bar" role="progressbar"
+                                        style="width: @((Model.Event.CurrentAttendees * 100.0 / Model.Event.MaxAttendees.Value))%; background-color: @(Model.Event.AccentColor ?? "var(--bs-primary)");"
+                                        aria-valuenow="@Model.Event.CurrentAttendees" aria-valuemin="0"
+                                        aria-valuemax="@Model.Event.MaxAttendees">
                                     </div>
                                 </div>
                                 <p class="small text-muted text-center mb-0">

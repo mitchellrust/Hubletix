@@ -28,8 +28,8 @@
         isPreviewMode = configContext.IsPreviewMode;
     }
     // Try to extract from ComponentRenderContext<HomePageComponentConfig>
-    else if (Model is ComponentRenderContext<HomePageComponentConfig> baseConfigContext && 
-             baseConfigContext.Component is HeroComponentConfig heroConfig)
+    else if (Model is ComponentRenderContext<HomePageComponentConfig> baseConfigContext &&
+    baseConfigContext.Component is HeroComponentConfig heroConfig)
     {
         heroComponent = heroConfig;
         primaryColor = baseConfigContext.PrimaryColor;
@@ -86,7 +86,7 @@
 
     var sectionClass = isPreviewMode ? "hero-section preview-mode" : "hero-section";
     var useAnimatedGradient = false;
-    
+
     // Build background style
     string backgroundStyle;
     if (!string.IsNullOrEmpty(backgroundImageUrl))
@@ -111,11 +111,19 @@
             background-size: 200% 200%;
             animation: gradient-shift 15s ease infinite;
         }
-        
+
         @@keyframes gradient-shift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
         }
     </style>
 }

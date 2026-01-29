@@ -40,62 +40,62 @@ public class DatabaseInitializationService
     {
         try
         {
-          _logger.LogInformation("Starting database initialization...");
+            _logger.LogInformation("Starting database initialization...");
 
-          // Apply TenantStore migrations
-          _logger.LogInformation("Applying TenantStore migrations...");
-          await tenantStoreContext.Database.MigrateAsync();
-          _logger.LogInformation("TenantStore migrations applied successfully");
+            // Apply TenantStore migrations
+            _logger.LogInformation("Applying TenantStore migrations...");
+            await tenantStoreContext.Database.MigrateAsync();
+            _logger.LogInformation("TenantStore migrations applied successfully");
 
-          // Apply App migrations
-          _logger.LogInformation("Applying App database migrations...");
-          await appContext.Database.MigrateAsync();
-          _logger.LogInformation("App database migrations applied successfully");
+            // Apply App migrations
+            _logger.LogInformation("Applying App database migrations...");
+            await appContext.Database.MigrateAsync();
+            _logger.LogInformation("App database migrations applied successfully");
 
-          // Seed platform roles
-          await SeedRolesAsync();
+            // Seed platform roles
+            await SeedRolesAsync();
 
-          // Seed platform wide data, i.e. platform plans
-          var platformPlans = await SeedPlatformAsync(appContext);
+            // Seed platform wide data, i.e. platform plans
+            var platformPlans = await SeedPlatformAsync(appContext);
 
-          // Seed tenant store data with demo tenant if needed
-          ClubTenantInfo demoTenantInfo = await SeedTenantStoreAsync(
-            tenantStoreContext,
-            "demo"
-          );
+            // Seed tenant store data with demo tenant if needed
+            ClubTenantInfo demoTenantInfo = await SeedTenantStoreAsync(
+              tenantStoreContext,
+              "demo"
+            );
 
-          // Seed application data with demo tenant info.
-          await SeedAppDemoAsync(appContext, demoTenantInfo, platformPlans);
+            // Seed application data with demo tenant info.
+            await SeedAppDemoAsync(appContext, demoTenantInfo, platformPlans);
 
-          // Seed tenant store data with acme tenant if needed
-          ClubTenantInfo acmeTenantInfo = await SeedTenantStoreAsync(
-            tenantStoreContext,
-            "acme"
-          );
+            // Seed tenant store data with acme tenant if needed
+            ClubTenantInfo acmeTenantInfo = await SeedTenantStoreAsync(
+              tenantStoreContext,
+              "acme"
+            );
 
-          // Seed application data with acme tenant info.
-          await SeedAppAcmeAsync(appContext, acmeTenantInfo, platformPlans);
+            // Seed application data with acme tenant info.
+            await SeedAppAcmeAsync(appContext, acmeTenantInfo, platformPlans);
 
-          // Seed tenant store data with paused tenant if needed
-          ClubTenantInfo pausedTenantInfo = await SeedTenantStoreAsync(
-            tenantStoreContext,
-            "paused"
-          );
+            // Seed tenant store data with paused tenant if needed
+            ClubTenantInfo pausedTenantInfo = await SeedTenantStoreAsync(
+              tenantStoreContext,
+              "paused"
+            );
 
-          // Seed application data with paused tenant info.
-          await SeedAppPausedAsync(appContext, pausedTenantInfo, platformPlans);
+            // Seed application data with paused tenant info.
+            await SeedAppPausedAsync(appContext, pausedTenantInfo, platformPlans);
 
-          // Seed cross-cutting data (payments, signup sessions)
-          // Was having null pointer issues, so commenting out for now
-        //   await SeedPaymentsAsync(appContext);
-        //   await SeedSignupSessionsAsync(appContext, platformPlans);
+            // Seed cross-cutting data (payments, signup sessions)
+            // Was having null pointer issues, so commenting out for now
+            //   await SeedPaymentsAsync(appContext);
+            //   await SeedSignupSessionsAsync(appContext, platformPlans);
 
-          _logger.LogInformation("Database initialization completed successfully");
+            _logger.LogInformation("Database initialization completed successfully");
         }
         catch (Exception ex)
         {
-          _logger.LogError(ex, "An error occurred while initializing the database");
-          throw;
+            _logger.LogError(ex, "An error occurred while initializing the database");
+            throw;
         }
     }
 
@@ -155,7 +155,7 @@ public class DatabaseInitializationService
     private async Task SeedRolesAsync()
     {
         var roles = new[] { PlatformRoles.PlatformAdmin };
-        
+
         foreach (var role in roles)
         {
             if (!await _roleManager.RoleExistsAsync(role))
@@ -179,7 +179,7 @@ public class DatabaseInitializationService
         {
             // Check if tenant exists
             var tenantExists = await context.TenantInfo.AnyAsync(t => t.Identifier == tenantIdentifier);
-            
+
             if (!tenantExists)
             {
                 _logger.LogInformation("Creating tenant '{Identifier}'...", tenantIdentifier);
@@ -340,8 +340,8 @@ public class DatabaseInitializationService
 
             // Generate demo users
             var demoUsers = await GenerateDemoUsersAsync(
-                context, 
-                demoTenant.Id, 
+                context,
+                demoTenant.Id,
                 location.Id,
                 demoPlans,
                 8,
@@ -1114,14 +1114,14 @@ public class DatabaseInitializationService
         int count,
         string tenantPrefix)
     {
-        var firstNames = new[] 
-        { 
-            "James", "Mary", "John", "Patricia", "Robert", "Jennifer", "Michael", "Linda", 
+        var firstNames = new[]
+        {
+            "James", "Mary", "John", "Patricia", "Robert", "Jennifer", "Michael", "Linda",
             "Sarah", "David", "Jessica", "William", "Emily", "Richard", "Daniel"
         };
-        
-        var lastNames = new[] 
-        { 
+
+        var lastNames = new[]
+        {
             "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis",
             "Rodriguez", "Martinez", "Wilson", "Anderson", "Taylor", "Moore", "Jackson"
         };
@@ -1137,7 +1137,7 @@ public class DatabaseInitializationService
             var firstName = firstNames[i % firstNames.Length];
             var lastName = lastNames[i % lastNames.Length];
             var email = $"{firstName.ToLower()}.{lastName.ToLower()}@{tenantPrefix}.com";
-            
+
             // Check if user already exists (for cross-tenant scenarios)
             var existingIdentityUser = await _userManager.FindByEmailAsync(email);
             PlatformUser? platformUser = null;
@@ -1160,7 +1160,7 @@ public class DatabaseInitializationService
                 };
 
                 var result = await _userManager.CreateAsync(identityUser, "Test123!");
-                
+
                 if (!result.Succeeded)
                 {
                     _logger.LogWarning("Failed to create user {Email}", email);
@@ -1265,7 +1265,7 @@ public class DatabaseInitializationService
             {
                 var crossTenantUser = await context.PlatformUsers
                     .Include(pu => pu.TenantUsers)
-                    .FirstOrDefaultAsync(pu => pu.TenantUsers.Any(tu => tu.TenantId == demoTenant.Id) 
+                    .FirstOrDefaultAsync(pu => pu.TenantUsers.Any(tu => tu.TenantId == demoTenant.Id)
                                              && pu.FirstName == "James");
 
                 if (crossTenantUser != null && !crossTenantUser.TenantUsers.Any(tu => tu.TenantId == tenantId))
@@ -1285,7 +1285,7 @@ public class DatabaseInitializationService
                     context.TenantUsers.Add(crossTenantMembership);
                     await context.SaveChangesAsync();
 
-                    _logger.LogInformation("Created cross-tenant membership for user {Name}", 
+                    _logger.LogInformation("Created cross-tenant membership for user {Name}",
                         $"{crossTenantUser.FirstName} {crossTenantUser.LastName}");
                 }
             }
