@@ -74,7 +74,7 @@ public class ClaimsPrincipalFactory : IClaimsPrincipalFactory
             if (tenantUser != null)
             {
                 claims.Add(new Claim("tenant_role", tenantUser.Role.ToString()));
-                
+
                 if (tenantUser.IsOwner)
                 {
                     claims.Add(new Claim("is_tenant_owner", "true"));

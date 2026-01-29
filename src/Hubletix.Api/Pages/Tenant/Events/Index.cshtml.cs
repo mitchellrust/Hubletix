@@ -13,18 +13,18 @@ public class EventsModel : TenantPageModel
     public List<EventCardDto> UpcomingEvents { get; set; } = new();
     public bool HasMoreEvents { get; set; }
     public List<string> AllEventTypes { get; set; } = new();
-    
+
     [BindProperty(SupportsGet = true)]
     public string TypeFilter { get; set; } = "all";
-    
+
     [BindProperty(SupportsGet = true)]
     public string AvailabilityFilter { get; set; } = "all";
-    
+
     [BindProperty(SupportsGet = true)]
     public int PageNum { get; set; } = 1;
-    
+
     private const int PageSize = 20;
-    
+
     public bool HasActiveFilters => TypeFilter != "all" || AvailabilityFilter != "all";
 
     public EventsModel(
@@ -33,7 +33,7 @@ public class EventsModel : TenantPageModel
         ITenantConfigService tenantConfigService,
         AppDbContext dbContext
     ) : base(multiTenantContextAccessor, logger, tenantConfigService, dbContext)
-    {}
+    { }
 
     public async Task<IActionResult> OnGetAsync()
     {
@@ -51,7 +51,7 @@ public class EventsModel : TenantPageModel
             .Where(v => !string.IsNullOrEmpty(v))
             .OrderBy(v => v)
             .ToList();
-        
+
         // Build query with filters
         var query = DbContext.Events
             .Include(e => e.EventRegistrations)
@@ -65,14 +65,14 @@ public class EventsModel : TenantPageModel
         {
             query = query.Where(e => e.EventType == TypeFilter);
         }
-        
+
         // Get one extra to check if there are more pages
         var events = await query
             .OrderBy(e => e.StartTimeUtc)
             .Skip((PageNum - 1) * PageSize)
             .Take(PageSize + 1)
             .ToListAsync();
-        
+
         HasMoreEvents = events.Count > PageSize;
         if (HasMoreEvents)
         {
@@ -103,7 +103,7 @@ public class EventsModel : TenantPageModel
                 CurrentAttendees = registrations
             };
         }).ToList();
-        
+
         // Apply availability filter
         if (AvailabilityFilter == "available")
         {
@@ -113,12 +113,12 @@ public class EventsModel : TenantPageModel
         {
             eventDtos = eventDtos.Where(e => e.IsFull).ToList();
         }
-        
+
         UpcomingEvents = eventDtos;
 
         return Page();
     }
-    
+
     public async Task<IActionResult> OnGetLoadMoreAsync(int pageNum, string typeFilter = "all", string availabilityFilter = "all")
     {
         // Verify events are enabled
@@ -126,11 +126,11 @@ public class EventsModel : TenantPageModel
         {
             return RedirectToPage("/Tenant/Home");
         }
-        
+
         TypeFilter = typeFilter;
         AvailabilityFilter = availabilityFilter;
         PageNum = pageNum;
-        
+
         // Build query with filters
         var query = DbContext.Events
             .Include(e => e.EventRegistrations)
@@ -138,20 +138,20 @@ public class EventsModel : TenantPageModel
                 e => e.IsActive &&
                      e.StartTimeUtc > DateTime.UtcNow
             );
-        
+
         // Apply event type filter
         if (TypeFilter != "all")
         {
             query = query.Where(e => e.EventType == TypeFilter);
         }
-        
+
         // Get one extra to check if there are more pages
         var events = await query
             .OrderBy(e => e.StartTimeUtc)
             .Skip((PageNum - 1) * PageSize)
             .Take(PageSize + 1)
             .ToListAsync();
-        
+
         var hasMore = events.Count > PageSize;
         if (hasMore)
         {
@@ -180,7 +180,7 @@ public class EventsModel : TenantPageModel
                 CurrentAttendees = registrations
             };
         }).ToList();
-        
+
         // Apply availability filter
         if (AvailabilityFilter == "available")
         {
@@ -190,10 +190,10 @@ public class EventsModel : TenantPageModel
         {
             eventDtos = eventDtos.Where(e => e.IsFull).ToList();
         }
-        
+
         return new JsonResult(new { events = eventDtos, hasMore });
     }
-    
+
     public string BuildTypeUrl(string type) => $"/events?TypeFilter={type}&AvailabilityFilter={AvailabilityFilter}";
     public string BuildAvailabilityUrl(string availability) => $"/events?TypeFilter={TypeFilter}&AvailabilityFilter={availability}";
 }
@@ -213,7 +213,7 @@ public class EventCardDto
     public string? ImageUrl { get; set; }
     public int? MaxAttendees { get; set; }
     public int CurrentAttendees { get; set; }
-    
+
     public bool IsFull => MaxAttendees.HasValue && CurrentAttendees >= MaxAttendees.Value;
     public bool IsSameDay => !EndTimeLocal.HasValue || StartTimeLocal.Date == EndTimeLocal.Value.Date;
 }

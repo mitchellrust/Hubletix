@@ -69,7 +69,7 @@ public class TenantSelectorModel : PlatformPageModel
             // Display active tenants and non-active tenants for all admins
             // Non-owner admins will see non-active tenants as disabled
             var filteredTenants = tenantUsers
-                .Where(tu => tu.Tenant.Status == TenantStatus.Active || 
+                .Where(tu => tu.Tenant.Status == TenantStatus.Active ||
                            tu.Tenant.Status == TenantStatus.PendingActivation ||
                            tu.Tenant.Status == TenantStatus.Suspended)
                 .ToList();
@@ -95,8 +95,8 @@ public class TenantSelectorModel : PlatformPageModel
         var protocol = request?.Scheme ?? "http";
         var hostname = request?.Host.Host ?? "hubletix.home";
         var port = request?.Host.Port;
-        var portString = port.HasValue && port.Value != 80 && port.Value != 443 
-            ? $":{port.Value}" 
+        var portString = port.HasValue && port.Value != 80 && port.Value != 443
+            ? $":{port.Value}"
             : string.Empty;
 
         string baseDomain;
@@ -109,8 +109,8 @@ public class TenantSelectorModel : PlatformPageModel
         {
             // Production environment - extract base domain
             var parts = hostname.Split('.');
-            baseDomain = parts.Length > 2 
-                ? string.Join(".", parts.Skip(parts.Length - 2)) 
+            baseDomain = parts.Length > 2
+                ? string.Join(".", parts.Skip(parts.Length - 2))
                 : hostname;
         }
 
@@ -125,9 +125,9 @@ public class TenantSelectorModel : PlatformPageModel
             case TenantStatus.PendingActivation:
                 // Find the signup session for this tenant to resume
                 var signupSession = await _dbContext.SignupSessions
-                    .FirstOrDefaultAsync(s => s.TenantId == tenantUser.Tenant.Id && 
+                    .FirstOrDefaultAsync(s => s.TenantId == tenantUser.Tenant.Id &&
                                            s.State != SignupSessionState.Completed);
-                
+
                 if (signupSession != null)
                 {
                     redirectUrl = $"{protocol}://{hostname}{portString}/signup/setuporganization?sessionId={signupSession.Id}";

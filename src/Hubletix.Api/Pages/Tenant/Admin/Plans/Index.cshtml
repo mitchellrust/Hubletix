@@ -14,7 +14,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
-    
+
     <div class="card border-0 shadow-sm">
         <div class="card-header bg-white border-bottom">
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -22,12 +22,15 @@
                 <a class="btn btn-sm btn-primary" href="/admin/plans/create">Create Plan</a>
             </div>
             <div class="btn-group btn-group-sm" role="group" aria-label="Status filter">
-                <a asp-page="/Tenant/Admin/Plans/Index" asp-route-status="all" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
-                   class="btn @(Model.StatusFilter == "all" ? "btn-primary" : "btn-outline-primary")">All</a>
-                <a asp-page="/Tenant/Admin/Plans/Index" asp-route-status="active" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
-                   class="btn @(Model.StatusFilter == "active" ? "btn-primary" : "btn-outline-primary")">Active</a>
-                <a asp-page="/Tenant/Admin/Plans/Index" asp-route-status="inactive" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" 
-                   class="btn @(Model.StatusFilter == "inactive" ? "btn-primary" : "btn-outline-primary")">Inactive</a>
+                <a asp-page="/Tenant/Admin/Plans/Index" asp-route-status="all" asp-route-sort="@Model.SortField"
+                    asp-route-dir="@Model.SortDirection"
+                    class="btn @(Model.StatusFilter == "all" ? "btn-primary" : "btn-outline-primary")">All</a>
+                <a asp-page="/Tenant/Admin/Plans/Index" asp-route-status="active" asp-route-sort="@Model.SortField"
+                    asp-route-dir="@Model.SortDirection"
+                    class="btn @(Model.StatusFilter == "active" ? "btn-primary" : "btn-outline-primary")">Active</a>
+                <a asp-page="/Tenant/Admin/Plans/Index" asp-route-status="inactive" asp-route-sort="@Model.SortField"
+                    asp-route-dir="@Model.SortDirection"
+                    class="btn @(Model.StatusFilter == "inactive" ? "btn-primary" : "btn-outline-primary")">Inactive</a>
             </div>
         </div>
         <div class="table-responsive">
@@ -35,7 +38,9 @@
                 <thead class="table-light">
                     <tr>
                         <th>
-                            <a asp-page="/Tenant/Admin/Plans/Index" asp-route-sort="name" asp-route-dir="@(Model.SortField == "name" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" class="text-decoration-none">
+                            <a asp-page="/Tenant/Admin/Plans/Index" asp-route-sort="name"
+                                asp-route-dir="@(Model.SortField == "name" && Model.SortDirection == "asc" ? "desc" : "asc")"
+                                asp-route-status="@Model.StatusFilter" class="text-decoration-none">
                                 Plan Name
                                 @if (Model.SortField == "name")
                                 {
@@ -44,7 +49,9 @@
                             </a>
                         </th>
                         <th>
-                            <a asp-page="/Tenant/Admin/Plans/Index" asp-route-sort="price" asp-route-dir="@(Model.SortField == "price" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" class="text-decoration-none">
+                            <a asp-page="/Tenant/Admin/Plans/Index" asp-route-sort="price"
+                                asp-route-dir="@(Model.SortField == "price" && Model.SortDirection == "asc" ? "desc" : "asc")"
+                                asp-route-status="@Model.StatusFilter" class="text-decoration-none">
                                 Price
                                 @if (Model.SortField == "price")
                                 {
@@ -53,7 +60,9 @@
                             </a>
                         </th>
                         <th>
-                            <a asp-page="/Tenant/Admin/Plans/Index" asp-route-sort="interval" asp-route-dir="@(Model.SortField == "interval" && Model.SortDirection == "asc" ? "desc" : "asc")" asp-route-status="@Model.StatusFilter" class="text-decoration-none">
+                            <a asp-page="/Tenant/Admin/Plans/Index" asp-route-sort="interval"
+                                asp-route-dir="@(Model.SortField == "interval" && Model.SortDirection == "asc" ? "desc" : "asc")"
+                                asp-route-status="@Model.StatusFilter" class="text-decoration-none">
                                 Billing
                                 @if (Model.SortField == "interval")
                                 {
@@ -87,7 +96,8 @@
                                 <td class="fw-semibold">@plan.Price</td>
                                 <td>
                                     <span class="badge bg-info">
-                                        @(plan.BillingInterval == "month" ? "Monthly" : plan.BillingInterval == "year" ? "Yearly" : plan.BillingInterval)
+                                        @(plan.BillingInterval == "month" ? "Monthly" : plan.BillingInterval == "year" ?
+                                                                        "Yearly" : plan.BillingInterval)
                                     </span>
                                 </td>
                                 <td>
@@ -124,8 +134,14 @@
                 Page @Model.PageNum of @Model.TotalPages
             </div>
             <div>
-                <a class="btn btn-sm btn-outline-secondary me-2 @(Model.PageNum <= 1 ? "disabled" : string.Empty)" asp-page="/Tenant/Admin/Plans/Index" asp-route-pageNum="@(Model.PageNum - 1)" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" asp-route-status="@Model.StatusFilter">Previous</a>
-                <a class="btn btn-sm btn-outline-secondary @(Model.PageNum >= Model.TotalPages ? "disabled" : string.Empty)" asp-page="/Tenant/Admin/Plans/Index" asp-route-pageNum="@(Model.PageNum + 1)" asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection" asp-route-status="@Model.StatusFilter">Next</a>
+                <a class="btn btn-sm btn-outline-secondary me-2 @(Model.PageNum <= 1 ? "disabled" : string.Empty)"
+                    asp-page="/Tenant/Admin/Plans/Index" asp-route-pageNum="@(Model.PageNum - 1)"
+                    asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection"
+                    asp-route-status="@Model.StatusFilter">Previous</a>
+                <a class="btn btn-sm btn-outline-secondary @(Model.PageNum >= Model.TotalPages ? "disabled" : string.Empty)"
+                    asp-page="/Tenant/Admin/Plans/Index" asp-route-pageNum="@(Model.PageNum + 1)"
+                    asp-route-sort="@Model.SortField" asp-route-dir="@Model.SortDirection"
+                    asp-route-status="@Model.StatusFilter">Next</a>
             </div>
         </div>
     </div>

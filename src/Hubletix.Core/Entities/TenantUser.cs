@@ -14,61 +14,61 @@ public class TenantUser : BaseEntity
     /// Foreign key to Tenant (uses BaseEntity.TenantId)
     /// </summary>
     // TenantId inherited from BaseEntity
-    
+
     /// <summary>
     /// Foreign key to PlatformUser
     /// </summary>
     public required string PlatformUserId { get; set; }
-    
+
     /// <summary>
     /// The role this user has within this specific tenant
     /// </summary>
     public TenantRole Role { get; set; }
-    
+
     /// <summary>
     /// The membership status within this tenant
     /// </summary>
     public TenantUserStatus Status { get; set; }
-    
+
     /// <summary>
     /// Whether this user is the owner/creator of the tenant
     /// </summary>
     public bool IsOwner { get; set; }
-    
+
     /// <summary>
     /// Foreign key to Location within this tenant (nullable)
     /// </summary>
     public string? LocationId { get; set; }
-    
+
     /// <summary>
     /// Foreign key to MembershipPlan within this tenant (nullable)
     /// </summary>
     public string? MembershipPlanId { get; set; }
-    
+
     // CreatedAt and CreatedBy inherited from BaseEntity
-    
+
     // Navigation Properties
-    
+
     /// <summary>
     /// Navigation to the tenant
     /// </summary>
     public Tenant Tenant { get; set; } = null!;
-    
+
     /// <summary>
     /// Navigation to the platform user
     /// </summary>
     public PlatformUser PlatformUser { get; set; } = null!;
-    
+
     /// <summary>
     /// Navigation to the location within this tenant
     /// </summary>
     public Location? Location { get; set; }
-    
+
     /// <summary>
     /// Navigation to the membership plan within this tenant
     /// </summary>
     public MembershipPlan? MembershipPlan { get; set; }
-    
+
     /// <summary>
     /// Events coached by this user in this tenant
     /// </summary>

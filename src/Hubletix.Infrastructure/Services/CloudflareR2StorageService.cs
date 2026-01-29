@@ -20,7 +20,7 @@ public class CloudflareR2StorageService : IStorageService
     // Validation constants
     private const long MaxFileSizeBytes = 10 * 1024 * 1024; // 10 MB
     private const int MaxDimensionPixels = 4096;
-    
+
     // Supported MIME types
     private static readonly HashSet<string> SupportedMimeTypes = new()
     {
@@ -44,10 +44,10 @@ public class CloudflareR2StorageService : IStorageService
     {
         _s3Client = s3Client;
         _logger = logger;
-        
-        _bucketName = configuration["CloudflareR2:BucketName"] 
+
+        _bucketName = configuration["CloudflareR2:BucketName"]
             ?? throw new InvalidOperationException("CloudflareR2:BucketName configuration is missing");
-        _publicUrl = configuration["CloudflareR2:PublicUrl"] 
+        _publicUrl = configuration["CloudflareR2:PublicUrl"]
             ?? throw new InvalidOperationException("CloudflareR2:PublicUrl configuration is missing");
     }
 
@@ -140,14 +140,14 @@ public class CloudflareR2StorageService : IStorageService
 
             var response = await _s3Client.DeleteObjectAsync(deleteRequest);
 
-            if (response.HttpStatusCode == System.Net.HttpStatusCode.NoContent || 
+            if (response.HttpStatusCode == System.Net.HttpStatusCode.NoContent ||
                 response.HttpStatusCode == System.Net.HttpStatusCode.OK)
             {
                 _logger.LogInformation("Successfully deleted image from R2: {Key}", key);
             }
             else
             {
-                _logger.LogWarning("Unexpected response when deleting image from R2. Key: {Key}, Status: {Status}", 
+                _logger.LogWarning("Unexpected response when deleting image from R2. Key: {Key}, Status: {Status}",
                     key, response.HttpStatusCode);
             }
         }

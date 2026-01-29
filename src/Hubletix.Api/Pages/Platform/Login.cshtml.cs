@@ -16,10 +16,10 @@ public class LoginModel : PlatformPageModel
 
     [BindProperty]
     public new string? Email { get; set; }
-    
+
     [BindProperty]
     public string? Password { get; set; }
-    
+
     [BindProperty]
     public bool RememberMe { get; set; }
 
@@ -45,7 +45,7 @@ public class LoginModel : PlatformPageModel
     {
         // When navigating on GET, we can clear temp data since we don't have any form submission errors
         TempData.Clear();
-        
+
         // If already authenticated, redirect to return URL or tenant selector
         if (IsAuthenticated)
         {

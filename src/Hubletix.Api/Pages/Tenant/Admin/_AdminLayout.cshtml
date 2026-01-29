@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,21 +12,18 @@
     </environment>
     <environment exclude="Development">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-            asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
-            asp-fallback-test-class="sr-only"
-            asp-fallback-test-property="position"
-            asp-fallback-test-value="absolute"
-            crossorigin="anonymous"
+            asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css" asp-fallback-test-class="sr-only"
+            asp-fallback-test-property="position" asp-fallback-test-value="absolute" crossorigin="anonymous"
             integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" />
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.0/font/bootstrap-icons.css" />
         <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
     </environment>
-    
+
     @await RenderSectionAsync("Styles", required: false)
-    
+
     <script>
         // Check localStorage and set initial classes before page renders to prevent flicker
-        (function() {
+        (function () {
             const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
             if (isCollapsed) {
                 document.documentElement.classList.add('sidebar-collapsed-initial');
@@ -33,434 +31,450 @@
         })();
     </script>
 </head>
+
 <body>
 
-<div class="d-flex min-vh-100">
-    <!-- Sidebar -->
-    <nav class="sidebar bg-dark text-white d-flex flex-column" id="adminSidebar">
-        <div class="p-4 border-bottom border-secondary d-flex justify-content-between align-items-center flex-shrink-0">
-            <div class="d-flex align-items-center">
-                @if (!string.IsNullOrEmpty(ViewData["TenantLogoUrl"] as string))
-                {
-                    <img src="@ViewData["TenantLogoUrl"]" alt="@ViewData["TenantName"]" height="32" class="nav-text">
-                }
-                else
-                {
-                    <h4 class="mb-0 fw-bold"><span class="nav-text">@ViewData["TenantName"]</span></h4>
-                }
-            </div>
-            <button class="btn btn-dark d-lg-none" type="button" onclick="toggleSidebar()">
-                <i class="bi bi-x-lg"></i>
-            </button>
-        </div>
-        
-        <div class="flex-grow-1 overflow-auto">
-            <ul class="nav flex-column py-3">
-                <li class="nav-item">
-                    <a class="nav-link text-white px-4 py-2 @(ViewContext.RouteData.Values["page"]?.ToString()?.EndsWith("Dashboard") == true ? "active bg-primary" : "")" 
-                       href="/admin/dashboard" data-bs-toggle="tooltip" data-bs-placement="right" title="Dashboard">
-                        <i class="bi bi-speedometer2 me-2"></i>
-                        <span class="nav-text">Dashboard</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white px-4 py-2 @(ViewContext.RouteData.Values["page"]?.ToString()?.EndsWith("PageBuilder/Index") == true ? "active bg-primary" : "")" 
-                       href="/admin/pagebuilder" data-bs-toggle="tooltip" data-bs-placement="right" title="Homepage Builder">
-                        <i class="bi bi-ui-radios-grid me-2"></i>
-                        <span class="nav-text">Homepage Builder</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white px-4 py-2 @(ViewContext.RouteData.Values["page"]?.ToString()?.EndsWith("Events/Index") == true ? "active bg-primary" : "")" 
-                       href="/admin/events" data-bs-toggle="tooltip" data-bs-placement="right" title="Events">
-                        <i class="bi bi-calendar-event me-2"></i>
-                        <span class="nav-text">Events</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white px-4 py-2 @(ViewContext.RouteData.Values["page"]?.ToString()?.EndsWith("Events/Registrations") == true ? "active bg-primary" : "")" 
-                       href="/admin/events/registrations" data-bs-toggle="tooltip" data-bs-placement="right" title="Event Registrations">
-                        <i class="bi bi-calendar-check me-2"></i>
-                        <span class="nav-text">Event Registrations</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white px-4 py-2 @(ViewContext.RouteData.Values["page"]?.ToString()?.EndsWith("Plans/Index") == true ? "active bg-primary" : "")" 
-                       href="/admin/plans" data-bs-toggle="tooltip" data-bs-placement="right" title="Membership Plans">
-                        <i class="bi bi-door-open me-2"></i>
-                        <span class="nav-text">Membership Plans</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white px-4 py-2 @(ViewContext.RouteData.Values["page"]?.ToString()?.EndsWith("Members/Index") == true ? "active bg-primary" : "")" 
-                       href="/admin/members" data-bs-toggle="tooltip" data-bs-placement="right" title="Members">
-                        <i class="bi bi-people me-2"></i>
-                        <span class="nav-text">Members</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white px-4 py-2" href="#" data-bs-toggle="tooltip" data-bs-placement="right" title="Analytics">
-                        <i class="bi bi-graph-up me-2"></i>
-                        <span class="nav-text">Analytics</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white px-4 py-2" href="#" data-bs-toggle="tooltip" data-bs-placement="right" title="Reports">
-                        <i class="bi bi-file-text me-2"></i>
-                        <span class="nav-text">Reports</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-        
-        <div class="flex-shrink-0">
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a class="nav-link text-white px-4 py-2" href="#" data-bs-toggle="tooltip" data-bs-placement="right" title="Settings">
-                        <i class="bi bi-gear me-2"></i>
-                        <span class="nav-text">Settings</span>
-                    </a>
-                </li>
-            </ul>
-            <div class="border-top border-secondary p-3 d-none d-lg-block">
-                <button class="btn btn-sm btn-outline-light w-100" onclick="toggleSidebarCollapse()" id="collapseBtn">
-                    <i class="bi bi-chevron-left me-2"></i>
-                    <span class="nav-text">Collapse</span>
-                </button>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Backdrop overlay for mobile -->
-    <div class="sidebar-backdrop d-lg-none" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
-
-    <!-- Main Content -->
-    <div class="flex-grow-1 d-flex flex-column">
-        <!-- Header -->
-        <header class="bg-white border-bottom px-4 py-3">
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center gap-3">
-                    <button class="btn btn-light d-lg-none" type="button" onclick="toggleSidebar()">
-                        <i class="bi bi-list"></i>
-                    </button>
-                    <h2 class="mb-0">Admin Portal</h2>
-                </div>
-                
-                <div class="d-flex align-items-center gap-3">
-                    @if (User?.Identity?.IsAuthenticated ?? false)
+    <div class="d-flex min-vh-100">
+        <!-- Sidebar -->
+        <nav class="sidebar bg-dark text-white d-flex flex-column" id="adminSidebar">
+            <div
+                class="p-4 border-bottom border-secondary d-flex justify-content-between align-items-center flex-shrink-0">
+                <div class="d-flex align-items-center">
+                    @if (!string.IsNullOrEmpty(ViewData["TenantLogoUrl"] as string))
                     {
-                        var userEmail = User.Identity.Name ?? "User";
-                        var avatarName = Uri.EscapeDataString(userEmail);
-                        <div class="dropdown">
-                            <button class="btn btn-light d-flex align-items-center gap-2 dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                <img src="https://ui-avatars.com/api/?name=@avatarName&background=4F46E5&color=fff&size=32" 
-                                     class="rounded-circle" width="32" height="32" alt="@userEmail">
-                                <span class="d-none d-md-inline">@userEmail</span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="/home"><i class="bi bi-house-door me-2"></i>Member Portal</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <a class="dropdown-item" href="/tenantselector">
-                                        <i class="bi bi-arrow-left-right me-2"></i>Switch Organization
-                                    </a>
-                                </li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <form method="post" asp-page="/Platform/Logout" class="px-3 py-1">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger w-100">
-                                            <i class="bi bi-box-arrow-right me-2"></i>Sign Out
-                                        </button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </div>
+                        <img src="@ViewData["TenantLogoUrl"]" alt="@ViewData["TenantName"]" height="32" class="nav-text">
+                    }
+                    else
+                    {
+                        <h4 class="mb-0 fw-bold"><span class="nav-text">@ViewData["TenantName"]</span></h4>
                     }
                 </div>
+                <button class="btn btn-dark d-lg-none" type="button" onclick="toggleSidebar()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
             </div>
-        </header>
 
-        <!-- Page Content -->
-        <main class="flex-grow-1 overflow-auto" style="background-color: #f8f9fa;">
-            @RenderBody()
-        </main>
+            <div class="flex-grow-1 overflow-auto">
+                <ul class="nav flex-column py-3">
+                    <li class="nav-item">
+                        <a class="nav-link text-white px-4 py-2 @(ViewContext.RouteData.Values["page"]?.ToString()?.EndsWith("Dashboard") == true ? "active bg-primary" : "")"
+                            href="/admin/dashboard" data-bs-toggle="tooltip" data-bs-placement="right"
+                            title="Dashboard">
+                            <i class="bi bi-speedometer2 me-2"></i>
+                            <span class="nav-text">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white px-4 py-2 @(ViewContext.RouteData.Values["page"]?.ToString()?.EndsWith("PageBuilder/Index") == true ? "active bg-primary" : "")"
+                            href="/admin/pagebuilder" data-bs-toggle="tooltip" data-bs-placement="right"
+                            title="Homepage Builder">
+                            <i class="bi bi-ui-radios-grid me-2"></i>
+                            <span class="nav-text">Homepage Builder</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white px-4 py-2 @(ViewContext.RouteData.Values["page"]?.ToString()?.EndsWith("Events/Index") == true ? "active bg-primary" : "")"
+                            href="/admin/events" data-bs-toggle="tooltip" data-bs-placement="right" title="Events">
+                            <i class="bi bi-calendar-event me-2"></i>
+                            <span class="nav-text">Events</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white px-4 py-2 @(ViewContext.RouteData.Values["page"]?.ToString()?.EndsWith("Events/Registrations") == true ? "active bg-primary" : "")"
+                            href="/admin/events/registrations" data-bs-toggle="tooltip" data-bs-placement="right"
+                            title="Event Registrations">
+                            <i class="bi bi-calendar-check me-2"></i>
+                            <span class="nav-text">Event Registrations</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white px-4 py-2 @(ViewContext.RouteData.Values["page"]?.ToString()?.EndsWith("Plans/Index") == true ? "active bg-primary" : "")"
+                            href="/admin/plans" data-bs-toggle="tooltip" data-bs-placement="right"
+                            title="Membership Plans">
+                            <i class="bi bi-door-open me-2"></i>
+                            <span class="nav-text">Membership Plans</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white px-4 py-2 @(ViewContext.RouteData.Values["page"]?.ToString()?.EndsWith("Members/Index") == true ? "active bg-primary" : "")"
+                            href="/admin/members" data-bs-toggle="tooltip" data-bs-placement="right" title="Members">
+                            <i class="bi bi-people me-2"></i>
+                            <span class="nav-text">Members</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white px-4 py-2" href="#" data-bs-toggle="tooltip"
+                            data-bs-placement="right" title="Analytics">
+                            <i class="bi bi-graph-up me-2"></i>
+                            <span class="nav-text">Analytics</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white px-4 py-2" href="#" data-bs-toggle="tooltip"
+                            data-bs-placement="right" title="Reports">
+                            <i class="bi bi-file-text me-2"></i>
+                            <span class="nav-text">Reports</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="flex-shrink-0">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link text-white px-4 py-2" href="#" data-bs-toggle="tooltip"
+                            data-bs-placement="right" title="Settings">
+                            <i class="bi bi-gear me-2"></i>
+                            <span class="nav-text">Settings</span>
+                        </a>
+                    </li>
+                </ul>
+                <div class="border-top border-secondary p-3 d-none d-lg-block">
+                    <button class="btn btn-sm btn-outline-light w-100" onclick="toggleSidebarCollapse()"
+                        id="collapseBtn">
+                        <i class="bi bi-chevron-left me-2"></i>
+                        <span class="nav-text">Collapse</span>
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Backdrop overlay for mobile -->
+        <div class="sidebar-backdrop d-lg-none" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+
+        <!-- Main Content -->
+        <div class="flex-grow-1 d-flex flex-column">
+            <!-- Header -->
+            <header class="bg-white border-bottom px-4 py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-3">
+                        <button class="btn btn-light d-lg-none" type="button" onclick="toggleSidebar()">
+                            <i class="bi bi-list"></i>
+                        </button>
+                        <h2 class="mb-0">Admin Portal</h2>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-3">
+                        @if (User?.Identity?.IsAuthenticated ?? false)
+                        {
+                            var userEmail = User.Identity.Name ?? "User";
+                            var avatarName = Uri.EscapeDataString(userEmail);
+                            <div class="dropdown">
+                                <button class="btn btn-light d-flex align-items-center gap-2 dropdown-toggle" type="button"
+                                    data-bs-toggle="dropdown">
+                                    <img src="https://ui-avatars.com/api/?name=@avatarName&background=4F46E5&color=fff&size=32"
+                                        class="rounded-circle" width="32" height="32" alt="@userEmail">
+                                    <span class="d-none d-md-inline">@userEmail</span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="/home"><i class="bi bi-house-door me-2"></i>Member
+                                            Portal</a></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="/tenantselector">
+                                            <i class="bi bi-arrow-left-right me-2"></i>Switch Organization
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li>
+                                        <form method="post" asp-page="/Platform/Logout" class="px-3 py-1">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger w-100">
+                                                <i class="bi bi-box-arrow-right me-2"></i>Sign Out
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <main class="flex-grow-1 overflow-auto" style="background-color: #f8f9fa;">
+                @RenderBody()
+            </main>
+        </div>
     </div>
-</div>
 
-<style>
-    .sidebar {
-        width: 240px;
-        height: 100vh;
-        position: fixed;
-        top: 0;
-        left: 0;
-        transition: width 0.3s ease, transform 0.3s ease;
-    }
-    
-    /* Initial collapsed state (set by inline script before render) */
-    html.sidebar-collapsed-initial .sidebar {
-        width: 70px;
-    }
-    
-    html.sidebar-collapsed-initial .sidebar .nav-text {
-        display: none;
-    }
-    
-    html.sidebar-collapsed-initial .sidebar .nav-link {
-        padding-left: 1.25rem !important;
-        padding-right: 1.25rem !important;
-        text-align: center;
-    }
-    
-    html.sidebar-collapsed-initial .sidebar .nav-link i {
-        margin-right: 0 !important;
-    }
-    
-    html.sidebar-collapsed-initial .d-flex.min-vh-100 {
-        padding-left: 70px;
-    }
-    
-    .sidebar.collapsed {
-        width: 70px;
-    }
-    
-    .sidebar.collapsed .nav-text {
-        display: none;
-    }
-    
-    .sidebar.collapsed .nav-link {
-        padding-left: 1.25rem !important;
-        padding-right: 1.25rem !important;
-        text-align: center;
-    }
-    
-    .sidebar.collapsed .nav-link i {
-        margin-right: 0 !important;
-    }
-    
-    .sidebar.collapsed h4 {
-        font-size: 1rem;
-    }
-    
-    .sidebar .nav-link {
-        transition: background-color 0.2s;
-    }
-    
-    .sidebar .nav-link:hover:not(.active) {
-        background-color: rgba(255, 255, 255, 0.1);
-    }
-    
-    .sidebar .nav-link.active {
-        background-color: #0d6efd;
-    }
-    
-    /* Add padding to main content to account for fixed sidebar */
-    .d-flex.min-vh-100 {
-        padding-left: 240px;
-        transition: padding-left 0.3s ease;
-    }
-    
-    .d-flex.min-vh-100.sidebar-collapsed {
-        padding-left: 70px;
-    }
-
-    .sidebar-backdrop {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 1040;
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.3s ease, visibility 0.3s ease;
-    }
-
-    .sidebar-backdrop.show {
-        opacity: 1;
-        visibility: visible;
-    }
-
-    /* Mobile styles */
-    @@media (max-width: 991.98px) {
-        .d-flex.min-vh-100 {
-            padding-left: 0;
-        }
-        
-        .d-flex.min-vh-100.sidebar-collapsed {
-            padding-left: 0;
-        }
-        
+    <style>
         .sidebar {
-            transform: translateX(-100%);
-            z-index: 1050;
-            width: 240px !important;
+            width: 240px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            transition: width 0.3s ease, transform 0.3s ease;
         }
-        
+
+        /* Initial collapsed state (set by inline script before render) */
+        html.sidebar-collapsed-initial .sidebar {
+            width: 70px;
+        }
+
+        html.sidebar-collapsed-initial .sidebar .nav-text {
+            display: none;
+        }
+
+        html.sidebar-collapsed-initial .sidebar .nav-link {
+            padding-left: 1.25rem !important;
+            padding-right: 1.25rem !important;
+            text-align: center;
+        }
+
+        html.sidebar-collapsed-initial .sidebar .nav-link i {
+            margin-right: 0 !important;
+        }
+
+        html.sidebar-collapsed-initial .d-flex.min-vh-100 {
+            padding-left: 70px;
+        }
+
         .sidebar.collapsed {
-            width: 240px !important;
+            width: 70px;
         }
-        
+
         .sidebar.collapsed .nav-text {
-            display: inline !important;
+            display: none;
         }
-        
+
         .sidebar.collapsed .nav-link {
-            padding-left: 1.5rem !important;
-            padding-right: 1.5rem !important;
-            text-align: left;
+            padding-left: 1.25rem !important;
+            padding-right: 1.25rem !important;
+            text-align: center;
         }
-        
+
         .sidebar.collapsed .nav-link i {
-            margin-right: 0.5rem !important;
+            margin-right: 0 !important;
         }
 
-        .sidebar.show {
-            transform: translateX(0);
+        .sidebar.collapsed h4 {
+            font-size: 1rem;
         }
-    }
-</style>
 
-<script>
-    function toggleSidebar() {
-        const sidebar = document.getElementById('adminSidebar');
-        const backdrop = document.getElementById('sidebarBackdrop');
-        
-        sidebar.classList.toggle('show');
-        backdrop.classList.toggle('show');
-    }
-    
-    function toggleSidebarCollapse() {
-        const sidebar = document.getElementById('adminSidebar');
-        const mainContent = document.querySelector('.d-flex.min-vh-100');
-        const collapseBtn = document.getElementById('collapseBtn');
-        const isCollapsed = sidebar.classList.toggle('collapsed');
-        mainContent.classList.toggle('sidebar-collapsed');
-        
-        // Update button icon and text
-        const icon = collapseBtn.querySelector('i');
-        const text = collapseBtn.querySelector('.nav-text');
-        
-        if (isCollapsed) {
-            icon.className = 'bi bi-chevron-right';
-            text.textContent = 'Expand';
-        } else {
-            icon.className = 'bi bi-chevron-left me-2';
-            text.textContent = 'Collapse';
+        .sidebar .nav-link {
+            transition: background-color 0.2s;
         }
-        
-        // Store preference in localStorage
-        localStorage.setItem('sidebarCollapsed', isCollapsed);
-    }
-    
-    // Restore sidebar state on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-        
-        if (isCollapsed) {
+
+        .sidebar .nav-link:hover:not(.active) {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar .nav-link.active {
+            background-color: #0d6efd;
+        }
+
+        /* Add padding to main content to account for fixed sidebar */
+        .d-flex.min-vh-100 {
+            padding-left: 240px;
+            transition: padding-left 0.3s ease;
+        }
+
+        .d-flex.min-vh-100.sidebar-collapsed {
+            padding-left: 70px;
+        }
+
+        .sidebar-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1040;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .sidebar-backdrop.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Mobile styles */
+        @@media (max-width: 991.98px) {
+            .d-flex.min-vh-100 {
+                padding-left: 0;
+            }
+
+            .d-flex.min-vh-100.sidebar-collapsed {
+                padding-left: 0;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+                z-index: 1050;
+                width: 240px !important;
+            }
+
+            .sidebar.collapsed {
+                width: 240px !important;
+            }
+
+            .sidebar.collapsed .nav-text {
+                display: inline !important;
+            }
+
+            .sidebar.collapsed .nav-link {
+                padding-left: 1.5rem !important;
+                padding-right: 1.5rem !important;
+                text-align: left;
+            }
+
+            .sidebar.collapsed .nav-link i {
+                margin-right: 0.5rem !important;
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+        }
+    </style>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('adminSidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+
+            sidebar.classList.toggle('show');
+            backdrop.classList.toggle('show');
+        }
+
+        function toggleSidebarCollapse() {
             const sidebar = document.getElementById('adminSidebar');
             const mainContent = document.querySelector('.d-flex.min-vh-100');
             const collapseBtn = document.getElementById('collapseBtn');
-            
-            // Add collapsed classes (initial CSS already applied via html class)
-            sidebar.classList.add('collapsed');
-            mainContent.classList.add('sidebar-collapsed');
-            
-            // Update button state
+            const isCollapsed = sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('sidebar-collapsed');
+
+            // Update button icon and text
             const icon = collapseBtn.querySelector('i');
             const text = collapseBtn.querySelector('.nav-text');
-            icon.className = 'bi bi-chevron-right';
-            text.textContent = 'Expand';
-        }
-        
-        // Remove the initial class now that proper classes are applied
-        document.documentElement.classList.remove('sidebar-collapsed-initial');
-        
-        // Initialize Bootstrap tooltips
-        initializeTooltips();
-    });
-    
-    function initializeTooltips() {
-        const sidebar = document.getElementById('adminSidebar');
-        const isCollapsed = sidebar.classList.contains('collapsed');
-        
-        // Destroy existing tooltips
-        const existingTooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-        existingTooltips.forEach(el => {
-            const tooltip = bootstrap.Tooltip.getInstance(el);
-            if (tooltip) {
-                tooltip.dispose();
-            }
-        });
-        
-        // Only enable tooltips when sidebar is collapsed on desktop
-        if (isCollapsed && window.innerWidth >= 992) {
-            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            tooltipTriggerList.forEach(function (tooltipTriggerEl) {
-                new bootstrap.Tooltip(tooltipTriggerEl);
-            });
-        }
-    }
-    
-    function toggleSidebarCollapse() {
-        const sidebar = document.getElementById('adminSidebar');
-        const mainContent = document.querySelector('.d-flex.min-vh-100');
-        const collapseBtn = document.getElementById('collapseBtn');
-        const isCollapsed = sidebar.classList.toggle('collapsed');
-        mainContent.classList.toggle('sidebar-collapsed');
-        
-        // Update button icon and text
-        const icon = collapseBtn.querySelector('i');
-        const text = collapseBtn.querySelector('.nav-text');
-        
-        if (isCollapsed) {
-            icon.className = 'bi bi-chevron-right';
-            text.textContent = 'Expand';
-        } else {
-            icon.className = 'bi bi-chevron-left me-2';
-            text.textContent = 'Collapse';
-        }
-        
-        // Store preference in localStorage
-        localStorage.setItem('sidebarCollapsed', isCollapsed);
-        
-        // Reinitialize tooltips
-        initializeTooltips();
-    }
 
-    // Close sidebar when clicking a link on mobile
-    document.querySelectorAll('.sidebar .nav-link').forEach(link => {
-        link.addEventListener('click', () => {
-            if (window.innerWidth < 992) {
-                toggleSidebar();
+            if (isCollapsed) {
+                icon.className = 'bi bi-chevron-right';
+                text.textContent = 'Expand';
+            } else {
+                icon.className = 'bi bi-chevron-left me-2';
+                text.textContent = 'Collapse';
             }
-        });
-    });
 
-    // Close sidebar on window resize if desktop size
-    window.addEventListener('resize', () => {
-        if (window.innerWidth >= 992) {
+            // Store preference in localStorage
+            localStorage.setItem('sidebarCollapsed', isCollapsed);
+        }
+
+        // Restore sidebar state on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+
+            if (isCollapsed) {
+                const sidebar = document.getElementById('adminSidebar');
+                const mainContent = document.querySelector('.d-flex.min-vh-100');
+                const collapseBtn = document.getElementById('collapseBtn');
+
+                // Add collapsed classes (initial CSS already applied via html class)
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('sidebar-collapsed');
+
+                // Update button state
+                const icon = collapseBtn.querySelector('i');
+                const text = collapseBtn.querySelector('.nav-text');
+                icon.className = 'bi bi-chevron-right';
+                text.textContent = 'Expand';
+            }
+
+            // Remove the initial class now that proper classes are applied
+            document.documentElement.classList.remove('sidebar-collapsed-initial');
+
+            // Initialize Bootstrap tooltips
+            initializeTooltips();
+        });
+
+        function initializeTooltips() {
             const sidebar = document.getElementById('adminSidebar');
-            const backdrop = document.getElementById('sidebarBackdrop');
-            sidebar.classList.remove('show');
-            backdrop.classList.remove('show');
-        }
-    });
-</script>
+            const isCollapsed = sidebar.classList.contains('collapsed');
 
-<environment include="Development">
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-</environment>
-<environment exclude="Development">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-            asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"
-            asp-fallback-test="window.bootstrap && window.bootstrap.Modal"
-            crossorigin="anonymous"
-            integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI">
+            // Destroy existing tooltips
+            const existingTooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            existingTooltips.forEach(el => {
+                const tooltip = bootstrap.Tooltip.getInstance(el);
+                if (tooltip) {
+                    tooltip.dispose();
+                }
+            });
+
+            // Only enable tooltips when sidebar is collapsed on desktop
+            if (isCollapsed && window.innerWidth >= 992) {
+                const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+                    new bootstrap.Tooltip(tooltipTriggerEl);
+                });
+            }
+        }
+
+        function toggleSidebarCollapse() {
+            const sidebar = document.getElementById('adminSidebar');
+            const mainContent = document.querySelector('.d-flex.min-vh-100');
+            const collapseBtn = document.getElementById('collapseBtn');
+            const isCollapsed = sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('sidebar-collapsed');
+
+            // Update button icon and text
+            const icon = collapseBtn.querySelector('i');
+            const text = collapseBtn.querySelector('.nav-text');
+
+            if (isCollapsed) {
+                icon.className = 'bi bi-chevron-right';
+                text.textContent = 'Expand';
+            } else {
+                icon.className = 'bi bi-chevron-left me-2';
+                text.textContent = 'Collapse';
+            }
+
+            // Store preference in localStorage
+            localStorage.setItem('sidebarCollapsed', isCollapsed);
+
+            // Reinitialize tooltips
+            initializeTooltips();
+        }
+
+        // Close sidebar when clicking a link on mobile
+        document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth < 992) {
+                    toggleSidebar();
+                }
+            });
+        });
+
+        // Close sidebar on window resize if desktop size
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 992) {
+                const sidebar = document.getElementById('adminSidebar');
+                const backdrop = document.getElementById('sidebarBackdrop');
+                sidebar.classList.remove('show');
+                backdrop.classList.remove('show');
+            }
+        });
     </script>
-</environment>
-@await RenderSectionAsync("Scripts", required: false)
+
+    <environment include="Development">
+        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+            asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"
+            asp-fallback-test="window.bootstrap && window.bootstrap.Modal" crossorigin="anonymous"
+            integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI">
+            </script>
+    </environment>
+    @await RenderSectionAsync("Scripts", required: false)
 
 </body>
+
 </html>

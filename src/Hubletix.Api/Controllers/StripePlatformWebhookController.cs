@@ -79,7 +79,7 @@ public class StripePlatformWebhookController : ControllerBase
                 case EventTypes.InvoicePaymentFailed:
                     await HandleInvoicePaymentFailed(stripeEvent);
                     break;
-                
+
                 case EventTypes.CustomerSubscriptionCreated:
                     // Handled via invoice.paid for activation
                     _logger.LogInformation(
@@ -330,7 +330,7 @@ public class StripePlatformWebhookController : ControllerBase
             .Where(p => p.Payment.Type == "payment_intent")
             .OrderByDescending(p => p.Created)
             .FirstOrDefault();
-            
+
         if (latestPayment == null)
         {
             _logger.LogWarning(
@@ -350,7 +350,7 @@ public class StripePlatformWebhookController : ControllerBase
                     checkoutSessionId,
                     $"Payment failed: {latestPayment.Payment.PaymentIntent.LastPaymentError?.Message ?? "Unknown error"}"
                 );
-                
+
                 _logger.LogInformation(
                     "Recorded billing failure: CheckoutSessionId={CheckoutSessionId}",
                     checkoutSessionId
@@ -493,7 +493,7 @@ public class StripePlatformWebhookController : ControllerBase
         var tenantSubscription = await _dbContext.TenantSubscriptions
             .Include(ts => ts.Tenant)
             .FirstOrDefaultAsync(ts => ts.StripeSubscriptionId == subscription.Id);
-            
+
         if (tenantSubscription == null)
         {
             _logger.LogWarning(
@@ -524,7 +524,7 @@ public class StripePlatformWebhookController : ControllerBase
             }
 
             await _dbContext.SaveChangesAsync();
-            
+
             _logger.LogInformation(
                 "Successfully processed subscription deletion: SubscriptionId={SubscriptionId}",
                 subscription.Id

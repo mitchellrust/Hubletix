@@ -9,7 +9,8 @@
 <div class="card mb-3 component-card" data-index="@index">
     <div class="card-header bg-light d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center gap-2">
-            <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" data-bs-toggle="collapse" data-bs-target="#cardsCollapse-@index" aria-expanded="false">
+            <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" data-bs-toggle="collapse"
+                data-bs-target="#cardsCollapse-@index" aria-expanded="false">
                 <i class="bi bi-chevron-down collapse-icon"></i>
             </button>
             <span><i class="bi bi-grid-3x3"></i> Cards Component</span>
@@ -28,63 +29,65 @@
     </div>
     <div id="cardsCollapse-@index" class="collapse">
         <div class="card-body">
-        <input type="hidden" name="ComponentDtos[@index].Type" value="Cards" />
-        <input type="hidden" name="ComponentDtos[@index].Order" value="@index" />
-        
-        <div class="mb-3">
-            <label class="form-label">Section Heading (optional)</label>
-            <input type="text" class="form-control component-input" name="ComponentDtos[@index].Heading" value="@cards.Heading" placeholder="Our Services" />
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Section Subheading (optional)</label>
-            <input type="text" class="form-control component-input" name="ComponentDtos[@index].Subheading" value="@cards.Subheading" placeholder="What we offer" />
-        </div>
-        
-        <hr />
-        <h6>Cards (up to 3)</h6>
-        <div class="cards-list" data-component-index="@index">
-            @if (cards.Cards != null)
-            {
-                @for (int i = 0; i < cards.Cards.Count; i++)
+            <input type="hidden" name="ComponentDtos[@index].Type" value="Cards" />
+            <input type="hidden" name="ComponentDtos[@index].Order" value="@index" />
+
+            <div class="mb-3">
+                <label class="form-label">Section Heading (optional)</label>
+                <input type="text" class="form-control component-input" name="ComponentDtos[@index].Heading"
+                    value="@cards.Heading" placeholder="Our Services" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Section Subheading (optional)</label>
+                <input type="text" class="form-control component-input" name="ComponentDtos[@index].Subheading"
+                    value="@cards.Subheading" placeholder="What we offer" />
+            </div>
+
+            <hr />
+            <h6>Cards (up to 3)</h6>
+            <div class="cards-list" data-component-index="@index">
+                @if (cards.Cards != null)
                 {
-                    var card = cards.Cards[i];
-                    <div class="card card-item mb-2">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <div class="d-flex align-items-center gap-2">
-                                    <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" data-bs-toggle="collapse" data-bs-target="#cardCollapse-@index-@i" aria-expanded="false">
-                                        <i class="bi bi-chevron-down collapse-icon"></i>
+                    @for (int i = 0; i < cards.Cards.Count; i++)
+                    {
+                        var card = cards.Cards[i];
+                        <div class="card card-item mb-2">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none"
+                                            data-bs-toggle="collapse" data-bs-target="#cardCollapse-@index-@i"
+                                            aria-expanded="false">
+                                            <i class="bi bi-chevron-down collapse-icon"></i>
+                                        </button>
+                                        <strong>Card @(i + 1)</strong>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-danger remove-card-btn">
+                                        <i class="bi bi-x"></i>
                                     </button>
-                                    <strong>Card @(i + 1)</strong>
                                 </div>
-                                <button type="button" class="btn btn-sm btn-outline-danger remove-card-btn">
-                                    <i class="bi bi-x"></i>
-                                </button>
-                            </div>
-                            <div id="cardCollapse-@index-@i" class="collapse">
-                            <div class="mb-2">
-                                <label class="form-label small">Heading</label>
-                                <input type="text" class="form-control form-control-sm component-input" 
-                                       name="ComponentDtos[@index].Cards[@i].Heading" 
-                                       value="@card.Heading"
-                                       placeholder="Card heading" />
-                            </div>
-                            <div class="mb-2">
-                                <label class="form-label small">Subheading</label>
-                                <input type="text" class="form-control form-control-sm component-input" 
-                                       name="ComponentDtos[@index].Cards[@i].Subheading" 
-                                       value="@card.Subheading"
-                                       placeholder="Card subheading" />
-                            </div>
+                                <div id="cardCollapse-@index-@i" class="collapse">
+                                    <div class="mb-2">
+                                        <label class="form-label small">Heading</label>
+                                        <input type="text" class="form-control form-control-sm component-input"
+                                            name="ComponentDtos[@index].Cards[@i].Heading" value="@card.Heading"
+                                            placeholder="Card heading" />
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label small">Subheading</label>
+                                        <input type="text" class="form-control form-control-sm component-input"
+                                            name="ComponentDtos[@index].Cards[@i].Subheading" value="@card.Subheading"
+                                            placeholder="Card subheading" />
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    }
                 }
-            }
-            <button type="button" class="btn btn-sm btn-outline-primary add-card-btn mb-2">
-                <i class="bi bi-plus"></i> Add Card
-            </button>
-        </div>
+                <button type="button" class="btn btn-sm btn-outline-primary add-card-btn mb-2">
+                    <i class="bi bi-plus"></i> Add Card
+                </button>
+            </div>
         </div>
     </div>
 </div>

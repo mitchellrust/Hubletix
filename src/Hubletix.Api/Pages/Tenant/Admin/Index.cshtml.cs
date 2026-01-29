@@ -6,7 +6,7 @@ using Hubletix.Infrastructure.Services;
 namespace Hubletix.Api.Pages.Tenant.Admin;
 
 public class IndexModel : TenantAdminPageModel
-{    
+{
     public IndexModel(
         AppDbContext dbContext,
         ITenantConfigService tenantConfigService,

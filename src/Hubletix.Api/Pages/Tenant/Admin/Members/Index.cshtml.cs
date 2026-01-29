@@ -38,7 +38,7 @@ public class MembersModel : TenantAdminPageModel
     {
         // Capture status message from redirect
         StatusMessage = message;
-        
+
         // Calculate pagination and sorting
         PageNum = Math.Max(1, pageNum);
         PageSize = Math.Clamp(pageSize, 5, 50);
@@ -51,16 +51,16 @@ public class MembersModel : TenantAdminPageModel
         var query = DbContext.TenantUsers
             .Where(u => u.TenantId == CurrentTenantInfo.Id)
             .Select(u => new
-                {
-                    TenantUserId = u.Id,
-                    MembershipPlanId = u.MembershipPlanId,
-                    PlatformUser = u.PlatformUser,
-                    Email = u.PlatformUser.IdentityUser.Email,
-                    MembershipPlanName = DbContext.MembershipPlans
+            {
+                TenantUserId = u.Id,
+                MembershipPlanId = u.MembershipPlanId,
+                PlatformUser = u.PlatformUser,
+                Email = u.PlatformUser.IdentityUser.Email,
+                MembershipPlanName = DbContext.MembershipPlans
                         .Where(p => p.Id == u.MembershipPlanId)
                         .Select(p => p.Name)
                         .FirstOrDefault()
-                }
+            }
             );
 
         // Apply status filter
@@ -70,7 +70,7 @@ public class MembersModel : TenantAdminPageModel
             "inactive" => query.Where(u => !u.PlatformUser.IsActive),
             _ => query // "all" - no filter
         };
-        
+
         // Apply membership plan filter
         if (!string.IsNullOrWhiteSpace(MembershipPlanFilter))
         {
@@ -124,14 +124,14 @@ public class MembersModel : TenantAdminPageModel
             MembershipPlanName = u.MembershipPlanName
         }).ToList();
     }
-    
+
     private async Task LoadMembershipPlanFacetsAsync()
     {
         // Build base query with status filter applied
         var userQuery = DbContext.TenantUsers
             .Include(tu => tu.PlatformUser)
             .Where(u => u.TenantId == CurrentTenantInfo.Id);
-        
+
         if (StatusFilter == "active")
         {
             userQuery = userQuery.Where(u => u.PlatformUser.IsActive);
@@ -141,7 +141,7 @@ public class MembersModel : TenantAdminPageModel
             userQuery = userQuery.Where(u => !u.PlatformUser.IsActive);
         }
         // "all" or null - no filter applied
-        
+
         // Get all membership plans with filtered member counts
         var planFacets = await DbContext.MembershipPlans
             .OrderBy(p => p.DisplayOrder)
@@ -153,7 +153,7 @@ public class MembersModel : TenantAdminPageModel
                 Count = userQuery.Count(u => u.MembershipPlanId == p.Id)
             })
             .ToListAsync();
-        
+
         // Add "No Plan" facet with filtered count
         var noPlanCount = await userQuery.CountAsync(u => u.MembershipPlanId == null);
         planFacets.Add(new MembershipPlanFacet
@@ -162,7 +162,7 @@ public class MembersModel : TenantAdminPageModel
             Name = "No Plan",
             Count = noPlanCount
         });
-        
+
         MembershipPlanFacets = planFacets;
     }
 }

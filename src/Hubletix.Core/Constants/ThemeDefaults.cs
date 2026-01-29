@@ -9,7 +9,7 @@ public static class ThemeDefaults
     /// Default primary color - Purple (#667eea)
     /// </summary>
     public const string PrimaryColor = "#667eea";
-    
+
     /// <summary>
     /// Default secondary color - Dark Purple (#764ba2)
     /// </summary>

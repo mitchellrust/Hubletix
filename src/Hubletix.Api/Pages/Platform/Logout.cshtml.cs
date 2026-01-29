@@ -34,7 +34,7 @@ public class LogoutModel : PlatformPageModel
         if (IsAuthenticated)
         {
             _logger.LogInformation("User {UserId} logging out", PlatformUserId);
-            
+
             // Sign out the user
             await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
         }

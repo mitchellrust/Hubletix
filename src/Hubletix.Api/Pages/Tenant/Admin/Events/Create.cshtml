@@ -41,26 +41,30 @@
 
                         <div class="mb-3">
                             <label asp-for="Event.Description" class="form-label">Description</label>
-                            <textarea class="form-control" asp-for="Event.Description" rows="3" placeholder="Enter event description"></textarea>
+                            <textarea class="form-control" asp-for="Event.Description" rows="3"
+                                placeholder="Enter event description"></textarea>
                             <span asp-validation-for="Event.Description" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-3">
                             <label asp-for="Event.LocationDetails" class="form-label">Location Details</label>
-                            <input class="form-control" asp-for="Event.LocationDetails" placeholder="Enter event location details (optional)" />
+                            <input class="form-control" asp-for="Event.LocationDetails"
+                                placeholder="Enter event location details (optional)" />
                             <span asp-validation-for="Event.LocationDetails" class="text-danger small"></span>
                         </div>
 
                         <div class="row">
                             <div class="col-12 col-md-6 mb-3">
                                 <label asp-for="Event.EventType" class="form-label">Event Type</label>
-                                <select class="form-select" asp-for="Event.EventType" asp-items="Model.EventTypeOptions"></select>
+                                <select class="form-select" asp-for="Event.EventType"
+                                    asp-items="Model.EventTypeOptions"></select>
                                 <span asp-validation-for="Event.EventType" class="text-danger small"></span>
                             </div>
 
                             <div class="col-12 col-md-6 mb-3">
                                 <label asp-for="Event.Capacity" class="form-label">Capacity</label>
-                                <input type="number" class="form-control" asp-for="Event.Capacity" min="1" placeholder="Enter max capacity" required />
+                                <input type="number" class="form-control" asp-for="Event.Capacity" min="1"
+                                    placeholder="Enter max capacity" required />
                                 <span asp-validation-for="Event.Capacity" class="text-danger small"></span>
                             </div>
                         </div>
@@ -70,13 +74,15 @@
                                 <label asp-for="PriceInDollars" class="form-label">Price</label>
                                 <div class="input-group">
                                     <span class="input-group-text">$</span>
-                                    <input type="number" class="form-control" asp-for="PriceInDollars" min="0" step="0.01" placeholder="0.00" />
+                                    <input type="number" class="form-control" asp-for="PriceInDollars" min="0"
+                                        step="0.01" placeholder="0.00" />
                                 </div>
                                 <span class="text-muted small">Leave blank or set to 0 for free events</span>
                             </div>
 
                             <div class="col-12 col-md-6 mb-3">
-                                <label asp-for="LocalRegistrationDeadline" class="form-label">Registration Deadline</label>
+                                <label asp-for="LocalRegistrationDeadline" class="form-label">Registration
+                                    Deadline</label>
                                 <input type="datetime-local" class="form-control" asp-for="LocalRegistrationDeadline" />
                                 <span class="text-muted small">Optional - leave blank for no deadline</span>
                             </div>
@@ -98,14 +104,16 @@
 
                         <div class="mb-3">
                             <label asp-for="Event.TimeZoneId" class="form-label">Time Zone</label>
-                            <select class="form-select" asp-for="Event.TimeZoneId" asp-items="Model.TimeZoneOptions"></select>
+                            <select class="form-select" asp-for="Event.TimeZoneId"
+                                asp-items="Model.TimeZoneOptions"></select>
                             <span asp-validation-for="Event.TimeZoneId" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Status</label>
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="isActive" asp-for="Event.IsActive" onchange="updateStatusLabel(this)" />
+                                <input class="form-check-input" type="checkbox" id="isActive" asp-for="Event.IsActive"
+                                    onchange="updateStatusLabel(this)" />
                                 <label class="form-check-label" for="isActive" id="statusLabel">
                                     @(Model.Event.IsActive ? "Active" : "Inactive")
                                 </label>

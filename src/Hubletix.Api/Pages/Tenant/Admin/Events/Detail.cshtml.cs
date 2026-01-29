@@ -33,7 +33,7 @@ public class EventDetailModel : TenantAdminPageModel
     public List<SelectListItem> TimeZoneOptions { get; set; } = new();
     public string? StatusMessage { get; set; }
     public string? ErrorMessage { get; set; }
-    
+
     // Registration properties
     public List<EventRegistrationDto> Registrations { get; set; } = new();
     public int PageNum { get; set; }
@@ -94,13 +94,13 @@ public class EventDetailModel : TenantAdminPageModel
 
         PopulateEventTypeOptions();
         PopulateTimeZoneOptions();
-        
+
         // Load registrations for this event
         await LoadEventRegistrationsAsync(id, sort, dir, pageNum, pageSize, regStatus);
-        
+
         return Page();
     }
-    
+
     private async Task LoadEventRegistrationsAsync(string eventId, string? sort, string? dir, int pageNum, int pageSize, string? regStatus)
     {
         // Calculate pagination and sorting
@@ -189,10 +189,10 @@ public class EventDetailModel : TenantAdminPageModel
         // Parse and convert local times to UTC
         DateTime startTimeUtc = existingEvent.StartTimeUtc;
         DateTime endTimeUtc = existingEvent.EndTimeUtc;
-        
+
         if (!string.IsNullOrEmpty(LocalStartTime) && !string.IsNullOrEmpty(LocalEndTime))
         {
-            if (DateTime.TryParse(LocalStartTime, out var localStart) && 
+            if (DateTime.TryParse(LocalStartTime, out var localStart) &&
                 DateTime.TryParse(LocalEndTime, out var localEnd))
             {
                 // Validate start time is before or same as end time
@@ -227,7 +227,7 @@ public class EventDetailModel : TenantAdminPageModel
         }
 
         // Check if any fields have actually changed
-        bool hasChanges = 
+        bool hasChanges =
             existingEvent.Name != Event.Name ||
             existingEvent.Description != Event.Description ||
             existingEvent.EventType != Event.EventType ||
@@ -250,17 +250,17 @@ public class EventDetailModel : TenantAdminPageModel
             // Check if price changed and there are active registrations
             bool priceChanged = existingEvent.PriceInCents != priceInCents;
             bool hasActiveRegistrations = false;
-            
+
             if (priceChanged)
             {
                 // Check for active registrations (Registered or Waitlist status) that would not
                 // be affected by price change, to notify the admin user.
                 hasActiveRegistrations = existingEvent.EventRegistrations
-                    .Count(r => r.EventId == Event.Id && 
-                           (r.Status == EventRegistrationStatus.Registered || 
+                    .Count(r => r.EventId == Event.Id &&
+                           (r.Status == EventRegistrationStatus.Registered ||
                             r.Status == EventRegistrationStatus.Waitlist)) > 0;
             }
-            
+
             // Update allowed fields
             existingEvent.Name = Event.Name;
             existingEvent.Description = Event.Description;
@@ -279,7 +279,7 @@ public class EventDetailModel : TenantAdminPageModel
             {
                 DbContext.Events.Update(existingEvent);
                 await DbContext.SaveChangesAsync();
-                
+
                 if (priceChanged && hasActiveRegistrations)
                 {
                     StatusMessage = "Event updated successfully. Note: This price change will not affect existing registrations that have already been paid.";
@@ -299,7 +299,7 @@ public class EventDetailModel : TenantAdminPageModel
         PopulateEventTypeOptions();
         PopulateTimeZoneOptions();
         Event = existingEvent;
-        
+
         // Convert UTC times back to local for display
         LocalStartTime = existingEvent.StartTimeUtc
             .ToTimeZone(existingEvent.TimeZoneId)
@@ -314,10 +314,10 @@ public class EventDetailModel : TenantAdminPageModel
                 .ToString("yyyy-MM-ddTHH:mm");
         }
         PriceInDollars = existingEvent.PriceInDollars;
-        
+
         // Reload registrations for display
         await LoadEventRegistrationsAsync(Event.Id, null, null, 1, 10, null);
-        
+
         return Page();
     }
 
@@ -349,10 +349,10 @@ public class EventDetailModel : TenantAdminPageModel
         {
             var registeredCount = activeRegistrations.Count(r => r.Status == EventRegistrationStatus.Registered);
             var waitlistCount = activeRegistrations.Count(r => r.Status == EventRegistrationStatus.Waitlist);
-            
+
             var message = "Cannot delete this event because it has ";
             var parts = new List<string>();
-            
+
             if (registeredCount > 0)
             {
                 parts.Add($"{registeredCount} registered {(registeredCount == 1 ? "attendee" : "attendees")}");
@@ -361,16 +361,16 @@ public class EventDetailModel : TenantAdminPageModel
             {
                 parts.Add($"{waitlistCount} waitlisted {(waitlistCount == 1 ? "attendee" : "attendees")}");
             }
-            
+
             message += string.Join(" and ", parts) + ". Please cancel all active registrations before deleting this event.";
-            
+
             ErrorMessage = message;
-            
+
             // Clear model state to prevent validation errors from appearing
             ModelState.Clear();
-            
+
             Event = eventToDelete;
-            
+
             // Repopulate form values
             LocalStartTime = eventToDelete.StartTimeUtc.ToTimeZone(eventToDelete.TimeZoneId).ToString("yyyy-MM-ddTHH:mm");
             LocalEndTime = eventToDelete.EndTimeUtc.ToTimeZone(eventToDelete.TimeZoneId).ToString("yyyy-MM-ddTHH:mm");
@@ -379,13 +379,13 @@ public class EventDetailModel : TenantAdminPageModel
                 LocalRegistrationDeadline = eventToDelete.RegistrationDeadlineUtc.Value.ToTimeZone(eventToDelete.TimeZoneId).ToString("yyyy-MM-ddTHH:mm");
             }
             PriceInDollars = eventToDelete.PriceInDollars;
-            
+
             PopulateEventTypeOptions();
             PopulateTimeZoneOptions();
-            
+
             // Reload registrations for display
             await LoadEventRegistrationsAsync(id, null, null, 1, 10, null);
-            
+
             return Page();
         }
 
@@ -398,12 +398,12 @@ public class EventDetailModel : TenantAdminPageModel
         catch (Exception ex)
         {
             ErrorMessage = $"Error deleting event: {ex.Message}";
-            
+
             // Clear model state to prevent validation errors from appearing
             ModelState.Clear();
-            
+
             Event = eventToDelete;
-            
+
             // Repopulate form values
             LocalStartTime = eventToDelete.StartTimeUtc.ToTimeZone(eventToDelete.TimeZoneId).ToString("yyyy-MM-ddTHH:mm");
             LocalEndTime = eventToDelete.EndTimeUtc.ToTimeZone(eventToDelete.TimeZoneId).ToString("yyyy-MM-ddTHH:mm");
@@ -412,10 +412,10 @@ public class EventDetailModel : TenantAdminPageModel
                 LocalRegistrationDeadline = eventToDelete.RegistrationDeadlineUtc.Value.ToTimeZone(eventToDelete.TimeZoneId).ToString("yyyy-MM-ddTHH:mm");
             }
             PriceInDollars = eventToDelete.PriceInDollars;
-            
+
             PopulateEventTypeOptions();
             PopulateTimeZoneOptions();
-            
+
             return Page();
         }
     }
@@ -466,7 +466,7 @@ public class EventDetailModel : TenantAdminPageModel
             };
         }).ToList();
     }
-    
+
     public EventRegistrationsTableViewModel GetRegistrationsTableViewModel()
     {
         return new EventRegistrationsTableViewModel

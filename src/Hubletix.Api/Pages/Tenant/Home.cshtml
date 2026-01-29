@@ -11,22 +11,22 @@
 
 @if (Model.HomePage.Components != null && Model.HomePage.Components.Count > 0)
 {
-    var primaryColor = !string.IsNullOrEmpty(Model.HomePage.PrimaryColor) 
-        ? Model.HomePage.PrimaryColor 
-        : ThemeDefaults.PrimaryColor;
-    var secondaryColor = !string.IsNullOrEmpty(Model.HomePage.SecondaryColor) 
-        ? Model.HomePage.SecondaryColor 
-        : ThemeDefaults.SecondaryColor;
-    
+    var primaryColor = !string.IsNullOrEmpty(Model.HomePage.PrimaryColor)
+    ? Model.HomePage.PrimaryColor
+    : ThemeDefaults.PrimaryColor;
+    var secondaryColor = !string.IsNullOrEmpty(Model.HomePage.SecondaryColor)
+    ? Model.HomePage.SecondaryColor
+    : ThemeDefaults.SecondaryColor;
+
     foreach (HomePageComponentViewModel component in Model.HomePage.Components.OrderBy(c => c.Order))
     {
         var partialPath = ComponentRegistry.GetPartialViewPath(component.GetType());
-        
+
         if (!string.IsNullOrEmpty(partialPath))
         {
             // Create render context for this component
             object? renderContext = null;
-            
+
             if (component is HeroComponentViewModel hero)
             {
                 renderContext = new ComponentRenderContext<HeroComponentViewModel>
@@ -47,7 +47,7 @@
                     IsPreviewMode = false
                 };
             }
-            
+
             if (renderContext != null)
             {
                 <partial name="@partialPath" model="renderContext" />

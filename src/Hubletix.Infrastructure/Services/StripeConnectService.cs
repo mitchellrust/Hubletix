@@ -26,7 +26,7 @@ public class StripeConnectService : IStripeConnectService
     public StripeConnectService(IOptions<StripeSettings> stripeSettings)
     {
         _settings = stripeSettings.Value.Connect;
-        
+
         // Create StripeClient with API key (thread-safe, no global config)
         _stripeClient = new StripeClient(_settings.PlatformSecretKey);
     }
@@ -51,7 +51,7 @@ public class StripeConnectService : IStripeConnectService
             },
             Identity = new AccountCreateIdentityOptions
             {
-              Country = tenantConfig.Settings.DefaultCountry,
+                Country = tenantConfig.Settings.DefaultCountry,
             },
             Defaults = new AccountCreateDefaultsOptions
             {
@@ -96,7 +96,7 @@ public class StripeConnectService : IStripeConnectService
 
         var accountService = _stripeClient.V2.Core.Accounts;
         var account = await accountService.CreateAsync(options, cancellationToken: cancellationToken);
-        
+
         return account.Id;
     }
 
@@ -120,7 +120,7 @@ public class StripeConnectService : IStripeConnectService
             },
             Identity = new AccountUpdateIdentityOptions
             {
-              Country = tenantConfig.Settings.DefaultCountry,
+                Country = tenantConfig.Settings.DefaultCountry,
             },
             Defaults = new AccountUpdateDefaultsOptions
             {
@@ -165,7 +165,7 @@ public class StripeConnectService : IStripeConnectService
 
         var accountService = _stripeClient.V2.Core.Accounts;
         var account = await accountService.UpdateAsync(stripeAccountId, options, cancellationToken: cancellationToken);
-        
+
         return account.Id;
     }
 
@@ -176,7 +176,7 @@ public class StripeConnectService : IStripeConnectService
     {
         var service = new Stripe.AccountService(_stripeClient);
         var account = await service.GetAsync(stripeAccountId, cancellationToken: cancellationToken);
-   
+
         return account;
     }
 
@@ -201,7 +201,7 @@ public class StripeConnectService : IStripeConnectService
 
         var accountLinkService = new Stripe.AccountLinkService(_stripeClient);
         var accountLink = await accountLinkService.CreateAsync(options, cancellationToken: cancellationToken);
-        
+
         return accountLink.Url;
     }
 
@@ -225,7 +225,7 @@ public class StripeConnectService : IStripeConnectService
 
         var service = new ProductService(_stripeClient);
         var product = await service.CreateAsync(options, requestOptions, cancellationToken);
-        
+
         return product.Id;
     }
 
@@ -262,7 +262,7 @@ public class StripeConnectService : IStripeConnectService
 
         var service = new PriceService(_stripeClient);
         var price = await service.CreateAsync(options, requestOptions, cancellationToken);
-        
+
         return price.Id;
     }
 
@@ -314,7 +314,7 @@ public class StripeConnectService : IStripeConnectService
 
         var service = new SessionService(_stripeClient);
         var session = await service.CreateAsync(options, requestOptions, cancellationToken);
-        
+
         return session;
     }
 
@@ -353,7 +353,7 @@ public class StripeConnectService : IStripeConnectService
 
         var service = new CustomerService(_stripeClient);
         var customer = await service.CreateAsync(options, requestOptions, cancellationToken);
-        
+
         return customer.Id;
     }
 
@@ -385,7 +385,7 @@ public class StripeConnectService : IStripeConnectService
 
         var service = new SubscriptionService(_stripeClient);
         var subscription = await service.CreateAsync(options, requestOptions, cancellationToken);
-        
+
         return subscription.Id;
     }
 

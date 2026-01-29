@@ -122,7 +122,7 @@ public class DashboardModel : TenantAdminPageModel
                 IsHappening = utcNow >= e.StartTimeUtc && utcNow <= e.EndTimeUtc
             };
         }).ToList();
-        
+
         return Page();
     }
 
@@ -141,7 +141,7 @@ public class DashboardModel : TenantAdminPageModel
             // Generate URLs for redirect
             var refreshUrl = Url.PageLink("/Tenant/Admin/Dashboard") ?? "/admin/dashboard";
             var returnUrl = Url.PageLink("/Tenant/Admin/Dashboard") ?? "/admin/dashboard";
-            
+
             // Use onboarding service to set up Stripe Connect
             var onboardingUrl = await _tenantOnboardingService.SetupStripeConnectAsync(
                 CurrentTenantInfo.Id,
@@ -184,7 +184,7 @@ public class DashboardModel : TenantAdminPageModel
             // Generate URLs for redirect
             var refreshUrl = Url.PageLink("/Tenant/Admin/Dashboard") ?? "/admin/dashboard";
             var returnUrl = Url.PageLink("/Tenant/Admin/Dashboard") ?? "/admin/dashboard";
-            
+
             // Use onboarding service to set up Stripe Connect
             var onboardingUrl = await _tenantOnboardingService.GetAccountUpdateLinkAsync(
                 CurrentTenantInfo.Id,

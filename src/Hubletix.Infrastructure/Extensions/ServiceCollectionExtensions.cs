@@ -14,7 +14,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddHomePageServices(this IServiceCollection services)
     {
         services.AddSingleton<IHomePageComponentRegistry, HomePageComponentRegistry>();
-        
+
         return services;
     }
 }

@@ -66,13 +66,13 @@ public class SelectPlanModel : PlatformPageModel
         {
             return plan.PriceInDollars;
         }
-        
+
         // If monthly, calculate annual with 10% discount
         if (plan.BillingInterval == BillingIntervals.Monthly)
         {
             return plan.PriceInDollars * 12 * 0.9m; // 10% discount
         }
-        
+
         return 0;
     }
 
@@ -92,7 +92,7 @@ public class SelectPlanModel : PlatformPageModel
                 planId,
                 string.Empty // Email will be collected in next step
             );
-            
+
             _logger.LogInformation(
                 "Started signup session: SessionId={SessionId}, PlanId={PlanId}",
                 session.Id,

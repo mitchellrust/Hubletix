@@ -25,12 +25,12 @@ builder.Services.AddIdentity<Hubletix.Core.Entities.User, Microsoft.AspNetCore.I
         options.Password.RequireNonAlphanumeric = true;
         options.Password.RequireUppercase = true;
         options.Password.RequiredLength = 8;
-        
+
         // Lockout settings
         options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
         options.Lockout.MaxFailedAccessAttempts = 5;
         options.Lockout.AllowedForNewUsers = true;
-        
+
         // User settings
         options.User.RequireUniqueEmail = true;
         options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
@@ -39,33 +39,33 @@ builder.Services.AddIdentity<Hubletix.Core.Entities.User, Microsoft.AspNetCore.I
     .AddEntityFrameworkStores<AppDbContext>()
     .AddUserValidator<RequireEmailValidator>();
 
-    // Configure Cookie Authentication (used by Identity)
-    // Set cookie domain to share across subdomains
-    var rootDomain = builder.Configuration["AppSettings:RootDomain"];
-    string? cookieDomain = null;
-    if (!string.IsNullOrEmpty(rootDomain))
-    {
-        // Extract domain without port when local (e.g., "hubletix.home" from "hubletix.home:9000")
-        var domain = rootDomain.Split(':')[0];
-        // Set with leading dot to share across subdomains
-        cookieDomain = $".{domain}";
-    }
+// Configure Cookie Authentication (used by Identity)
+// Set cookie domain to share across subdomains
+var rootDomain = builder.Configuration["AppSettings:RootDomain"];
+string? cookieDomain = null;
+if (!string.IsNullOrEmpty(rootDomain))
+{
+    // Extract domain without port when local (e.g., "hubletix.home" from "hubletix.home:9000")
+    var domain = rootDomain.Split(':')[0];
+    // Set with leading dot to share across subdomains
+    cookieDomain = $".{domain}";
+}
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.Name = ".Hubletix.Auth";
     options.Cookie.HttpOnly = true;
-    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment() 
-        ? CookieSecurePolicy.None // In development, allow non-HTTPS for local testing 
+    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
+        ? CookieSecurePolicy.None // In development, allow non-HTTPS for local testing
         : CookieSecurePolicy.Always;
-    options.Cookie.SameSite = builder.Environment.IsDevelopment() 
-        ? SameSiteMode.Lax // In development, allow non-HTTPS for local testing 
+    options.Cookie.SameSite = builder.Environment.IsDevelopment()
+        ? SameSiteMode.Lax // In development, allow non-HTTPS for local testing
         : SameSiteMode.Strict;
-    
+
     if (!string.IsNullOrEmpty(cookieDomain))
     {
         options.Cookie.Domain = cookieDomain;
     }
-    
+
     options.ExpireTimeSpan = TimeSpan.FromMinutes(15);
     options.SlidingExpiration = true;
     options.LoginPath = "/login";
@@ -80,7 +80,7 @@ builder.Services.AddAntiforgery(options =>
     options.Cookie.SameSite = builder.Environment.IsDevelopment()
         ? SameSiteMode.Lax // In development, allow non-HTTPS for local testing
         : SameSiteMode.Strict;
-    
+
     if (!string.IsNullOrEmpty(cookieDomain))
     {
         options.Cookie.Domain = cookieDomain;
@@ -92,11 +92,11 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("PlatformAdmin", policy =>
         policy.RequireClaim("platform_role", "PlatformAdmin"));
-    
+
     options.AddPolicy("TenantAdmin", policy =>
         policy.RequireClaim("tenant_role", "Admin")
               .RequireClaim("tenant_id"));
-    
+
     options.AddPolicy("TenantMember", policy =>
         policy.RequireClaim("tenant_id"));
 });
@@ -192,13 +192,13 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    
+
     try
     {
         var dbInitService = services.GetRequiredService<DatabaseInitializationService>();
         var tenantStoreContextFactory = services.GetRequiredService<IDbContextFactory<TenantStoreDbContext>>();
         var appContext = services.GetRequiredService<AppDbContext>();
-        
+
         using var tenantStoreContext = await tenantStoreContextFactory.CreateDbContextAsync();
         await dbInitService.InitializeDatabaseAsync(tenantStoreContext, appContext);
     }

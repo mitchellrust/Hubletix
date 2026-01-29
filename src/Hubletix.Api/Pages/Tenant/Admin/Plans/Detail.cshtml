@@ -70,7 +70,8 @@
 
                             <div class="mb-3">
                                 <label asp-for="Plan.Description" class="form-label">Description</label>
-                                <textarea class="form-control" asp-for="Plan.Description" rows="3" placeholder="Enter plan description"></textarea>
+                                <textarea class="form-control" asp-for="Plan.Description" rows="3"
+                                    placeholder="Enter plan description"></textarea>
                                 <span asp-validation-for="Plan.Description" class="text-danger small"></span>
                             </div>
 
@@ -79,23 +80,27 @@
                                     <label asp-for="PriceInDollars" class="form-label">Price</label>
                                     <div class="input-group">
                                         <span class="input-group-text">$</span>
-                                        <input type="number" class="form-control" asp-for="PriceInDollars" 
-                                               step="0.01" min="0.01" placeholder="0.00" required />
+                                        <input type="number" class="form-control" asp-for="PriceInDollars" step="0.01"
+                                            min="0.01" placeholder="0.00" required />
                                     </div>
                                     <span class="text-muted small">Price in dollars</span>
                                 </div>
 
                                 <div class="col-12 col-md-6 mb-3">
                                     <label asp-for="Plan.BillingInterval" class="form-label">Billing Interval</label>
-                                    <select class="form-select" asp-for="Plan.BillingInterval" asp-items="Model.BillingIntervalOptions" onchange="updateMonthlyDisplayVisibility()"></select>
+                                    <select class="form-select" asp-for="Plan.BillingInterval"
+                                        asp-items="Model.BillingIntervalOptions"
+                                        onchange="updateMonthlyDisplayVisibility()"></select>
                                     <span asp-validation-for="Plan.BillingInterval" class="text-danger small"></span>
                                 </div>
                             </div>
 
-                            <div class="mb-3" id="monthlyDisplayToggle" style="display: @(Model.Plan.IsRecurring && Model.Plan.BillingInterval != BillingIntervals.Monthly ? "block" : "none")">
+                            <div class="mb-3" id="monthlyDisplayToggle"
+                                style="display: @(Model.Plan.IsRecurring && Model.Plan.BillingInterval != BillingIntervals.Monthly ? "block" : "none")">
                                 <label class="form-label">Display price as monthly equivalent?</label>
                                 <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="IsPriceDisplayedMonthly" asp-for="Plan.IsPriceDisplayedMonthly" onchange="updatePriceDisplayLabel(this)" />
+                                    <input class="form-check-input" type="checkbox" id="IsPriceDisplayedMonthly"
+                                        asp-for="Plan.IsPriceDisplayedMonthly" onchange="updatePriceDisplayLabel(this)" />
                                     <label class="form-check-label" for="IsPriceDisplayedMonthly" id="priceDisplayLabel">
                                         @(Model.Plan.IsPriceDisplayedMonthly == true ? "Yes" : "No")
                                     </label>
@@ -105,14 +110,16 @@
 
                             <div class="mb-3">
                                 <label asp-for="Plan.DisplayOrder" class="form-label">Display Order</label>
-                                <input type="number" class="form-control" asp-for="Plan.DisplayOrder" min="0" placeholder="0" />
+                                <input type="number" class="form-control" asp-for="Plan.DisplayOrder" min="0"
+                                    placeholder="0" />
                                 <span class="text-muted small">Lower numbers appear first in listings</span>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Status</label>
                                 <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="isActive" asp-for="Plan.IsActive" onchange="updateStatusLabel(this)" />
+                                    <input class="form-check-input" type="checkbox" id="isActive" asp-for="Plan.IsActive"
+                                        onchange="updateStatusLabel(this)" />
                                     <label class="form-check-label" for="isActive" id="statusLabel">
                                         @(Model.Plan.IsActive == true ? "Active" : "Inactive")
                                     </label>
@@ -155,7 +162,8 @@
                     </div>
                     <div class="card-body">
                         <p class="text-muted small">Once you delete a plan, there is no going back. Please be certain.</p>
-                        <button type="button" class="btn btn-outline-danger w-100" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                        <button type="button" class="btn btn-outline-danger w-100" data-bs-toggle="modal"
+                            data-bs-target="#deleteModal">
                             Delete Plan
                         </button>
                     </div>
@@ -201,11 +209,11 @@
             function updateMonthlyDisplayVisibility() {
                 const billingInterval = document.getElementById('Plan_BillingInterval').value;
                 const monthlyDisplayToggle = document.getElementById('monthlyDisplayToggle');
-                
+
                 // Show the toggle only if billing interval is not Monthly
                 if (
-                  billingInterval !== '@BillingIntervals.Monthly'
-                  && billingInterval !== '@BillingIntervals.OneTime'
+                    billingInterval !== '@BillingIntervals.Monthly'
+                    && billingInterval !== '@BillingIntervals.OneTime'
                 ) {
                     monthlyDisplayToggle.style.display = 'block';
                 } else {

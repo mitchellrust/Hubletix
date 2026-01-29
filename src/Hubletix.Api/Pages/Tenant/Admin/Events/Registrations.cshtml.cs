@@ -38,7 +38,7 @@ public class EventRegistrationsModel : TenantAdminPageModel
     public async Task OnGetAsync(string? sort = null, string? dir = null, int pageNum = 1, int pageSize = 10, string? status = null, string? time = null, string? eventId = null, string? message = null)
     {
         StatusMessage = message;
-        
+
         // Calculate pagination and sorting
         PageNum = Math.Max(1, pageNum);
         PageSize = Math.Clamp(pageSize, 5, 50);
@@ -121,22 +121,22 @@ public class EventRegistrationsModel : TenantAdminPageModel
             CancellationReason = r.Registration.CancellationReason
         }).ToList();
     }
-    
+
     private async Task LoadEventFacetsAsync(DateTime nowUtc, string? statusFilter, string? timeFilter)
     {
         // Build base query with status filter applied
         var registrationQuery = DbContext.EventRegistrations
             .AsQueryable();
-                    
+
         if (statusFilter != "all")
         {
             registrationQuery = registrationQuery.Where(r => r.Status.ToLower() == statusFilter);
         }
-        
+
         // Build event query with time filter
         var eventQuery = DbContext.Events
             .Where(e => e.TenantId == CurrentTenantInfo.Id);
-        
+
         if (timeFilter == "upcoming")
         {
             eventQuery = eventQuery.Where(e => e.StartTimeUtc >= nowUtc);
@@ -146,7 +146,7 @@ public class EventRegistrationsModel : TenantAdminPageModel
             eventQuery = eventQuery.Where(e => e.StartTimeUtc < nowUtc);
         }
         // "all" - no time filter
-        
+
         // Get events with registration counts
         var events = await eventQuery
             .OrderByDescending(e => e.StartTimeUtc)
@@ -159,10 +159,10 @@ public class EventRegistrationsModel : TenantAdminPageModel
             })
             .Take(20)
             .ToListAsync();
-        
+
         EventFacets = events;
     }
-    
+
     public EventRegistrationsTableViewModel GetRegistrationsTableViewModel()
     {
         return new EventRegistrationsTableViewModel

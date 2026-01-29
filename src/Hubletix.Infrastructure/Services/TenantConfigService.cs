@@ -14,12 +14,12 @@ public interface ITenantConfigService
     /// Get tenant configuration, using cache if available.
     /// </summary>
     Task<Tenant?> GetTenantAsync(string tenantId);
-    
+
     /// <summary>
     /// Update tenant configuration and invalidate cache.
     /// </summary>
     Task UpdateTenantConfigAsync(string tenantId, string configJson);
-    
+
     /// <summary>
     /// Invalidate cache for a specific tenant (call after external updates).
     /// </summary>
@@ -62,7 +62,7 @@ public class TenantConfigService : ITenantConfigService
     public async Task UpdateTenantConfigAsync(string tenantId, string configJson)
     {
         var tenant = await _dbContext.Tenants.FindAsync(tenantId);
-        
+
         if (tenant == null)
         {
             throw new InvalidOperationException($"Tenant with ID {tenantId} not found.");
@@ -73,7 +73,7 @@ public class TenantConfigService : ITenantConfigService
 
         // Invalidate cache after update
         InvalidateCache(tenantId);
-        
+
         _logger.LogInformation("Updated configuration for tenant: {TenantId}", tenantId);
     }
 

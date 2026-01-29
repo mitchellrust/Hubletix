@@ -74,7 +74,7 @@ public class EventDetailDto
     public int CurrentAttendees { get; set; }
     public decimal? Price { get; set; }
     public DateTime? RegistrationDeadline { get; set; }
-    
+
     public bool IsFull => MaxAttendees.HasValue && CurrentAttendees >= MaxAttendees.Value;
     public bool IsSameDay => !EndTimeLocal.HasValue || StartTimeLocal.Date == EndTimeLocal.Value.Date;
     public int SpotsRemaining => MaxAttendees.HasValue ? MaxAttendees.Value - CurrentAttendees : 0;

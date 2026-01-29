@@ -41,12 +41,14 @@
     <!-- Mobile Tabs (visible only on small screens) -->
     <ul class="nav nav-tabs d-lg-none mb-3" id="mobile-tabs" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="components-tab" data-bs-toggle="tab" data-bs-target="#components-panel" type="button" role="tab" aria-controls="components-panel" aria-selected="true">
+            <button class="nav-link active" id="components-tab" data-bs-toggle="tab" data-bs-target="#components-panel"
+                type="button" role="tab" aria-controls="components-panel" aria-selected="true">
                 <i class="bi bi-puzzle"></i> Components
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="preview-tab" data-bs-toggle="tab" data-bs-target="#preview-panel" type="button" role="tab" aria-controls="preview-panel" aria-selected="false">
+            <button class="nav-link" id="preview-tab" data-bs-toggle="tab" data-bs-target="#preview-panel" type="button"
+                role="tab" aria-controls="preview-panel" aria-selected="false">
                 <i class="bi bi-eye"></i> Preview
             </button>
         </li>
@@ -54,15 +56,18 @@
 
     <div class="row">
         <!-- Editor Panel (Left) -->
-        <div class="col-lg-6 tab-pane fade show active d-lg-block" id="components-panel" role="tabpanel" aria-labelledby="components-tab">
+        <div class="col-lg-6 tab-pane fade show active d-lg-block" id="components-panel" role="tabpanel"
+            aria-labelledby="components-tab">
             <div class="card shadow-sm">
                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Components</h5>
                     <div class="d-flex align-items-center gap-2">
-                        <button type="button" class="btn btn-sm btn-outline-secondary" id="toggle-all-btn" title="Expand all components">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="toggle-all-btn"
+                            title="Expand all components">
                             <i class="bi bi-arrows-expand"></i> Expand All
                         </button>
-                        <span id="unsaved-badge" class="badge bg-warning text-dark" style="display: none;">Unsaved changes</span>
+                        <span id="unsaved-badge" class="badge bg-warning text-dark" style="display: none;">Unsaved
+                            changes</span>
                     </div>
                 </div>
                 <div class="card-body">
@@ -70,7 +75,7 @@
                         <!-- Hidden inputs for theme colors (posted to preview handler) -->
                         <input type="hidden" name="PrimaryColor" value="@Model.PrimaryColor" />
                         <input type="hidden" name="SecondaryColor" value="@Model.SecondaryColor" />
-                        
+
                         <div id="components-container">
                             @if (Model.ComponentDtos != null && Model.ComponentDtos.Count > 0)
                             {
@@ -90,18 +95,19 @@
                             }
                             else
                             {
-                                <p class="text-muted text-center py-4">No components added yet. Click "Add Component" below to get started.</p>
+                                <p class="text-muted text-center py-4">No components added yet. Click "Add Component" below
+                                    to get started.</p>
                             }
                         </div>
 
                         <div class="mt-3">
                             <div class="btn-group w-100" role="group">
-                                <button type="button" class="btn btn-outline-primary" id="add-hero-btn" 
-                                        @(Model.ComponentDtos?.Count >= Model.MaxComponents ? "disabled" : "")>
+                                <button type="button" class="btn btn-outline-primary" id="add-hero-btn"
+                                    @(Model.ComponentDtos?.Count >= Model.MaxComponents ? "disabled" : "")>
                                     <i class="bi bi-plus-circle"></i> Add Hero
                                 </button>
                                 <button type="button" class="btn btn-outline-primary" id="add-cards-btn"
-                                        @(Model.ComponentDtos?.Count >= Model.MaxComponents ? "disabled" : "")>
+                                    @(Model.ComponentDtos?.Count >= Model.MaxComponents ? "disabled" : "")>
                                     <i class="bi bi-plus-circle"></i> Add Cards Section
                                 </button>
                             </div>
@@ -115,11 +121,13 @@
         </div>
 
         <!-- Preview Panel (Right) -->
-        <div class="col-lg-6 tab-pane fade show d-lg-block" id="preview-panel" role="tabpanel" aria-labelledby="preview-tab">
+        <div class="col-lg-6 tab-pane fade show d-lg-block" id="preview-panel" role="tabpanel"
+            aria-labelledby="preview-tab">
             <div class="card shadow-sm" id="preview-card">
                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Live Preview</h5>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" id="expand-preview-btn" title="Expand to fullscreen">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="expand-preview-btn"
+                        title="Expand to fullscreen">
                         <i class="bi bi-arrows-fullscreen"></i>
                     </button>
                 </div>
@@ -134,7 +142,9 @@
 </div>
 
 <!-- Floating minimize button (shown in fullscreen mode) -->
-<button type="button" class="btn btn-secondary" id="minimize-preview-btn" style="display: none; position: fixed; top: 20px; right: 20px; z-index: 1060; box-shadow: 0 4px 6px rgba(0,0,0,0.3);" title="Exit fullscreen">
+<button type="button" class="btn btn-secondary" id="minimize-preview-btn"
+    style="display: none; position: fixed; top: 20px; right: 20px; z-index: 1060; box-shadow: 0 4px 6px rgba(0,0,0,0.3);"
+    title="Exit fullscreen">
     <i class="bi bi-fullscreen-exit"></i> Exit Fullscreen
 </button>
 
@@ -186,7 +196,8 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p class="mb-0"><i class="bi bi-exclamation-triangle text-warning"></i> <strong>This will update the live homepage for all members.</strong></p>
+                <p class="mb-0"><i class="bi bi-exclamation-triangle text-warning"></i> <strong>This will update the
+                        live homepage for all members.</strong></p>
                 <p class="mb-0 mt-3">Are you sure you want to publish these changes?</p>
             </div>
             <div class="modal-footer">
@@ -212,11 +223,12 @@
             .tab-pane:not(.active) {
                 display: none !important;
             }
+
             .tab-pane.active {
                 display: block !important;
             }
         }
-        
+
         /* Desktop - always show both panels side by side, override Bootstrap tab behavior */
         @@media (min-width: 992px) {
             .tab-pane {
@@ -224,77 +236,78 @@
                 opacity: 1 !important;
             }
         }
+
         /* Preview mode styling - adjusts components to fit preview panel */
         .preview-mode .display-3 {
             font-size: 2.5rem !important;
         }
-        
+
         .preview-mode .display-4 {
             font-size: 2rem !important;
         }
-        
+
         .preview-mode .display-5 {
             font-size: 1.75rem !important;
         }
-        
+
         .preview-mode .lead {
             font-size: 1rem !important;
         }
-        
+
         .preview-mode .fs-4 {
             font-size: 1rem !important;
         }
-        
+
         .preview-mode section {
             min-height: auto !important;
         }
-        
+
         .preview-mode .hero-section {
             min-height: 300px !important;
         }
-        
+
         .preview-mode .py-5 {
             padding-top: 2rem !important;
             padding-bottom: 2rem !important;
         }
-        
+
         /* Collapsible component cards - chevron rotation */
         .collapse-icon {
             transition: transform 0.2s ease-in-out;
         }
-        
+
         [aria-expanded="false"] .collapse-icon {
             transform: rotate(-90deg);
         }
-        
+
         [aria-expanded="true"] .collapse-icon {
             transform: rotate(0deg);
         }
-        
+
         .preview-mode .px-5 {
             padding-left: 2rem !important;
             padding-right: 2rem !important;
         }
-        
+
         .preview-mode .py-3 {
             padding-top: 1.5rem !important;
             padding-bottom: 1.5rem !important;
         }
-        
+
         .preview-mode .mb-4 {
             margin-bottom: 1rem !important;
         }
-        
+
         .preview-mode .mb-5 {
             margin-bottom: 1.5rem !important;
         }
-        
+
         /* Ensure preview container allows expansion */
         #preview-container {
             overflow-y: auto;
             max-height: 80vh;
         }
-        
+
         /* Fullscreen preview mode */
         .preview-fullscreen {
             position: fixed !important;
@@ -306,13 +319,13 @@
             margin: 0 !important;
             max-width: none !important;
         }
-        
+
         .preview-fullscreen .card {
             height: 100%;
             border-radius: 0;
             border: none;
         }
-        
+
         .preview-fullscreen #preview-container {
             max-height: calc(100vh - 60px) !important;
             height: calc(100vh - 60px);
@@ -325,820 +338,820 @@
         <script src="~/lib/cropperjs/dist/cropper.min.js"></script>
     </environment>
     <environment exclude="Development">
-        <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"</script>
-    </environment>
-    <script>
-        let componentIndex = @(Model.ComponentDtos?.Count ?? 0);
-        let isDirty = false;
-        let deleteTargetIndex = null;
-        let pendingNavigationUrl = null;
-        const maxComponents = @Model.MaxComponents;
-        const maxCards = @Model.MaxCardsPerComponent;
+        <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js" </script>
+        </environment >
+                <script>
+                    let componentIndex = @(Model.ComponentDtos?.Count ?? 0);
+                    let isDirty = false;
+                    let deleteTargetIndex = null;
+                    let pendingNavigationUrl = null;
+                    const maxComponents = @Model.MaxComponents;
+                    const maxCards = @Model.MaxCardsPerComponent;
 
-        // Cropper.js instances and pending image data
-        const cropperInstances = {};
-        const pendingImages = {}; // Store { index: { blob, oldImageUrl } }
+                    // Cropper.js instances and pending image data
+                    const cropperInstances = { };
+                    const pendingImages = { }; // Store {index: {blob, oldImageUrl} }
 
-        // Track dirty state
-        function markDirty() {
-            isDirty = true;
-            document.getElementById('unsaved-badge').style.display = 'inline-block';
-            document.getElementById('save-btn').disabled = false;
-        }
+                    // Track dirty state
+                    function markDirty() {
+                        isDirty = true;
+                    document.getElementById('unsaved-badge').style.display = 'inline-block';
+                    document.getElementById('save-btn').disabled = false;
+            }
 
-        function markClean() {
-            isDirty = false;
-            document.getElementById('unsaved-badge').style.display = 'none';
-            document.getElementById('save-btn').disabled = true;
-        }
+                    function markClean() {
+                        isDirty = false;
+                    document.getElementById('unsaved-badge').style.display = 'none';
+                    document.getElementById('save-btn').disabled = true;
+            }
 
-        // Update preview via AJAX
-        async function updatePreview() {
-            const form = document.getElementById('homepage-form');
-            const formData = new FormData(form);
+                    // Update preview via AJAX
+                    async function updatePreview() {
+                const form = document.getElementById('homepage-form');
+                    const formData = new FormData(form);
 
-            try {
-                const response = await fetch('?handler=Preview', {
-                    method: 'POST',
+                    try {
+                    const response = await fetch('?handler=Preview', {
+                        method: 'POST',
                     body: formData,
                     headers: {
                         'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-                    }
-                });
+                        }
+                    });
 
-                // Check for authentication/authorization failures
-                if (response.status === 401 || response.status === 403) {
-                    // Session expired or unauthorized
-                    alert('Your session has expired. You will be redirected to sign in again.');
+                    // Check for authentication/authorization failures
+                    if (response.status === 401 || response.status === 403) {
+                        // Session expired or unauthorized
+                        alert('Your session has expired. You will be redirected to sign in again.');
                     window.location.href = '/login';
                     return;
-                }
+                    }
 
-                // Check for redirects (typically to login page)
-                if (response.redirected) {
-                    alert('Your session has expired. Please sign in again.');
+                    // Check for redirects (typically to login page)
+                    if (response.redirected) {
+                        alert('Your session has expired. Please sign in again.');
                     window.location.href = response.url;
                     return;
-                }
+                    }
 
-                if (response.ok) {
-                    const html = await response.text();
+                    if (response.ok) {
+                        const html = await response.text();
                     document.getElementById('preview-container').innerHTML = html;
-                } else {
-                    console.error('Preview update failed:', response.statusText);
+                    } else {
+                        console.error('Preview update failed:', response.statusText);
+                    }
+                } catch (error) {
+                        console.error('Preview update error:', error);
                 }
-            } catch (error) {
-                console.error('Preview update error:', error);
             }
-        }
 
-        // Add Hero component
-        document.getElementById('add-hero-btn').addEventListener('click', async () => {
-            if (componentIndex >= maxComponents) return;
+            // Add Hero component
+            document.getElementById('add-hero-btn').addEventListener('click', async () => {
+                if (componentIndex >= maxComponents) return;
 
-            const heroHtml = `
-                <div class="card mb-3 component-card" data-index="${componentIndex}">
-                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                        <span><i class="bi bi-image"></i> Hero Component</span>
-                        <div class="btn-group btn-group-sm">
-                            <button type="button" class="btn btn-outline-secondary move-up-btn" ${componentIndex === 0 ? 'disabled' : ''}>
-                                <i class="bi bi-arrow-up"></i>
-                            </button>
-                            <button type="button" class="btn btn-outline-secondary move-down-btn">
-                                <i class="bi bi-arrow-down"></i>
-                            </button>
-                            <button type="button" class="btn btn-outline-danger delete-btn">
-                                <i class="bi bi-trash"></i>
-                            </button>
+                    const heroHtml = `
+                    <div class="card mb-3 component-card" data-index="${componentIndex}">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-image"></i> Hero Component</span>
+                            <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-outline-secondary move-up-btn" ${componentIndex === 0 ? 'disabled' : ''}>
+                                    <i class="bi bi-arrow-up"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary move-down-btn">
+                                    <i class="bi bi-arrow-down"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-danger delete-btn">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <input type="hidden" name="ComponentDtos[${componentIndex}].Type" value="Hero" />
+                            <input type="hidden" name="ComponentDtos[${componentIndex}].Order" value="${componentIndex}" />
+                            <input type="hidden" name="ComponentDtos[${componentIndex}].BackgroundImageUrl" value="" class="hero-bg-image-url" />
+
+                            <div class="mb-3">
+                                <label class="form-label">Background Image <small class="text-muted">(Optional, 16:9 recommended)</small></label>
+                                <div class="d-flex gap-2 align-items-start">
+                                    <div class="flex-grow-1">
+                                        <input type="file" class="form-control hero-image-input" accept="image/jpeg,image/png,image/webp" data-index="${componentIndex}" />
+                                        <small class="form-text text-muted d-block mt-1">
+                                            Max 10 MB • JPEG, PNG, or WebP • Max 4096x4096 pixels
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Heading</label>
+                                <input type="text" class="form-control component-input" name="ComponentDtos[${componentIndex}].Heading" placeholder="Enter hero heading" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Subheading</label>
+                                <input type="text" class="form-control component-input" name="ComponentDtos[${componentIndex}].Subheading" placeholder="Enter hero subheading" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">CTA Button Text</label>
+                                <input type="text" class="form-control component-input" name="ComponentDtos[${componentIndex}].CtaText" placeholder="Learn More" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">CTA Button URL</label>
+                                <select class="form-select component-input" name="ComponentDtos[${componentIndex}].CtaUrl">
+                                    <option value="">Select a page...</option>
+                                    @foreach ((string Value, string Label) url in Model.AllowedCtaUrls)
+                                    {
+                                        <option value="@url.Value">@url.Label</option>
+                                    }
+                                </select>
+                            </div>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <input type="hidden" name="ComponentDtos[${componentIndex}].Type" value="Hero" />
-                        <input type="hidden" name="ComponentDtos[${componentIndex}].Order" value="${componentIndex}" />
-                        <input type="hidden" name="ComponentDtos[${componentIndex}].BackgroundImageUrl" value="" class="hero-bg-image-url" />
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Background Image <small class="text-muted">(Optional, 16:9 recommended)</small></label>
-                            <div class="d-flex gap-2 align-items-start">
-                                <div class="flex-grow-1">
-                                    <input type="file" class="form-control hero-image-input" accept="image/jpeg,image/png,image/webp" data-index="${componentIndex}" />
-                                    <small class="form-text text-muted d-block mt-1">
-                                        Max 10 MB • JPEG, PNG, or WebP • Max 4096x4096 pixels
-                                    </small>
+                    <!-- Image Cropper Modal -->
+                    <div class="modal fade" id="imageCropperModal-${componentIndex}" tabindex="-1" aria-labelledby="imageCropperModalLabel-${componentIndex}" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="imageCropperModalLabel-${componentIndex}">
+                                        <i class="bi bi-crop"></i> Crop Hero Image
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="cropper-container-wrapper">
+                                        <img id="cropperImage-${componentIndex}" class="w-100" style="max-height: 70vh;" />
+                                    </div>
+                                    <div class="mt-3">
+                                        <small class="text-muted">
+                                            <i class="bi bi-info-circle"></i> Drag to reposition, scroll to zoom. The image will be cropped to 16:9 aspect ratio.
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="button" class="btn btn-primary crop-save-btn" data-index="${componentIndex}">
+                                        <i class="bi bi-check-lg"></i> Crop & Save
+                                    </button>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Heading</label>
-                            <input type="text" class="form-control component-input" name="ComponentDtos[${componentIndex}].Heading" placeholder="Enter hero heading" />
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Subheading</label>
-                            <input type="text" class="form-control component-input" name="ComponentDtos[${componentIndex}].Subheading" placeholder="Enter hero subheading" />
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">CTA Button Text</label>
-                            <input type="text" class="form-control component-input" name="ComponentDtos[${componentIndex}].CtaText" placeholder="Learn More" />
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">CTA Button URL</label>
-                            <select class="form-select component-input" name="ComponentDtos[${componentIndex}].CtaUrl">
-                                <option value="">Select a page...</option>
-                                @foreach ((string Value, string Label) url in Model.AllowedCtaUrls)
-                                {
-                                    <option value="@url.Value">@url.Label</option>
-                                }
-                            </select>
                         </div>
                     </div>
-                </div>
-                <!-- Image Cropper Modal -->
-                <div class="modal fade" id="imageCropperModal-${componentIndex}" tabindex="-1" aria-labelledby="imageCropperModalLabel-${componentIndex}" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="imageCropperModalLabel-${componentIndex}">
-                                    <i class="bi bi-crop"></i> Crop Hero Image
-                                </h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    `;
+
+                    const container = document.getElementById('components-container');
+                    const emptyMessage = container.querySelector('p.text-muted');
+                    if (emptyMessage) emptyMessage.remove();
+
+                    container.insertAdjacentHTML('beforeend', heroHtml);
+                    componentIndex++;
+
+                    attachEventListeners();
+                    updateComponentCount();
+                    markDirty();
+                    await updatePreview();
+            });
+
+            // Add Cards component
+            document.getElementById('add-cards-btn').addEventListener('click', async () => {
+                if (componentIndex >= maxComponents) return;
+
+                    const cardsHtml = `
+                    <div class="card mb-3 component-card" data-index="${componentIndex}">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-grid-3x3"></i> Cards Component</span>
+                            <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-outline-secondary move-up-btn" ${componentIndex === 0 ? 'disabled' : ''}>
+                                    <i class="bi bi-arrow-up"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary move-down-btn">
+                                    <i class="bi bi-arrow-down"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-danger delete-btn">
+                                    <i class="bi bi-trash"></i>
+                                </button>
                             </div>
-                            <div class="modal-body">
-                                <div class="cropper-container-wrapper">
-                                    <img id="cropperImage-${componentIndex}" class="w-100" style="max-height: 70vh;" />
-                                </div>
-                                <div class="mt-3">
-                                    <small class="text-muted">
-                                        <i class="bi bi-info-circle"></i> Drag to reposition, scroll to zoom. The image will be cropped to 16:9 aspect ratio.
-                                    </small>
-                                </div>
+                        </div>
+                        <div class="card-body">
+                            <input type="hidden" name="ComponentDtos[${componentIndex}].Type" value="Cards" />
+                            <input type="hidden" name="ComponentDtos[${componentIndex}].Order" value="${componentIndex}" />
+
+                            <div class="mb-3">
+                                <label class="form-label">Section Heading (optional)</label>
+                                <input type="text" class="form-control component-input" name="ComponentDtos[${componentIndex}].Heading" placeholder="Our Services" />
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="button" class="btn btn-primary crop-save-btn" data-index="${componentIndex}">
-                                    <i class="bi bi-check-lg"></i> Crop & Save
+                            <div class="mb-3">
+                                <label class="form-label">Section Subheading (optional)</label>
+                                <input type="text" class="form-control component-input" name="ComponentDtos[${componentIndex}].Subheading" placeholder="What we offer" />
+                            </div>
+
+                            <hr />
+                            <h6>Cards (up to ${maxCards})</h6>
+                            <div class="cards-list" data-component-index="${componentIndex}">
+                                <button type="button" class="btn btn-sm btn-outline-primary add-card-btn mb-2">
+                                    <i class="bi bi-plus"></i> Add Card
                                 </button>
                             </div>
                         </div>
                     </div>
-                </div>
-            `;
+                    `;
 
-            const container = document.getElementById('components-container');
-            const emptyMessage = container.querySelector('p.text-muted');
-            if (emptyMessage) emptyMessage.remove();
-            
-            container.insertAdjacentHTML('beforeend', heroHtml);
-            componentIndex++;
-            
-            attachEventListeners();
-            updateComponentCount();
-            markDirty();
-            await updatePreview();
-        });
+                    const container = document.getElementById('components-container');
+                    const emptyMessage = container.querySelector('p.text-muted');
+                    if (emptyMessage) emptyMessage.remove();
 
-        // Add Cards component
-        document.getElementById('add-cards-btn').addEventListener('click', async () => {
-            if (componentIndex >= maxComponents) return;
+                    container.insertAdjacentHTML('beforeend', cardsHtml);
+                    componentIndex++;
 
-            const cardsHtml = `
-                <div class="card mb-3 component-card" data-index="${componentIndex}">
-                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                        <span><i class="bi bi-grid-3x3"></i> Cards Component</span>
-                        <div class="btn-group btn-group-sm">
-                            <button type="button" class="btn btn-outline-secondary move-up-btn" ${componentIndex === 0 ? 'disabled' : ''}>
-                                <i class="bi bi-arrow-up"></i>
-                            </button>
-                            <button type="button" class="btn btn-outline-secondary move-down-btn">
-                                <i class="bi bi-arrow-down"></i>
-                            </button>
-                            <button type="button" class="btn btn-outline-danger delete-btn">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <input type="hidden" name="ComponentDtos[${componentIndex}].Type" value="Cards" />
-                        <input type="hidden" name="ComponentDtos[${componentIndex}].Order" value="${componentIndex}" />
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Section Heading (optional)</label>
-                            <input type="text" class="form-control component-input" name="ComponentDtos[${componentIndex}].Heading" placeholder="Our Services" />
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Section Subheading (optional)</label>
-                            <input type="text" class="form-control component-input" name="ComponentDtos[${componentIndex}].Subheading" placeholder="What we offer" />
-                        </div>
-                        
-                        <hr />
-                        <h6>Cards (up to ${maxCards})</h6>
-                        <div class="cards-list" data-component-index="${componentIndex}">
-                            <button type="button" class="btn btn-sm btn-outline-primary add-card-btn mb-2">
-                                <i class="bi bi-plus"></i> Add Card
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            const container = document.getElementById('components-container');
-            const emptyMessage = container.querySelector('p.text-muted');
-            if (emptyMessage) emptyMessage.remove();
-            
-            container.insertAdjacentHTML('beforeend', cardsHtml);
-            componentIndex++;
-            
-            attachEventListeners();
-            updateComponentCount();
-            markDirty();
-            await updatePreview();
-        });
-
-        // Attach event listeners to dynamic elements
-        function attachEventListeners() {
-            // Input change events
-            document.querySelectorAll('.component-input').forEach(input => {
-                input.removeEventListener('blur', handleInputChange);
-                input.addEventListener('blur', handleInputChange);
+                    attachEventListeners();
+                    updateComponentCount();
+                    markDirty();
+                    await updatePreview();
             });
 
-            // Delete buttons
-            document.querySelectorAll('.delete-btn').forEach(btn => {
-                btn.removeEventListener('click', handleDelete);
-                btn.addEventListener('click', handleDelete);
-            });
+                    // Attach event listeners to dynamic elements
+                    function attachEventListeners() {
+                        // Input change events
+                        document.querySelectorAll('.component-input').forEach(input => {
+                            input.removeEventListener('blur', handleInputChange);
+                            input.addEventListener('blur', handleInputChange);
+                        });
 
-            // Move up buttons
-            document.querySelectorAll('.move-up-btn').forEach(btn => {
-                btn.removeEventListener('click', handleMoveUp);
-                btn.addEventListener('click', handleMoveUp);
-            });
+                // Delete buttons
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                        btn.removeEventListener('click', handleDelete);
+                    btn.addEventListener('click', handleDelete);
+                });
 
-            // Move down buttons
-            document.querySelectorAll('.move-down-btn').forEach(btn => {
-                btn.removeEventListener('click', handleMoveDown);
-                btn.addEventListener('click', handleMoveDown);
-            });
+                // Move up buttons
+                document.querySelectorAll('.move-up-btn').forEach(btn => {
+                        btn.removeEventListener('click', handleMoveUp);
+                    btn.addEventListener('click', handleMoveUp);
+                });
 
-            // Add card buttons
-            document.querySelectorAll('.add-card-btn').forEach(btn => {
-                btn.removeEventListener('click', handleAddCard);
-                btn.addEventListener('click', handleAddCard);
-            });
+                // Move down buttons
+                document.querySelectorAll('.move-down-btn').forEach(btn => {
+                        btn.removeEventListener('click', handleMoveDown);
+                    btn.addEventListener('click', handleMoveDown);
+                });
 
-            // Remove card buttons
-            document.querySelectorAll('.remove-card-btn').forEach(btn => {
-                btn.removeEventListener('click', handleRemoveCard);
-                btn.addEventListener('click', handleRemoveCard);
-            });
+                // Add card buttons
+                document.querySelectorAll('.add-card-btn').forEach(btn => {
+                        btn.removeEventListener('click', handleAddCard);
+                    btn.addEventListener('click', handleAddCard);
+                });
 
-            // Hero image input handlers
-            document.querySelectorAll('.hero-image-input').forEach(input => {
-                input.removeEventListener('change', handleImageSelect);
-                input.addEventListener('change', handleImageSelect);
-            });
+                // Remove card buttons
+                document.querySelectorAll('.remove-card-btn').forEach(btn => {
+                        btn.removeEventListener('click', handleRemoveCard);
+                    btn.addEventListener('click', handleRemoveCard);
+                });
 
-            // Remove image buttons
-            document.querySelectorAll('.remove-image-btn').forEach(btn => {
-                btn.removeEventListener('click', handleRemoveImage);
-                btn.addEventListener('click', handleRemoveImage);
-            });
+                // Hero image input handlers
+                document.querySelectorAll('.hero-image-input').forEach(input => {
+                        input.removeEventListener('change', handleImageSelect);
+                    input.addEventListener('change', handleImageSelect);
+                });
 
-            // Crop & save buttons
-            document.querySelectorAll('.crop-save-btn').forEach(btn => {
-                btn.removeEventListener('click', handleCropSave);
-                btn.addEventListener('click', handleCropSave);
-            });
-        }
+                // Remove image buttons
+                document.querySelectorAll('.remove-image-btn').forEach(btn => {
+                        btn.removeEventListener('click', handleRemoveImage);
+                    btn.addEventListener('click', handleRemoveImage);
+                });
 
-        // Handle image file selection
-        function handleImageSelect(e) {
-            const file = e.target.files[0];
-            const index = e.target.dataset.index;
-            
-            if (!file) return;
-
-            // Validate file type
-            const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
-            if (!validTypes.includes(file.type)) {
-                alert('Please select a JPEG, PNG, or WebP image file.');
-                e.target.value = '';
-                return;
+                // Crop & save buttons
+                document.querySelectorAll('.crop-save-btn').forEach(btn => {
+                        btn.removeEventListener('click', handleCropSave);
+                    btn.addEventListener('click', handleCropSave);
+                });
             }
 
-            // Validate file size (10 MB)
-            if (file.size > 10 * 1024 * 1024) {
-                alert('Image file size must be less than 10 MB.');
-                e.target.value = '';
-                return;
-            }
+                    // Handle image file selection
+                    function handleImageSelect(e) {
+                const file = e.target.files[0];
+                    const index = e.target.dataset.index;
 
-            // Read file and show cropper modal
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const imageElement = document.getElementById(`cropperImage-${index}`);
-                imageElement.src = event.target.result;
+                    if (!file) return;
 
-                // Show modal
-                const modal = new bootstrap.Modal(document.getElementById(`imageCropperModal-${index}`));
-                modal.show();
+                    // Validate file type
+                    const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+                    if (!validTypes.includes(file.type)) {
+                        alert('Please select a JPEG, PNG, or WebP image file.');
+                    e.target.value = '';
+                    return;
+                }
 
-                // Initialize Cropper.js when modal is shown
-                modal._element.addEventListener('shown.bs.modal', function initCropper() {
-                    // Destroy existing cropper if any
-                    if (cropperInstances[index]) {
+                // Validate file size (10 MB)
+                if (file.size > 10 * 1024 * 1024) {
+                        alert('Image file size must be less than 10 MB.');
+                    e.target.value = '';
+                    return;
+                }
+
+                    // Read file and show cropper modal
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                    const imageElement = document.getElementById(`cropperImage-${index}`);
+                    imageElement.src = event.target.result;
+
+                    // Show modal
+                    const modal = new bootstrap.Modal(document.getElementById(`imageCropperModal-${index}`));
+                    modal.show();
+
+                    // Initialize Cropper.js when modal is shown
+                    modal._element.addEventListener('shown.bs.modal', function initCropper() {
+                        // Destroy existing cropper if any
+                        if (cropperInstances[index]) {
                         cropperInstances[index].destroy();
-                    }
+                        }
 
                     // Create new cropper with 16:9 aspect ratio
                     cropperInstances[index] = new Cropper(imageElement, {
                         aspectRatio: 16 / 9,
-                        viewMode: 1,
-                        dragMode: 'move',
-                        autoCropArea: 1,
-                        restore: false,
-                        guides: true,
-                        center: true,
-                        highlight: false,
-                        cropBoxMovable: true,
-                        cropBoxResizable: true,
-                        toggleDragModeOnDblclick: false,
-                    });
+                    viewMode: 1,
+                    dragMode: 'move',
+                    autoCropArea: 1,
+                    restore: false,
+                    guides: true,
+                    center: true,
+                    highlight: false,
+                    cropBoxMovable: true,
+                    cropBoxResizable: true,
+                    toggleDragModeOnDblclick: false,
+                        });
 
                     // Remove this listener after initialization
                     modal._element.removeEventListener('shown.bs.modal', initCropper);
-                });
+                    });
 
-                // Clean up cropper when modal is hidden
-                modal._element.addEventListener('hidden.bs.modal', function cleanup() {
-                    if (cropperInstances[index]) {
+                    // Clean up cropper when modal is hidden
+                    modal._element.addEventListener('hidden.bs.modal', function cleanup() {
+                        if (cropperInstances[index]) {
                         cropperInstances[index].destroy();
-                        delete cropperInstances[index];
-                    }
+                    delete cropperInstances[index];
+                        }
                     // Clear file input if no image was saved
                     if (!pendingImages[index]) {
                         e.target.value = '';
-                    }
+                        }
+                    });
+                };
+                    reader.readAsDataURL(file);
+            }
+
+                    // Handle crop & save button click
+                    function handleCropSave(e) {
+                const index = e.target.dataset.index;
+                    const cropper = cropperInstances[index];
+
+                    if (!cropper) return;
+
+                    // Get cropped canvas
+                    const canvas = cropper.getCroppedCanvas({
+                        maxWidth: 4096,
+                    maxHeight: 4096,
+                    imageSmoothingEnabled: true,
+                    imageSmoothingQuality: 'high',
                 });
-            };
-            reader.readAsDataURL(file);
-        }
 
-        // Handle crop & save button click
-        function handleCropSave(e) {
-            const index = e.target.dataset.index;
-            const cropper = cropperInstances[index];
-            
-            if (!cropper) return;
+                    // Convert to blob
+                    canvas.toBlob(async function(blob) {
+                    // Store the old image URL for deletion
+                    const oldImageUrl = document.querySelector(`input[name="ComponentDtos[${index}].BackgroundImageUrl"]`).value;
 
-            // Get cropped canvas
-            const canvas = cropper.getCroppedCanvas({
-                maxWidth: 4096,
-                maxHeight: 4096,
-                imageSmoothingEnabled: true,
-                imageSmoothingQuality: 'high',
-            });
+                    // Create preview URL (for both thumbnail and preview panel)
+                    const previewUrl = URL.createObjectURL(blob);
 
-            // Convert to blob
-            canvas.toBlob(async function(blob) {
-                // Store the old image URL for deletion
-                const oldImageUrl = document.querySelector(`input[name="ComponentDtos[${index}].BackgroundImageUrl"]`).value;
-
-                // Create preview URL (for both thumbnail and preview panel)
-                const previewUrl = URL.createObjectURL(blob);
-
-                // Store pending image data with preview URL
-                pendingImages[index] = {
-                    blob: blob,
+                    // Store pending image data with preview URL
+                    pendingImages[index] = {
+                        blob: blob,
                     oldImageUrl: oldImageUrl,
                     previewUrl: previewUrl
-                };
+                    };
 
-                // Update hidden input with preview URL so it shows in the preview panel
-                document.querySelector(`input[name="ComponentDtos[${index}].BackgroundImageUrl"]`).value = previewUrl;
+                    // Update hidden input with preview URL so it shows in the preview panel
+                    document.querySelector(`input[name="ComponentDtos[${index}].BackgroundImageUrl"]`).value = previewUrl;
 
-                // Remove thumbnail preview from component list panel (we only show in preview now)
-                // TODO: Do we need this? Or can we remove?
-                const card = document.querySelector(`.component-card[data-index="${index}"]`);
-                const currentPreview = card.querySelector('.current-image-preview');
-                if (currentPreview) {
-                    currentPreview.remove();
-                }
-
-                // Close modal
-                const modal = bootstrap.Modal.getInstance(document.getElementById(`imageCropperModal-${index}`));
-                if (modal) modal.hide();
-
-                // Mark as dirty
-                markDirty();
-
-                // Update preview panel to show the image
-                await updatePreview();
-            }, 'image/jpeg', 0.9);
-        }
-
-        // Handle remove image button click
-        function handleRemoveImage(e) {
-            const index = e.target.dataset.index;
-            
-            // Revoke blob URL if exists
-            if (pendingImages[index]?.previewUrl) {
-                URL.revokeObjectURL(pendingImages[index].previewUrl);
-            }
-            
-            // Clear pending image
-            delete pendingImages[index];
-            
-            // Clear hidden input
-            document.querySelector(`input[name="ComponentDtos[${index}].BackgroundImageUrl"]`).value = '';
-            
-            // Clear file input
-            const fileInput = document.querySelector(`.hero-image-input[data-index="${index}"]`);
-            if (fileInput) fileInput.value = '';
-            
-            // Remove preview thumbnail
-            // TODO: Do we need this? Or can we remove?
-            const preview = e.target.closest('.current-image-preview');
-            if (preview) preview.remove();
-            
-            // Mark as dirty
-            markDirty();
-
-            // Update preview panel to remove the image
-            updatePreview();
-        }
-
-        async function handleInputChange() {
-            markDirty();
-            await updatePreview();
-        }
-
-        function handleDelete(e) {
-            const card = e.target.closest('.component-card');
-            deleteTargetIndex = parseInt(card.dataset.index);
-            
-            const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
-            modal.show();
-        }
-
-        document.getElementById('confirm-delete-btn').addEventListener('click', async () => {
-            const modal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal'));
-            modal.hide();
-
-            const cards = Array.from(document.querySelectorAll('.component-card'));
-            const cardToDelete = cards.find(c => parseInt(c.dataset.index) === deleteTargetIndex);
-            
-            if (cardToDelete) {
-                cardToDelete.remove();
-                reindexComponents();
-                updateComponentCount();
-                markDirty();
-                await updatePreview();
-            }
-        });
-
-        async function handleMoveUp(e) {
-            const card = e.target.closest('.component-card');
-            const prev = card.previousElementSibling;
-            
-            if (prev && prev.classList.contains('component-card')) {
-                card.parentNode.insertBefore(card, prev);
-                reindexComponents();
-                markDirty();
-                await updatePreview();
-            }
-        }
-
-        async function handleMoveDown(e) {
-            const card = e.target.closest('.component-card');
-            const next = card.nextElementSibling;
-            
-            if (next && next.classList.contains('component-card')) {
-                card.parentNode.insertBefore(next, card);
-                reindexComponents();
-                markDirty();
-                await updatePreview();
-            }
-        }
-
-        function handleAddCard(e) {
-            const cardsList = e.target.closest('.cards-list');
-            const componentIdx = cardsList.dataset.componentIndex;
-            const cardCount = cardsList.querySelectorAll('.card-item').length;
-            
-            if (cardCount >= maxCards) {
-                alert(`Maximum of ${maxCards} cards allowed per component.`);
-                return;
-            }
-
-            const cardHtml = `
-                <div class="card card-item mb-2">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <strong>Card ${cardCount + 1}</strong>
-                            <button type="button" class="btn btn-sm btn-outline-danger remove-card-btn">
-                                <i class="bi bi-x"></i>
-                            </button>
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label small">Heading</label>
-                            <input type="text" class="form-control form-control-sm component-input" 
-                                   name="ComponentDtos[${componentIdx}].Cards[${cardCount}].Heading" 
-                                   placeholder="Card heading" />
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label small">Subheading</label>
-                            <input type="text" class="form-control form-control-sm component-input" 
-                                   name="ComponentDtos[${componentIdx}].Cards[${cardCount}].Subheading" 
-                                   placeholder="Card subheading" />
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            e.target.insertAdjacentHTML('beforebegin', cardHtml);
-            attachEventListeners();
-            markDirty();
-            updatePreview();
-        }
-
-        async function handleRemoveCard(e) {
-            const cardItem = e.target.closest('.card-item');
-            cardItem.remove();
-            
-            // Reindex cards within this component
-            const cardsList = e.target.closest('.cards-list');
-            const componentIdx = cardsList.dataset.componentIndex;
-            const cards = cardsList.querySelectorAll('.card-item');
-            
-            cards.forEach((card, idx) => {
-                card.querySelector('strong').textContent = `Card ${idx + 1}`;
-                card.querySelectorAll('input').forEach(input => {
-                    const name = input.name;
-                    input.name = name.replace(/\.Cards\[\d+\]/, `.Cards[${idx}]`);
-                });
-            });
-
-            markDirty();
-            await updatePreview();
-        }
-
-        function reindexComponents() {
-            const cards = document.querySelectorAll('.component-card');
-            cards.forEach((card, idx) => {
-                card.dataset.index = idx;
-                
-                // Update all input names within this component
-                card.querySelectorAll('input[name^="ComponentDtos["]').forEach(input => {
-                    const name = input.name;
-                    const newName = name.replace(/ComponentDtos\[\d+\]/, `ComponentDtos[${idx}]`);
-                    input.name = newName;
-                });
-
-                // Update order hidden field
-                const orderInput = card.querySelector('input[name$=".Order"]');
-                if (orderInput) orderInput.value = idx;
-
-                // Update move buttons
-                const moveUpBtn = card.querySelector('.move-up-btn');
-                const moveDownBtn = card.querySelector('.move-down-btn');
-                
-                if (moveUpBtn) moveUpBtn.disabled = (idx === 0);
-                if (moveDownBtn) moveDownBtn.disabled = (idx === cards.length - 1);
-            });
-
-            componentIndex = cards.length;
-        }
-
-        function updateComponentCount() {
-            const count = document.querySelectorAll('.component-card').length;
-            const addHeroBtn = document.getElementById('add-hero-btn');
-            const addCardsBtn = document.getElementById('add-cards-btn');
-            const countDisplay = document.getElementById('component-count');
-            
-            // Update the displayed count
-            if (countDisplay) {
-                countDisplay.textContent = `${count} / ${maxComponents} components used`;
-            }
-            
-            if (count >= maxComponents) {
-                addHeroBtn.disabled = true;
-                addCardsBtn.disabled = true;
-            } else {
-                addHeroBtn.disabled = false;
-                addCardsBtn.disabled = false;
-            }
-
-            // Check if Hero exists at position 0
-            const firstCard = document.querySelector('.component-card');
-            if (firstCard) {
-                const typeInput = firstCard.querySelector('input[name$=".Type"]');
-                if (typeInput && typeInput.value === 'Hero') {
-                    addHeroBtn.disabled = true; // Only one Hero allowed
-                }
-            }
-
-            // Show empty message if no components
-            const container = document.getElementById('components-container');
-            if (count === 0 && !container.querySelector('p.text-muted')) {
-                container.innerHTML = '<p class="text-muted text-center py-4">No components added yet. Click "Add Component" below to get started.</p>';
-            }
-        }
-
-        // Save button click handler - show confirmation modal
-        document.getElementById('save-btn').addEventListener('click', () => {
-            const modal = new bootstrap.Modal(document.getElementById('saveConfirmModal'));
-            modal.show();
-        });
-
-        // Handle confirmed save from modal
-        document.getElementById('confirm-save-btn').addEventListener('click', async () => {
-            const modal = bootstrap.Modal.getInstance(document.getElementById('saveConfirmModal'));
-            modal.hide();
-            
-            const saveBtn = document.getElementById('save-btn');
-            const originalContent = saveBtn.innerHTML;
-            
-            // Show saving indicator
-            saveBtn.disabled = true;
-            saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
-            
-            try {
-                // Upload pending images first
-                if (Object.keys(pendingImages).length > 0) {
-                    saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Uploading images...';
-                    
-                    for (const [index, imageData] of Object.entries(pendingImages)) {
-                        try {
-                            // Create form data for image upload
-                            const uploadFormData = new FormData();
-                            uploadFormData.append('file', imageData.blob, 'hero-image.jpg');
-                            
-                            // Upload to R2
-                            const uploadResponse = await fetch('/tenants/upload-hero-image', {
-                                method: 'POST',
-                                body: uploadFormData,
-                                headers: {
-                                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-                                }
-                            });
-                            
-                            if (!uploadResponse.ok) {
-                                const errorData = await uploadResponse.json();
-                                throw new Error(errorData.error || 'Failed to upload image');
-                            }
-                            
-                            const result = await uploadResponse.json();
-                            
-                            if (result.success) {
-                                // Update hidden input with new image URL
-                                document.querySelector(`input[name="ComponentDtos[${index}].BackgroundImageUrl"]`).value = result.imageUrl;
-                                
-                                // Queue old image for deletion (will be handled server-side)
-                                if (imageData.oldImageUrl) {
-                                    console.log('Old image will be deleted:', imageData.oldImageUrl);
-                                }
-                            } else {
-                                throw new Error(result.error || 'Upload failed');
-                            }
-                        } catch (uploadError) {
-                            console.error('Image upload error:', uploadError);
-                            alert(`Failed to upload image: ${uploadError.message}`);
-                            saveBtn.disabled = false;
-                            saveBtn.innerHTML = originalContent;
-                            return;
-                        }
+                    // Remove thumbnail preview from component list panel (we only show in preview now)
+                    // TODO: Do we need this? Or can we remove?
+                    const card = document.querySelector(`.component-card[data-index="${index}"]`);
+                    const currentPreview = card.querySelector('.current-image-preview');
+                    if (currentPreview) {
+                        currentPreview.remove();
                     }
-                    
-                    // Clear pending images after successful upload
-                    Object.keys(pendingImages).forEach(key => delete pendingImages[key]);
-                }
-                
-                // Now save the form - submit normally to let browser handle redirect
-                saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
-                
-                // Mark as clean to prevent beforeunload warning
-                markClean();
-                
-                // Submit the form normally (browser will follow the redirect and show TempData)
-                const form = document.getElementById('homepage-form');
-                form.submit();
-            } catch (error) {
-                console.error('Save error:', error);
-                alert('An error occurred while saving. Please try again.');
-                saveBtn.disabled = false;
-                saveBtn.innerHTML = originalContent;
-            }
-        });
 
-        // Global navigation interceptor
-        document.addEventListener('click', (e) => {
-            const link = e.target.closest('a');
-            
-            // If it's a link and we have unsaved changes
-            if (link && link.href && isDirty) {
-                // Don't intercept if it's a hash link or javascript: link
-                if (link.href.startsWith('#') || link.href.startsWith('javascript:')) {
+                    // Close modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById(`imageCropperModal-${index}`));
+                    if (modal) modal.hide();
+
+                    // Mark as dirty
+                    markDirty();
+
+                    // Update preview panel to show the image
+                    await updatePreview();
+                }, 'image/jpeg', 0.9);
+            }
+
+                    // Handle remove image button click
+                    function handleRemoveImage(e) {
+                const index = e.target.dataset.index;
+
+                    // Revoke blob URL if exists
+                    if (pendingImages[index]?.previewUrl) {
+                        URL.revokeObjectURL(pendingImages[index].previewUrl);
+                }
+
+                    // Clear pending image
+                    delete pendingImages[index];
+
+                    // Clear hidden input
+                    document.querySelector(`input[name="ComponentDtos[${index}].BackgroundImageUrl"]`).value = '';
+
+                    // Clear file input
+                    const fileInput = document.querySelector(`.hero-image-input[data-index="${index}"]`);
+                    if (fileInput) fileInput.value = '';
+
+                    // Remove preview thumbnail
+                    // TODO: Do we need this? Or can we remove?
+                    const preview = e.target.closest('.current-image-preview');
+                    if (preview) preview.remove();
+
+                    // Mark as dirty
+                    markDirty();
+
+                    // Update preview panel to remove the image
+                    updatePreview();
+            }
+
+                    async function handleInputChange() {
+                        markDirty();
+                    await updatePreview();
+            }
+
+                    function handleDelete(e) {
+                const card = e.target.closest('.component-card');
+                    deleteTargetIndex = parseInt(card.dataset.index);
+
+                    const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+                    modal.show();
+            }
+
+            document.getElementById('confirm-delete-btn').addEventListener('click', async () => {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal'));
+                    modal.hide();
+
+                    const cards = Array.from(document.querySelectorAll('.component-card'));
+                const cardToDelete = cards.find(c => parseInt(c.dataset.index) === deleteTargetIndex);
+
+                    if (cardToDelete) {
+                        cardToDelete.remove();
+                    reindexComponents();
+                    updateComponentCount();
+                    markDirty();
+                    await updatePreview();
+                }
+            });
+
+                    async function handleMoveUp(e) {
+                const card = e.target.closest('.component-card');
+                    const prev = card.previousElementSibling;
+
+                    if (prev && prev.classList.contains('component-card')) {
+                        card.parentNode.insertBefore(card, prev);
+                    reindexComponents();
+                    markDirty();
+                    await updatePreview();
+                }
+            }
+
+                    async function handleMoveDown(e) {
+                const card = e.target.closest('.component-card');
+                    const next = card.nextElementSibling;
+
+                    if (next && next.classList.contains('component-card')) {
+                        card.parentNode.insertBefore(next, card);
+                    reindexComponents();
+                    markDirty();
+                    await updatePreview();
+                }
+            }
+
+                    function handleAddCard(e) {
+                const cardsList = e.target.closest('.cards-list');
+                    const componentIdx = cardsList.dataset.componentIndex;
+                    const cardCount = cardsList.querySelectorAll('.card-item').length;
+
+                if (cardCount >= maxCards) {
+                        alert(`Maximum of ${maxCards} cards allowed per component.`);
                     return;
                 }
-                
-                // Prevent default navigation
-                e.preventDefault();
-                e.stopPropagation();
-                
-                // Store the target URL
-                pendingNavigationUrl = link.href;
-                
-                // Show unsaved changes modal
-                const modal = new bootstrap.Modal(document.getElementById('unsavedChangesModal'));
-                modal.show();
-            }
-        }, true); // Use capture phase to intercept before other handlers
 
-        // Handle confirmed navigation from unsaved changes modal
-        document.getElementById('confirm-leave-btn').addEventListener('click', () => {
-            if (pendingNavigationUrl) {
-                // Mark as clean to bypass beforeunload warning
-                isDirty = false;
-                
-                // Hide modal
-                const modal = bootstrap.Modal.getInstance(document.getElementById('unsavedChangesModal'));
-                if (modal) {
-                    modal.hide();
+                    const cardHtml = `
+                    <div class="card card-item mb-2">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <strong>Card ${cardCount + 1}</strong>
+                                <button type="button" class="btn btn-sm btn-outline-danger remove-card-btn">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small">Heading</label>
+                                <input type="text" class="form-control form-control-sm component-input"
+                                    name="ComponentDtos[${componentIdx}].Cards[${cardCount}].Heading"
+                                    placeholder="Card heading" />
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small">Subheading</label>
+                                <input type="text" class="form-control form-control-sm component-input"
+                                    name="ComponentDtos[${componentIdx}].Cards[${cardCount}].Subheading"
+                                    placeholder="Card subheading" />
+                            </div>
+                        </div>
+                    </div>
+                    `;
+
+                    e.target.insertAdjacentHTML('beforebegin', cardHtml);
+                    attachEventListeners();
+                    markDirty();
+                    updatePreview();
+            }
+
+                    async function handleRemoveCard(e) {
+                const cardItem = e.target.closest('.card-item');
+                    cardItem.remove();
+
+                    // Reindex cards within this component
+                    const cardsList = e.target.closest('.cards-list');
+                    const componentIdx = cardsList.dataset.componentIndex;
+                    const cards = cardsList.querySelectorAll('.card-item');
+
+                cards.forEach((card, idx) => {
+                        card.querySelector('strong').textContent = `Card ${idx + 1}`;
+                    card.querySelectorAll('input').forEach(input => {
+                        const name = input.name;
+                    input.name = name.replace(/\.Cards\[\d+\]/, `.Cards[${idx}]`);
+                    });
+                });
+
+                    markDirty();
+                    await updatePreview();
+            }
+
+                    function reindexComponents() {
+                const cards = document.querySelectorAll('.component-card');
+                cards.forEach((card, idx) => {
+                        card.dataset.index = idx;
+
+                    // Update all input names within this component
+                    card.querySelectorAll('input[name^="ComponentDtos["]').forEach(input => {
+                        const name = input.name;
+                    const newName = name.replace(/ComponentDtos\[\d+\]/, `ComponentDtos[${idx}]`);
+                    input.name = newName;
+                    });
+
+                    // Update order hidden field
+                    const orderInput = card.querySelector('input[name$=".Order"]');
+                    if (orderInput) orderInput.value = idx;
+
+                    // Update move buttons
+                    const moveUpBtn = card.querySelector('.move-up-btn');
+                    const moveDownBtn = card.querySelector('.move-down-btn');
+
+                    if (moveUpBtn) moveUpBtn.disabled = (idx === 0);
+                    if (moveDownBtn) moveDownBtn.disabled = (idx === cards.length - 1);
+                });
+
+                    componentIndex = cards.length;
+            }
+
+                    function updateComponentCount() {
+                const count = document.querySelectorAll('.component-card').length;
+                    const addHeroBtn = document.getElementById('add-hero-btn');
+                    const addCardsBtn = document.getElementById('add-cards-btn');
+                    const countDisplay = document.getElementById('component-count');
+
+                    // Update the displayed count
+                    if (countDisplay) {
+                        countDisplay.textContent = `${count} / ${maxComponents} components used`;
                 }
-                
-                // Navigate to the stored URL
-                window.location.href = pendingNavigationUrl;
-            }
-        });
 
-        // Initialize
-        attachEventListeners();
-        reindexComponents();
-        updateComponentCount();
+                if (count >= maxComponents) {
+                        addHeroBtn.disabled = true;
+                    addCardsBtn.disabled = true;
+                } else {
+                        addHeroBtn.disabled = false;
+                    addCardsBtn.disabled = false;
+                }
 
-        // Toggle all components expand/collapse
-        let allExpanded = false;
-        const toggleAllBtn = document.getElementById('toggle-all-btn');
-        
-        toggleAllBtn.addEventListener('click', () => {
-            const collapseElements = document.querySelectorAll('.component-card .collapse, .card-item .collapse');
-            
-            if (allExpanded) {
-                // Collapse all
-                collapseElements.forEach(el => {
-                    const bsCollapse = bootstrap.Collapse.getInstance(el) || new bootstrap.Collapse(el, { toggle: false });
-                    bsCollapse.hide();
-                });
-                toggleAllBtn.innerHTML = '<i class="bi bi-arrows-expand"></i> Expand All';
-                allExpanded = false;
-            } else {
-                // Expand all
-                collapseElements.forEach(el => {
-                    const bsCollapse = bootstrap.Collapse.getInstance(el) || new bootstrap.Collapse(el, { toggle: false });
-                    bsCollapse.show();
-                });
-                toggleAllBtn.innerHTML = '<i class="bi bi-arrows-collapse"></i> Collapse All';
-                allExpanded = true;
-            }
-        });
+                    // Check if Hero exists at position 0
+                    const firstCard = document.querySelector('.component-card');
+                    if (firstCard) {
+                    const typeInput = firstCard.querySelector('input[name$=".Type"]');
+                    if (typeInput && typeInput.value === 'Hero') {
+                        addHeroBtn.disabled = true; // Only one Hero allowed
+                    }
+                }
 
-        // Fullscreen preview toggle
-        const previewPanel = document.getElementById('preview-panel');
-        const expandBtn = document.getElementById('expand-preview-btn');
-        const minimizeBtn = document.getElementById('minimize-preview-btn');
-        
-        if (!previewPanel || !expandBtn || !minimizeBtn) {
-            console.error('Preview elements not found');
-        }
-        
-        expandBtn.addEventListener('click', () => {
-            previewPanel.classList.add('preview-fullscreen');
-            expandBtn.style.display = 'none';
-            minimizeBtn.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-        });
-        
-        minimizeBtn.addEventListener('click', () => {
-            previewPanel.classList.remove('preview-fullscreen');
-            expandBtn.style.display = 'block';
-            minimizeBtn.style.display = 'none';
-            document.body.style.overflow = '';
-        });
-        
-        // ESC key to exit fullscreen
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && previewPanel.classList.contains('preview-fullscreen')) {
-                minimizeBtn.click();
+                    // Show empty message if no components
+                    const container = document.getElementById('components-container');
+                    if (count === 0 && !container.querySelector('p.text-muted')) {
+                        container.innerHTML = '<p class="text-muted text-center py-4">No components added yet. Click "Add Component" below to get started.</p>';
+                }
             }
-        });
 
-        // Warn on page leave if unsaved changes
-        window.addEventListener('beforeunload', (e) => {
-            if (isDirty) {
-                e.preventDefault();
-                e.returnValue = '';
+            // Save button click handler - show confirmation modal
+            document.getElementById('save-btn').addEventListener('click', () => {
+                const modal = new bootstrap.Modal(document.getElementById('saveConfirmModal'));
+                    modal.show();
+            });
+
+            // Handle confirmed save from modal
+            document.getElementById('confirm-save-btn').addEventListener('click', async () => {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('saveConfirmModal'));
+                    modal.hide();
+
+                    const saveBtn = document.getElementById('save-btn');
+                    const originalContent = saveBtn.innerHTML;
+
+                    // Show saving indicator
+                    saveBtn.disabled = true;
+                    saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+
+                    try {
+                    // Upload pending images first
+                    if (Object.keys(pendingImages).length > 0) {
+                        saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Uploading images...';
+
+                    for (const [index, imageData] of Object.entries(pendingImages)) {
+                            try {
+                                // Create form data for image upload
+                                const uploadFormData = new FormData();
+                    uploadFormData.append('file', imageData.blob, 'hero-image.jpg');
+
+                    // Upload to R2
+                    const uploadResponse = await fetch('/tenants/upload-hero-image', {
+                        method: 'POST',
+                    body: uploadFormData,
+                    headers: {
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                                    }
+                                });
+
+                    if (!uploadResponse.ok) {
+                                    const errorData = await uploadResponse.json();
+                    throw new Error(errorData.error || 'Failed to upload image');
+                                }
+
+                    const result = await uploadResponse.json();
+
+                    if (result.success) {
+                        // Update hidden input with new image URL
+                        document.querySelector(`input[name="ComponentDtos[${index}].BackgroundImageUrl"]`).value = result.imageUrl;
+
+                    // Queue old image for deletion (will be handled server-side)
+                    if (imageData.oldImageUrl) {
+                        console.log('Old image will be deleted:', imageData.oldImageUrl);
+                                    }
+                                } else {
+                                    throw new Error(result.error || 'Upload failed');
+                                }
+                            } catch (uploadError) {
+                        console.error('Image upload error:', uploadError);
+                    alert(`Failed to upload image: ${uploadError.message}`);
+                                saveBtn.disabled = false;
+                                saveBtn.innerHTML = originalContent;
+                                return;
+                            }
+                        }
+
+                        // Clear pending images after successful upload
+                        Object.keys(pendingImages).forEach(key => delete pendingImages[key]);
+                    }
+
+                    // Now save the form - submit normally to let browser handle redirect
+                    saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+
+                    // Mark as clean to prevent beforeunload warning
+                    markClean();
+
+                    // Submit the form normally (browser will follow the redirect and show TempData)
+                    const form = document.getElementById('homepage-form');
+                    form.submit();
+                } catch (error) {
+                    console.error('Save error:', error);
+                    alert('An error occurred while saving. Please try again.');
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = originalContent;
+                }
+            });
+
+            // Global navigation interceptor
+            document.addEventListener('click', (e) => {
+                const link = e.target.closest('a');
+
+                // If it's a link and we have unsaved changes
+                if (link && link.href && isDirty) {
+                    // Don't intercept if it's a hash link or javascript: link
+                    if (link.href.startsWith('#') || link.href.startsWith('javascript:')) {
+                        return;
+                    }
+
+                    // Prevent default navigation
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // Store the target URL
+                    pendingNavigationUrl = link.href;
+
+                    // Show unsaved changes modal
+                    const modal = new bootstrap.Modal(document.getElementById('unsavedChangesModal'));
+                    modal.show();
+                }
+            }, true); // Use capture phase to intercept before other handlers
+
+            // Handle confirmed navigation from unsaved changes modal
+            document.getElementById('confirm-leave-btn').addEventListener('click', () => {
+                if (pendingNavigationUrl) {
+                    // Mark as clean to bypass beforeunload warning
+                    isDirty = false;
+
+                    // Hide modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('unsavedChangesModal'));
+                    if (modal) {
+                        modal.hide();
+                    }
+
+                    // Navigate to the stored URL
+                    window.location.href = pendingNavigationUrl;
+                }
+            });
+
+            // Initialize
+            attachEventListeners();
+            reindexComponents();
+            updateComponentCount();
+
+            // Toggle all components expand/collapse
+            let allExpanded = false;
+            const toggleAllBtn = document.getElementById('toggle-all-btn');
+
+            toggleAllBtn.addEventListener('click', () => {
+                const collapseElements = document.querySelectorAll('.component-card .collapse, .card-item .collapse');
+
+                if (allExpanded) {
+                    // Collapse all
+                    collapseElements.forEach(el => {
+                        const bsCollapse = bootstrap.Collapse.getInstance(el) || new bootstrap.Collapse(el, { toggle: false });
+                        bsCollapse.hide();
+                    });
+                    toggleAllBtn.innerHTML = '<i class="bi bi-arrows-expand"></i> Expand All';
+                    allExpanded = false;
+                } else {
+                    // Expand all
+                    collapseElements.forEach(el => {
+                        const bsCollapse = bootstrap.Collapse.getInstance(el) || new bootstrap.Collapse(el, { toggle: false });
+                        bsCollapse.show();
+                    });
+                    toggleAllBtn.innerHTML = '<i class="bi bi-arrows-collapse"></i> Collapse All';
+                    allExpanded = true;
+                }
+            });
+
+            // Fullscreen preview toggle
+            const previewPanel = document.getElementById('preview-panel');
+            const expandBtn = document.getElementById('expand-preview-btn');
+            const minimizeBtn = document.getElementById('minimize-preview-btn');
+
+            if (!previewPanel || !expandBtn || !minimizeBtn) {
+                console.error('Preview elements not found');
             }
-        });
-    </script>
+
+            expandBtn.addEventListener('click', () => {
+                previewPanel.classList.add('preview-fullscreen');
+                expandBtn.style.display = 'none';
+                minimizeBtn.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            });
+
+            minimizeBtn.addEventListener('click', () => {
+                previewPanel.classList.remove('preview-fullscreen');
+                expandBtn.style.display = 'block';
+                minimizeBtn.style.display = 'none';
+                document.body.style.overflow = '';
+            });
+
+            // ESC key to exit fullscreen
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && previewPanel.classList.contains('preview-fullscreen')) {
+                    minimizeBtn.click();
+                }
+            });
+
+            // Warn on page leave if unsaved changes
+            window.addEventListener('beforeunload', (e) => {
+                if (isDirty) {
+                    e.preventDefault();
+                    e.returnValue = '';
+                }
+            });
+        </script>
 }
